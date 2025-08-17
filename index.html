@@ -1,71 +1,319 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Valiant Vision</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Montserrat', sans-serif;
-      background-color: #f4f4f4;
-      color: #333;
-    }
-    header {
-      background-color: #ffffff;
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      border-bottom: 2px solid #e0e0e0;
-    }
-    header img {
-      height: 60px;
-      margin-right: 15px;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2.5rem;
-      color: #222;
-      font-weight: bold;
-    }
-    header p {
-      margin-top: 0.2rem;
-      font-size: 1.1rem;
-      color: #777;
-    }
-    .cta {
-      text-align: center;
-      margin: 4rem 0;
-    }
-    .cta button {
-      background-color: #3a86ff;
-      color: #fff;
-      border: none;
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
-    }
-    .cta button:hover {
-      background-color: #265fc1;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Valiant Vision</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --vv-green:#76b900;    /* vivid green */
+    --vv-purple:#4300b9;   /* vivid purple */
+    --vv-dark:#141316;
+    --vv-text:#2c2c2c;
+    --vv-muted:#6b6b6b;
+    --vv-bg:#f4f4f7;
+    --shadow:0 10px 30px rgba(0,0,0,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:'Lora', serif; /* body in Lora */
+    color:var(--vv-text);
+    background:var(--vv-bg);
+    line-height:1.6;
+  }
+
+  /* ===== NAVBAR ===== */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    background:#fff; border-bottom:1px solid #ececf0;
+    box-shadow:0 6px 14px rgba(67,0,185,0.05);
+  }
+  .nav-inner{
+    max-width:1100px; margin:0 auto; padding:10px 20px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+  }
+  .brand{display:flex; align-items:center; gap:12px}
+  .brand img{height:48px; width:auto}
+  .brand .name{font:800 1.5rem/1 'Montserrat', sans-serif; color:var(--vv-purple)}
+  .menu{display:flex; gap:18px; align-items:center}
+  .menu a{
+    font:600 0.95rem/1 'Montserrat', sans-serif;
+    color:var(--vv-purple); text-decoration:none;
+    padding:8px 12px; border-radius:10px; transition:all .2s ease;
+  }
+  .menu a:hover,.menu a.active{ background:var(--vv-purple); color:#fff }
+
+  /* ===== HERO (emotional subscription) ===== */
+  .hero{
+    position:relative; isolation:isolate;
+    min-height:72vh; display:grid; place-items:center;
+    padding:72px 20px 56px;
+    background:
+      radial-gradient(1200px 500px at 10% -10%, rgba(118,185,0,.35),transparent 60%),
+      radial-gradient(1200px 500px at 110% 10%, rgba(67,0,185,.35),transparent 60%),
+      #0f0d2a; /* deep backdrop for contrast */
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0; z-index:-1;
+    background:url('hero.jpg') center/cover no-repeat;
+    opacity:.35; filter:contrast(110%) saturate(110%) blur(1px);
+  }
+  .hero-card{
+    width:100%; max-width:920px;
+    background:rgba(255,255,255,.92);
+    border-radius:24px; box-shadow:var(--shadow);
+    padding:32px; backdrop-filter:saturate(130%) blur(4px);
+  }
+  .kicker{
+    color:var(--vv-green); font:800 .8rem/1 'Montserrat', sans-serif;
+    letter-spacing:.14em; text-transform:uppercase;
+  }
+  .hero h1{
+    font-family:'Montserrat', sans-serif;
+    font-weight:800; margin:.35rem 0 0; font-size:2.4rem; color:#111; line-height:1.18;
+  }
+  .hero p{max-width:760px; margin:.75rem 0 1.25rem; color:#333; font-size:1.05rem}
+  .hero small{color:var(--vv-muted)}
+
+  .sub-form{display:flex; gap:10px; flex-wrap:wrap; margin-top:.25rem}
+  .sub-form input{
+    flex:1 1 260px; padding:14px 16px; border:1px solid #ddd; border-radius:12px; font-size:1rem;
+    font-family:'Lora', serif;
+  }
+  .btn{
+    appearance:none; border:0; cursor:pointer;
+    padding:14px 18px; border-radius:12px; font-weight:800;
+    letter-spacing:.2px; font-family:'Montserrat', sans-serif;
+    transition:transform .05s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+    box-shadow:0 8px 18px rgba(67,0,185,.18);
+    background:linear-gradient(135deg, var(--vv-purple), var(--vv-green)); color:#fff;
+  }
+  .btn:active{transform:translateY(1px)}
+
+  /* ===== SECTIONS ===== */
+  section{max-width:1100px; margin:64px auto; padding:0 20px}
+  section.card{ background:#fff; border-radius:20px; box-shadow:var(--shadow); padding:28px; }
+  h2.section-title{ font-family:'Montserrat',sans-serif; font-weight:800; font-size:2rem; margin:.25rem 0 1rem; color:#222 }
+  .twocol{ display:grid; grid-template-columns:1.1fr .9fr; gap:24px }
+  @media (max-width:860px){ .twocol{grid-template-columns:1fr} }
+
+  .kit-list{list-style:none; padding:0; margin:0}
+  .kit-list li{
+    background:#fff; margin-bottom:12px; padding:14px 16px;
+    border-left:4px solid var(--vv-purple);
+    border-radius:12px; box-shadow:0 1px 6px rgba(0,0,0,.05)
+  }
+
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px }
+  @media (max-width:900px){ .grid-3{grid-template-columns:1fr} }
+  .cardlet{ background:#fff; border-radius:16px; padding:18px; box-shadow:var(--shadow) }
+  .cardlet h3{ margin:.2rem 0 .35rem; color:var(--vv-purple); font-family:'Montserrat',sans-serif }
+
+  .pill{
+    display:inline-block; padding:6px 10px; border-radius:999px; font-size:.85rem;
+    font-weight:800; color:#fff; background:linear-gradient(135deg, var(--vv-green), var(--vv-purple));
+    margin-top:6px; font-family:'Montserrat',sans-serif;
+  }
+
+  .profile{ display:grid; grid-template-columns:110px 1fr; gap:16px; align-items:center }
+  .avatar{ width:110px; height:110px; border-radius:60px; overflow:hidden; background:#eee }
+  .avatar img{width:100%; height:100%; object-fit:cover}
+  .badges{display:flex; gap:14px; flex-wrap:wrap; margin-top:8px}
+  .badge{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px;
+          background:#f7f8ff; border:1px solid #ececff; color:var(--vv-purple); font-weight:700;
+          font-family:'Montserrat',sans-serif }
+  .dot{width:10px; height:10px; border-radius:50%; background:var(--vv-green)}
+
+  /* Modal for T&C + Parent Consent */
+  .modal{ position:fixed; inset:0; display:none; place-items:center; background:rgba(10,8,20,.56);
+          z-index:80; padding:20px }
+  .modal.open{display:grid}
+  .modal-card{ width:min(640px, 92vw); background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:22px 22px 18px }
+  .modal h3{margin:.2rem 0 .7rem}
+  .modal .actions{display:flex; gap:10px; justify-content:flex-end; margin-top:14px}
+
+  footer{ margin-top:72px; padding:28px 20px; text-align:center; color:#8a8a98 }
+</style>
 </head>
 <body>
 
-  <header>
-    <img src="Valiant Vision.jpg" alt="Valiant Vision Logo">
-    <div>
-      <h1>Valiant Vision</h1>
-      <p>Empowering learners through hands-on creativity.</p>
+<!-- NAVBAR -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <!-- Use your logo with the exact filename below -->
+      <img src="Valiant Vision.jpg" alt="Valiant Vision logo">
+      <div class="name">Valiant Vision</div>
     </div>
-  </header>
-
-  <div class="cta">
-    <p><em>Excited? Our kits are launching soon.</em></p>
-    <a href="register.html"><button>Subscribe</button></a>
+    <div class="menu">
+      <a href="#about" class="active">About Us</a>
+      <a href="#problem">Problem</a>
+      <a href="#solution">Our Solution</a>
+    </div>
   </div>
+</nav>
 
+<!-- HERO / SUBSCRIPTION -->
+<header class="hero" id="home">
+  <div class="hero-card">
+    <div class="kicker">Join thousands of curious minds</div>
+    <h1>Give Your Curiosity a Home</h1>
+    <p>
+      Unlock monthly hands-on creativity with kits inspired by mentors from
+      <strong>Montserry University</strong>, <strong>Newton Institute</strong>, and <strong>Arden School of Design</strong>.
+      Build real skills, collect badges, and access opportunities across India.
+    </p>
+    <form class="sub-form" onsubmit="openModal(event)">
+      <input type="email" placeholder="Your email" aria-label="Email" required>
+      <button class="btn" type="submit">Subscribe & Start</button>
+    </form>
+    <small>Parents & teachers welcome — let’s spark a brighter tomorrow, together.</small>
+  </div>
+</header>
+
+<!-- ABOUT (Kit after subscription) -->
+<section id="about" class="card twocol">
+  <div>
+    <h2 class="section-title">About Valiant Vision</h2>
+    <p>
+      We nurture curiosity with thoughtfully curated kits and a supportive network. Students learn by doing,
+      reflect with guided prompts, and share progress through a friendly profile and skill badges.
+    </p>
+    <ul class="kit-list" style="margin-top:10px">
+      <li><strong>Interactive Notebooks:</strong> Cut, paste, draw, and reflect to cement ideas.</li>
+      <li><strong>Sticky Notes:</strong> Perfect for brainstorming and collaborative charts.</li>
+      <li><strong>Whiteboards & Markers:</strong> Sketch solutions and iterate rapidly.</li>
+      <li><strong>Index Cards:</strong> Flashcards, peer quizzes, and sorting activities.</li>
+      <li><strong>Colored Pens & Highlighters:</strong> Color-code, mind-map, and make ideas pop.</li>
+    </ul>
+  </div>
+  <div class="cardlet">
+    <h3 style="margin-top:0;">Why it works</h3>
+    <p>
+      Tactile tools + reflection build confidence. Community badges and real-world opportunities keep learners motivated.
+    </p>
+    <span class="pill">Starter ₹299/mo</span>
+  </div>
+</section>
+
+<!-- PROBLEM & SOLUTION SNAPSHOT -->
+<section id="problem" class="grid-3">
+  <div class="cardlet">
+    <h3>The Problem</h3>
+    <p>Outside class, many students lack engaging tools, feedback, and a path to show progress. Motivation fades without visible wins.</p>
+  </div>
+  <div class="cardlet" id="solution">
+    <h3>Our Solution</h3>
+    <p>Monthly kits + guided prompts + badges. Learners practice, reflect, share, and earn recognitions that open doors.</p>
+  </div>
+  <div class="cardlet">
+    <h3>Results</h3>
+    <p>Higher participation, stronger portfolios, and access to internships & competitions via our partner network.</p>
+  </div>
+</section>
+
+<!-- OPPORTUNITIES / PEOPLE / LEARN -->
+<section class="grid-3">
+  <div class="cardlet">
+    <h3>Opportunities</h3>
+    <p>Apply for: GreenTech University Internship • FutureLabs AI Hackathon • National Design Sprint.</p>
+    <span class="pill">New this week</span>
+  </div>
+  <div class="cardlet">
+    <h3>People</h3>
+    <div class="profile">
+      <div class="avatar"><img src="hero.jpg" alt="Student avatar"></div>
+      <div>
+        <strong>Priya Sharma</strong> • Montserry University<br/>
+        “The kits made me love learning again.”
+        <div class="badges">
+          <span class="badge"><span class="dot"></span> Curiosity Champ</span>
+          <span class="badge"><span class="dot"></span> Creative Leader</span>
+          <span class="badge"><span class="dot"></span> Reflector</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cardlet">
+    <h3>Learn</h3>
+    <p>Mini-lessons and videos contributed by universities and employers on the skills students request most.</p>
+    <span class="pill">Weekly drops</span>
+  </div>
+</section>
+
+<!-- INNOVATE / ANNOUNCEMENTS -->
+<section class="grid-3">
+  <div class="cardlet">
+    <h3>Innovate</h3>
+    <p>Book our mobile innovation lab for your campus — prototyping workshops and portfolio reviews.</p>
+    <span class="pill">Slots open</span>
+  </div>
+  <div class="cardlet">
+    <h3>Announcements</h3>
+    <ul style="margin:0 0 0 18px">
+      <li>10 new partner mentors onboarded</li>
+      <li>August Badge Marathon — earn 3X rewards</li>
+      <li>Scholarship shortlist released (Batch A)</li>
+    </ul>
+  </div>
+  <div class="cardlet">
+    <h3>Keep the Spark Alive</h3>
+    <p>After you subscribe, your dashboard shows kit contents, tasks, and goals immediately.</p>
+    <button class="btn" onclick="document.querySelector('.menu a[href=\"#about\"]').click()">Explore the Kit</button>
+  </div>
+</section>
+
+<footer>© 2025 Valiant Vision • Made for curious learners</footer>
+
+<!-- MODAL (T&C + Parent Consent) -->
+<div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-card">
+    <h3 id="modal-title">Consent & Terms</h3>
+    <p style="margin:.2rem 0 .6rem">
+      By continuing you agree to our <a href="#" style="color:var(--vv-purple); font-weight:700">Terms</a>
+      and confirm you have parent/guardian consent if you are under 18.
+    </p>
+    <label style="display:flex; gap:8px; align-items:center; margin:.3rem 0">
+      <input id="chk1" type="checkbox" required> I agree to the Terms & Conditions
+    </label>
+    <label style="display:flex; gap:8px; align-items:center;">
+      <input id="chk2" type="checkbox" required> I have parent/guardian consent (if under 18)
+    </label>
+    <div class="actions">
+      <button class="btn" onclick="closeModal(true)">Continue</button>
+      <button class="btn" style="background:#ececf7; color:#222; box-shadow:none" onclick="closeModal(false)">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Smooth-scroll for top menu
+  document.querySelectorAll('.menu a[href^="#"]').forEach(a=>{
+    a.addEventListener('click', e=>{
+      e.preventDefault();
+      document.querySelectorAll('.menu a').forEach(x=>x.classList.remove('active'));
+      a.classList.add('active');
+      const el=document.querySelector(a.getAttribute('href'));
+      if(el){ el.scrollIntoView({behavior:'smooth', block:'start'}); }
+    });
+  });
+
+  // Mock subscription -> show consent modal, then scroll to About
+  function openModal(e){ e.preventDefault(); document.getElementById('modal').classList.add('open'); }
+  function closeModal(ok){
+    const m=document.getElementById('modal');
+    if(!ok){ m.classList.remove('open'); return; }
+    if(!document.getElementById('chk1').checked || !document.getElementById('chk2').checked){ return; }
+    m.classList.remove('open');
+    document.querySelector('.menu a[href="#about"]').click();
+  }
+</script>
 </body>
 </html>
