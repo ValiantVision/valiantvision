@@ -1,33 +1,100 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Subscribers - Valiant Vision</title>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscriber Data - Valiant Vision</title>
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #4300b9;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 20px auto;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    th {
+      background: #76b900;
+      color: #fff;
+    }
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+    }
+  </style>
 </head>
 <body>
-  <h2>All Subscribers</h2>
-  <table border="1" id="subscribersTable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Timestamp</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <header>
+    <h1>Valiant Vision - Subscriber Data</h1>
+  </header>
+
+  <div id="content" class="loading">Loading subscriber data...</div>
 
   <script>
+    // Replace with your Google Apps Script Web App URL
     const scriptURL = "PASTE_YOUR_WEB_APP_URL_HERE";
+
     fetch(scriptURL)
       .then(res => res.json())
       .then(data => {
-        const tbody = document.querySelector("#subscribersTable tbody");
-        data.slice(1).forEach(row => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td>`;
-          tbody.appendChild(tr);
-        });
+        if (!data || data.length < 2) {
+          document.getElementById("content").innerHTML = "<p>No data available.</p>";
+          return;
+        }
+
+        let table = "<table><tr>" +
+          "<th>Name</th>" +
+          "<th>Primary Email</th>" +
+          "<th>Additional Email</th>" +
+          "<th>Mobile</th>" +
+          "<th>State</th>" +
+          "<th>District</th>" +
+          "<th>Country</th>" +
+          "<th>Area Pincode</th>" +
+          "<th>Country Pincode</th>" +
+          "<th>Timestamp</th>" +
+          "</tr>";
+
+        for (let i = 1; i < data.length; i++) {
+          table += "<tr>";
+          for (let j = 0; j < data[i].length; j++) {
+            table += "<td>" + (data[i][j] || "") + "</td>";
+          }
+          table += "</tr>";
+        }
+        table += "</table>";
+
+        document.getElementById("content").innerHTML = table;
+      })
+      .catch(err => {
+        document.getElementById("content").innerHTML = "<p>Error loading data.</p>";
+        console.error(err);
       });
   </script>
 </body>
 </html>
+
