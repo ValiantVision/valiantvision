@@ -1,33 +1,137 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Subscribe - Valiant Vision</title>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscribe | Valiant Vision</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --vv-green: #76b900;
+      --vv-purple: #4300b9;
+      --vv-bg: #f4f4f7;
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Lora', serif;
+      background: var(--vv-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(67,0,185,.85), rgba(118,185,0,.85)),
+                  url('hero.jpg') center/cover no-repeat;
+    }
+    .form-card {
+      background: #fff;
+      padding: 32px;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      max-width: 600px;
+      width: 100%;
+    }
+    .form-card h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: var(--vv-purple);
+      margin: 0 0 10px;
+    }
+    .form-card p {
+      color: #555;
+      font-size: 1rem;
+      margin-bottom: 18px;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: block;
+      margin-bottom: 6px;
+      color: #333;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: 'Lora', serif;
+    }
+    .form-group textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+    button {
+      background: linear-gradient(135deg, var(--vv-purple), var(--vv-green));
+      color: #fff;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: 'Montserrat', sans-serif;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 8px 18px rgba(67,0,185,.18);
+      transition: transform 0.1s ease;
+    }
+    button:active {
+      transform: translateY(2px);
+    }
+  </style>
 </head>
 <body>
-  <h2>Subscribe to Valiant Vision</h2>
-  <form id="subscribeForm">
-    <input type="text" id="name" placeholder="Full Name" required><br>
-    <input type="email" id="email" placeholder="Email Address" required><br>
-    <button type="submit">Subscribe</button>
+  <form class="form-card" id="subscribeForm">
+    <h1>Subscribe to Valiant Vision</h1>
+    <p>Fill in your details to join thousands of learners unlocking creativity every month.</p>
+
+    <div class="form-group"><label for="name">Full Name</label><input type="text" id="name" required></div>
+    <div class="form-group"><label for="email">Email</label><input type="email" id="email" required></div>
+    <div class="form-group"><label for="phone">Phone</label><input type="tel" id="phone"></div>
+    <div class="form-group"><label for="state">State</label><input type="text" id="state"></div>
+    <div class="form-group"><label for="country">Country</label><input type="text" id="country"></div>
+    <div class="form-group"><label for="class">Class</label><input type="text" id="class"></div>
+    <div class="form-group"><label for="school">School</label><input type="text" id="school"></div>
+    <div class="form-group"><label for="skills">Skills</label><textarea id="skills"></textarea></div>
+    <div class="form-group"><label for="hobbies">Hobbies</label><textarea id="hobbies"></textarea></div>
+    <div class="form-group"><label for="achievements">Main Achievements</label><textarea id="achievements"></textarea></div>
+
+    <button type="submit">Join Now</button>
   </form>
-  <p id="status"></p>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxmmldZI5DJGdUzS9iZpJgTdcYa5jSMdWBq8W7v9bywnwvQ1D9OJE9rEcGU2KKacrCo/exec";
-    document.getElementById("subscribeForm").addEventListener("submit", function(e) {
+    document.getElementById("subscribeForm").addEventListener("submit", function(e){
       e.preventDefault();
-      fetch(scriptURL, {
+
+      const data = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        state: document.getElementById("state").value,
+        country: document.getElementById("country").value,
+        class: document.getElementById("class").value,
+        school: document.getElementById("school").value,
+        skills: document.getElementById("skills").value,
+        hobbies: document.getElementById("hobbies").value,
+        achievements: document.getElementById("achievements").value
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbzQBzQ8BY0-H6qfi2E0WJ1ijWx_gXngz9O5SUyeo3iI6dZXirxEA1xFhdJKkIWWeU3T/exec", {
         method: "POST",
-        body: JSON.stringify({
-          name: document.getElementById("name").value,
-          email: document.getElementById("email").value
-        })
-      }).then(res => {
-        document.getElementById("status").textContent = "Subscription successful!";
-        document.getElementById("subscribeForm").reset();
-      }).catch(err => {
-        document.getElementById("status").textContent = "Error. Try again.";
-      });
+        body: JSON.stringify(data)
+      })
+      .then(res => alert("✅ Subscription successful!"))
+      .catch(err => alert("❌ Error: " + err));
     });
   </script>
 </body>
