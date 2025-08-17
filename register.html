@@ -19,7 +19,7 @@
       color: #333;
       padding: 2rem;
       border-radius: 10px;
-      width: 350px;
+      width: 400px;
       box-shadow: 0 5px 20px rgba(0,0,0,0.2);
       text-align: center;
     }
@@ -30,7 +30,7 @@
     input {
       width: 90%;
       padding: 0.8rem;
-      margin: 0.5rem 0;
+      margin: 0.4rem 0;
       border: 1px solid #ccc;
       border-radius: 5px;
     }
@@ -58,15 +58,21 @@
     <h2>Subscribe to Valiant Vision</h2>
     <form id="registerForm">
       <input type="text" id="name" placeholder="Full Name" required><br>
-      <input type="email" id="email" placeholder="Email Address" required><br>
+      <input type="email" id="email" placeholder="Primary Email" required><br>
+      <input type="email" id="altEmail" placeholder="Additional Email"><br>
+      <input type="tel" id="mobile" placeholder="Mobile Number" required><br>
+      <input type="text" id="state" placeholder="State" required><br>
+      <input type="text" id="district" placeholder="District" required><br>
+      <input type="text" id="country" placeholder="Country" required><br>
+      <input type="text" id="areaPin" placeholder="Area Pincode" required><br>
+      <input type="text" id="countryPin" placeholder="Country Pincode"><br>
       <button type="submit">Subscribe</button>
     </form>
     <p id="status"></p>
   </div>
 
   <script>
-    // Replace this with your Google Apps Script URL later
-    const scriptURL = "PASTE_YOUR_WEB_APP_URL_HERE";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbw8oyCDxE2Ym27s1w1HZse6EeMEPLhWLTax90nG2W0V6It01kMTThNHqjEib8oONaxz/exec";
 
     document.getElementById("registerForm").addEventListener("submit", function(e) {
       e.preventDefault();
@@ -74,7 +80,14 @@
         method: "POST",
         body: JSON.stringify({
           name: document.getElementById("name").value,
-          email: document.getElementById("email").value
+          email: document.getElementById("email").value,
+          altEmail: document.getElementById("altEmail").value,
+          mobile: document.getElementById("mobile").value,
+          state: document.getElementById("state").value,
+          district: document.getElementById("district").value,
+          country: document.getElementById("country").value,
+          areaPin: document.getElementById("areaPin").value,
+          countryPin: document.getElementById("countryPin").value
         })
       }).then(res => {
         document.getElementById("status").textContent = "🎉 Thank you for subscribing!";
