@@ -8,189 +8,225 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
+      background: #f4f4f7;
       display: flex;
       flex-direction: column;
       height: 100vh;
-      background: #f4f4f7;
     }
-    #toolbar {
+    header {
       background: #4300b9;
       color: white;
-      padding: 10px;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .toolbar {
       display: flex;
       align-items: center;
       gap: 10px;
-      flex-wrap: wrap;
+      background: #fff;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
     }
-    #toolbar label { font-weight: bold; }
-    canvas {
-      flex: 1;
-      border: 2px solid #4300b9;
-      cursor: crosshair;
-      background: white;
-    }
-    button {
+    .toolbar button {
       padding: 6px 12px;
       border: none;
       border-radius: 6px;
+      background: #4300b9;
+      color: white;
       cursor: pointer;
-      font-weight: bold;
+      font-size: 0.9rem;
     }
-    .save-btn { background: #76b900; color: white; }
-    .clear-btn { background: crimson; color: white; }
-    .home-btn { background: #222; color: white; margin-left: auto; }
-    .note {
+    .toolbar button.active {
+      background: #76b900;
+    }
+    #board {
+      flex: 1;
+      cursor: crosshair;
+    }
+    .sticky {
       position: absolute;
       background: yellow;
       padding: 10px;
-      border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      cursor: move;
+      border: 1px solid #ccc;
+      resize: both;
+      overflow: auto;
       min-width: 120px;
-      min-height: 60px;
-    }
-    .note textarea {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: transparent;
-      resize: none;
-      font-family: Arial, sans-serif;
+      min-height: 80px;
       font-size: 14px;
-      outline: none;
+      font-family: Arial, sans-serif;
     }
   </style>
 </head>
 <body>
-  <div id="toolbar">
-    <label>Color:</label>
-    <input type="color" id="colorPicker" value="#000000">
-
-    <label>Pen Size:</label>
-    <input type="range" id="sizePicker" min="2" max="20" value="4">
-
-    <button id="pen">Pen</button>
-    <button id="eraser">Eraser</button>
-    <button id="line">Line</button>
-    <button id="rect">Rectangle</button>
-    <button id="circle">Circle</button>
-    <button id="note">Sticky Note</button>
-    <button class="clear-btn" id="clear">Clear</button>
-    <button class="save-btn" id="save">Save</button>
-    <button class="home-btn" onclick="window.location.href='index.html'">🏠 Home</button>
+  <header>Valiant Vision Whiteboard</header>
+  <div class="toolbar">
+    <button id="pen" class="active">✏️ Pen</button>
+    <button id="line">📏 Line</button>
+    <button id="rect">⬛ Rectangle</button>
+    <button id="circle">⚪ Circle</button>
+    <button id="triangle">🔺 Triangle</button>
+    <button id="arrow">➡️ Arrow</button>
+    <button id="eraser">🩹 Eraser</button>
+    <button id="sticky">📝 Sticky Note</button>
+    <input type="color" id="color" value="#000000">
+    <input type="range" id="thickness" min="1" max="20" value="2">
   </div>
-
   <canvas id="board"></canvas>
 
   <script>
     const canvas = document.getElementById("board");
     const ctx = canvas.getContext("2d");
-    const toolbarHeight = document.getElementById("toolbar").offsetHeight;
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight - toolbarHeight;
+    canvas.height = window.innerHeight - 100;
 
-    let painting = false;
-    let color = document.getElementById("colorPicker").value;
-    let size = document.getElementById("sizePicker").value;
-    let tool = "pen"; 
+    let drawing = false;
+    let tool = "pen";
     let startX, startY;
 
-    // Tools
-    document.getElementById("colorPicker").addEventListener("change", e => color = e.target.value);
-    document.getElementById("sizePicker").addEventListener("input", e => size = e.target.value);
+    const colorPicker = document.getElementById("color");
+    const thickness = document.getElementById("thickness");
 
-    document.getElementById("pen").onclick = () => tool = "pen";
-    document.getElementById("eraser").onclick = () => tool = "eraser";
-    document.getElementById("line").onclick = () => tool = "line";
-    document.getElementById("rect").onclick = () => tool = "rect";
-    document.getElementById("circle").onclick = () => tool = "circle";
-    document.getElementById("note").onclick = addNote;
-
-    // Drawing
-    function startDraw(e) {
-      painting = true;
-      startX = e.clientX;
-      startY = e.clientY - toolbarHeight;
-      if(tool === "pen" || tool === "eraser") draw(e);
-    }
-    function stopDraw(e) {
-      if(!painting) return;
-      painting = false;
-      ctx.beginPath();
-      if(tool === "line" || tool === "rect" || tool === "circle") {
-        const endX = e.clientX;
-        const endY = e.clientY - toolbarHeight;
-        drawShape(tool, startX, startY, endX, endY);
-      }
-    }
-    function draw(e) {
-      if (!painting) return;
-      ctx.lineWidth = size;
-      ctx.lineCap = "round";
-      ctx.strokeStyle = (tool === "eraser") ? "#FFFFFF" : color;
-      ctx.lineTo(e.clientX, e.clientY - toolbarHeight);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(e.clientX, e.clientY - toolbarHeight);
-    }
-
-    function drawShape(shape, x1, y1, x2, y2) {
-      ctx.strokeStyle = color;
-      ctx.lineWidth = size;
-      if(shape === "line") {
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
-      } else if(shape === "rect") {
-        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-      } else if(shape === "circle") {
-        ctx.beginPath();
-        let radius = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
-        ctx.arc(x1, y1, radius, 0, 2*Math.PI);
-        ctx.stroke();
-      }
-    }
-
-    canvas.addEventListener("mousedown", startDraw);
-    canvas.addEventListener("mouseup", stopDraw);
-    canvas.addEventListener("mousemove", draw);
-
-    // Sticky Notes
-    function addNote() {
-      const note = document.createElement("div");
-      note.className = "note";
-      note.style.left = "100px";
-      note.style.top = "100px";
-      note.innerHTML = `<textarea>Write here...</textarea>`;
-      document.body.appendChild(note);
-
-      // Make draggable
-      let isDragging = false, offsetX, offsetY;
-      note.addEventListener("mousedown", e => {
-        if(e.target.tagName !== "TEXTAREA") {
-          isDragging = true;
-          offsetX = e.offsetX;
-          offsetY = e.offsetY;
-        }
+    document.querySelectorAll(".toolbar button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".toolbar button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        tool = btn.id;
       });
-      window.addEventListener("mousemove", e => {
-        if(isDragging) {
+    });
+
+    canvas.addEventListener("mousedown", e => {
+      drawing = true;
+      startX = e.offsetX;
+      startY = e.offsetY;
+      if(tool === "pen" || tool === "eraser") {
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+      }
+    });
+
+    canvas.addEventListener("mouseup", e => {
+      if(!drawing) return;
+      drawing = false;
+      const endX = e.offsetX, endY = e.offsetY;
+      ctx.strokeStyle = colorPicker.value;
+      ctx.lineWidth = thickness.value;
+
+      if(tool === "line") {
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+      } 
+      else if(tool === "rect") {
+        ctx.strokeRect(startX, startY, endX - startX, endY - startY);
+      } 
+      else if(tool === "circle") {
+        const radius = Math.sqrt((endX - startX)**2 + (endY - startY)**2);
+        ctx.beginPath();
+        ctx.arc(startX, startY, radius, 0, Math.PI*2);
+        ctx.stroke();
+      }
+      else if(tool === "triangle") {
+        ctx.beginPath();
+        ctx.moveTo(startX, endY);
+        ctx.lineTo((startX+endX)/2, startY);
+        ctx.lineTo(endX, endY);
+        ctx.closePath();
+        ctx.stroke();
+      }
+      else if(tool === "arrow") {
+        const headlen = 15;
+        const angle = Math.atan2(endY - startY, endX - startX);
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.lineTo(endX - headlen * Math.cos(angle - Math.PI / 6),
+                   endY - headlen * Math.sin(angle - Math.PI / 6));
+        ctx.moveTo(endX, endY);
+        ctx.lineTo(endX - headlen * Math.cos(angle + Math.PI / 6),
+                   endY - headlen * Math.sin(angle + Math.PI / 6));
+        ctx.stroke();
+      }
+    });
+
+    canvas.addEventListener("mousemove", e => {
+      if(!drawing) return;
+      ctx.strokeStyle = (tool === "eraser") ? "#f4f4f7" : colorPicker.value;
+      ctx.lineWidth = thickness.value;
+      if(tool === "pen" || tool === "eraser") {
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+      }
+    });
+
+    // === Sticky Notes (Draggable + Save in LocalStorage) ===
+    function createSticky(content = "", x = 100, y = 100) {
+      const note = document.createElement("textarea");
+      note.className = "sticky";
+      note.value = content;
+      note.style.left = x + "px";
+      note.style.top = y + "px";
+
+      // Dragging
+      note.onmousedown = function(e) {
+        if (e.target.tagName !== "TEXTAREA") return;
+        let offsetX = e.clientX - note.offsetLeft;
+        let offsetY = e.clientY - note.offsetTop;
+
+        function move(e) {
           note.style.left = (e.clientX - offsetX) + "px";
           note.style.top = (e.clientY - offsetY) + "px";
         }
-      });
-      window.addEventListener("mouseup", () => isDragging = false);
+        function stop() {
+          document.removeEventListener("mousemove", move);
+          document.removeEventListener("mouseup", stop);
+          saveNotes();
+        }
+        document.addEventListener("mousemove", move);
+        document.addEventListener("mouseup", stop);
+      };
+
+      // Save on change
+      note.addEventListener("input", saveNotes);
+
+      document.body.appendChild(note);
     }
 
-    // Clear + Save
-    document.getElementById("clear").onclick = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
-    document.getElementById("save").onclick = () => {
-      const link = document.createElement("a");
-      link.download = "valiant-vision-whiteboard.png";
-      link.href = canvas.toDataURL();
-      link.click();
-    };
+    document.getElementById("sticky").addEventListener("click", () => {
+      createSticky();
+      saveNotes();
+    });
+
+    // Save sticky notes
+    function saveNotes() {
+      const notes = [];
+      document.querySelectorAll(".sticky").forEach(n => {
+        notes.push({
+          content: n.value,
+          x: n.offsetLeft,
+          y: n.offsetTop,
+          w: n.offsetWidth,
+          h: n.offsetHeight
+        });
+      });
+      localStorage.setItem("stickyNotes", JSON.stringify(notes));
+    }
+
+    // Load sticky notes
+    function loadNotes() {
+      const notes = JSON.parse(localStorage.getItem("stickyNotes") || "[]");
+      notes.forEach(n => {
+        createSticky(n.content, n.x, n.y);
+        const added = document.querySelectorAll(".sticky");
+        const last = added[added.length-1];
+        last.style.width = n.w + "px";
+        last.style.height = n.h + "px";
+      });
+    }
+
+    window.onload = loadNotes;
   </script>
 </body>
 </html>
