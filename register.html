@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscribe - Valiant Vision</title>
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(to right, #76b900, #4300b9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .form-container {
+      background: white;
+      color: #333;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 350px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 1rem;
+      color: #4300b9;
+    }
+    input {
+      width: 90%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #76b900;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      color: white;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    button:hover {
+      background: #5a8f00;
+    }
+    #status {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Subscribe to Valiant Vision</h2>
+    <form id="registerForm">
+      <input type="text" id="name" placeholder="Full Name" required><br>
+      <input type="email" id="email" placeholder="Email Address" required><br>
+      <button type="submit">Subscribe</button>
+    </form>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    // Replace this with your Google Apps Script URL later
+    const scriptURL = "PASTE_YOUR_WEB_APP_URL_HERE";
+
+    document.getElementById("registerForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      fetch(scriptURL, {
+        method: "POST",
+        body: JSON.stringify({
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value
+        })
+      }).then(res => {
+        document.getElementById("status").textContent = "🎉 Thank you for subscribing!";
+        document.getElementById("registerForm").reset();
+      }).catch(err => {
+        document.getElementById("status").textContent = "⚠️ Error. Please try again.";
+      });
+    });
+  </script>
+</body>
+</html>
