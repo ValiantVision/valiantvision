@@ -348,8 +348,35 @@ function addMessage(text, className) {
 </script>
 <!-- AI Chatbot Widget End -->
 
+  <script>
+async function sendMessage(prompt) {
+  const url = "https://script.google.com/macros/s/AKfycbxqYBe7EKnNGOKWLzpDSvC4YQewRZu47qSQH9Ugebqm-M9ZIOy5ctpn8GW6A1FGhWJ2eA/exec"; // Replace with your Google Apps Script web app URL
+
+  // First, handle OPTIONS request manually (for CORS)
+  await fetch(url, {
+    method: "OPTIONS",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+
+  // Then, send the actual POST request
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ prompt })
+  });
+
+  const data = await response.json();
+  console.log(data.reply); // You can show this in your chat box
+}
+</script>
+
 </body>
 </html>
+
 
 
 
