@@ -157,5 +157,30 @@
 
 <footer>© 2025 Valiant Vision • Made for curious learners</footer>
 
+<!-- AI Chatbot Widget -->
+<div id="chatbot">
+  <div id="chat-icon">💬</div>
+  <div id="chat-window" class="hidden">
+    <div id="chat-header">
+      <span>🤖 Valiant AI</span>
+      <button id="close-btn">×</button>
+    </div>
+    <div id="chat-messages"></div>
+    <div id="chat-input">
+      <input type="text" id="userInput" placeholder="Ask me anything..." />
+      <button id="voiceBtn">🎤</button>
+      <button id="sendBtn">➤</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Floating Icon */
+  #chatbot { position: fixed; bottom: 20px; right: 20px; font-family: Arial, sans-serif; }
+  #chat-icon {
+    background: #4300b9; color: #fff; font-size: 28px; padding: 14px;
+    border-radius: 50%;
+
 </body>
 </html>
+
