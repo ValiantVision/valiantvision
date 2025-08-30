@@ -291,7 +291,7 @@
 </div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbwunN1Ba4j-w7-YKxu4y_xJThc-Y_KyjNq6e-SlJxza8UdH-NQL9uuGh7nGWbr-gngpvA/exec"; // replace with your deployed GAS URL
+const scriptURL = "https://script.google.com/macros/s/AKfycbzfH7R7FeK3HcHDMu-sktYzdquWbFWV8FnmiYe0e6BW_pk1TpYUZGFMyAchLhEfT6a6cg/exec"; // replace with your deployed GAS URL
 
 // Toggle chat window
 const chatIcon = document.getElementById('chat-icon');
@@ -335,7 +335,7 @@ async function handleSend() {
     const lastMsg = messagesDiv.lastChild;
     if(lastMsg && lastMsg.textContent === "Thinking... 🤔") lastMsg.remove();
 
-    addMessage(data.reply || "No response from AI", 'ai-message');
+    addMessage(data.result || "No response from AI", 'ai-message');
   } catch(err) {
     console.error(err);
     addMessage("Error connecting to AI.", 'ai-message');
@@ -354,6 +354,7 @@ function addMessage(text, className) {
 
 </body>
 </html>
+
 
 
 
