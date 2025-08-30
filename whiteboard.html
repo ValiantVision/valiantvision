@@ -214,6 +214,7 @@
       });
       localStorage.setItem("stickyNotes", JSON.stringify(notes));
     }
+    
 
     // Load sticky notes
     function loadNotes() {
@@ -229,6 +230,15 @@
 
     window.onload = loadNotes;
   </script>
+  <script>
+  // Clear All Sticky Notes
+  document.getElementById("clearSticky").addEventListener("click", () => {
+    document.querySelectorAll(".sticky-wrap").forEach(note => note.remove());
+    localStorage.removeItem("stickyNotes"); // clear saved notes too
+  });
+</script>
+
 </body>
 </html>
+
 
