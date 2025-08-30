@@ -292,7 +292,7 @@
 </div>
 
 <script>
-const scriptURL = "YOUR_GAS_WEBAPP_URL"; // replace with your deployed GAS URL
+const scriptURL = "https://script.google.com/macros/s/AKfycbwr9jXK4OJA0qamaLecfhjGOwuw-T2QAbihOrtP4kwUB6WA_uARklD_ILA92sJCorSIeA/exec"; // replace with your deployed GAS URL
 
 // Toggle chat window
 const chatIcon = document.getElementById('chat-icon');
@@ -353,34 +353,9 @@ function addMessage(text, className) {
 }
 </script>
 
-  <script>
-async function sendMessage(prompt) {
-  const url = "https://script.google.com/macros/s/AKfycbxqYBe7EKnNGOKWLzpDSvC4YQewRZu47qSQH9Ugebqm-M9ZIOy5ctpn8GW6A1FGhWJ2eA/exec"; // Replace with your Google Apps Script web app URL
-
-  // First, handle OPTIONS request manually (for CORS)
-  await fetch(url, {
-    method: "OPTIONS",
-    headers: {
-      "Content-Type": "application/json"
-    }
-  });
-
-  // Then, send the actual POST request
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ prompt })
-  });
-
-  const data = await response.json();
-  console.log(data.reply); // You can show this in your chat box
-}
-</script>
-
 </body>
 </html>
+
 
 
 
