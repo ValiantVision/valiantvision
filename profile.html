@@ -1,167 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Profile | Valiant Vision</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile | Valiant Vision</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Lora:wght@400;700&display=swap" rel="stylesheet">
 
-  <style>
-    :root {
-      --vv-green: #76b900;
-      --vv-purple: #4300b9;
-      --vv-bg: #f4f4f7;
-      --shadow: 0 10px 30px rgba(0,0,0,.08);
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Lora', serif;
-      background: linear-gradient(135deg, rgba(67,0,185,.85), rgba(118,185,0,.85)), var(--vv-bg);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .profile-card {
-      background: #fff;
-      border-radius: 18px;
-      max-width: 700px;
-      width: 100%;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .profile-header {
-      background: linear-gradient(135deg, var(--vv-purple), var(--vv-green));
-      color: #fff;
-      padding: 30px;
-      text-align: center;
-    }
-
-    .profile-header h1 {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 800;
-      font-size: 2rem;
-      margin: 0;
-    }
-
-    .profile-body {
-      padding: 30px;
-    }
-
-    .profile-section {
-      margin-bottom: 20px;
-    }
-
-    .profile-section h2 {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--vv-purple);
-      margin-bottom: 8px;
-    }
-
-    .profile-section p {
-      font-size: 1rem;
-      color: #333;
-      margin: 0;
-      padding-left: 10px;
-    }
-
-    .no-data {
-      text-align: center;
-      font-size: 1.2rem;
-      color: red;
-      padding: 40px;
-    }
-  </style>
+<style>
+:root {
+  --vv-green: #76b900;
+  --vv-purple: #4300b9;
+  --vv-bg: #f4f4f7;
+  --shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Lora', serif;
+  background: var(--vv-bg);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+.profile-card {
+  background: #fff;
+  padding: 32px;
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  max-width: 600px;
+  width: 100%;
+}
+.profile-card h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 1.8rem;
+  color: var(--vv-purple);
+  margin-bottom: 20px;
+  text-align: center;
+}
+.profile-field {
+  margin-bottom: 12px;
+}
+.profile-field strong {
+  color: var(--vv-purple);
+  font-family: 'Montserrat', sans-serif;
+}
+.profile-avatar {
+  display: block;
+  max-width: 150px;
+  max-height: 150px;
+  margin: 0 auto 20px auto;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--vv-green);
+}
+</style>
 </head>
 <body>
-  <div class="profile-card" id="profileCard">
-    <div class="profile-header">
-      <h1>My Profile</h1>
-    </div>
-    <div class="profile-body">
-      <div class="profile-section">
-        <h2>Full Name</h2>
-        <p id="name"></p>
-      </div>
-      <div class="profile-section">
-        <h2>Email</h2>
-        <p id="email"></p>
-      </div>
-      <div class="profile-section">
-        <h2>Phone</h2>
-        <p id="phone"></p>
-      </div>
-      <div class="profile-section">
-        <h2>State</h2>
-        <p id="state"></p>
-      </div>
-      <div class="profile-section">
-        <h2>Country</h2>
-        <p id="country"></p>
-      </div>
-      <div class="profile-section">
-        <h2>Class</h2>
-        <p id="class"></p>
-      </div>
-      <div class="profile-section">
-        <h2>School</h2>
-        <p id="school"></p>
-      </div>
-      <div class="profile-section">
-        <h2>Skills</h2>
-        <p id="skills"></p>
-      </div>
-      <div class="profile-section" id="hobbiesSection">
-        <h2>Hobbies</h2>
-        <p id="hobbies"></p>
-      </div>
-      <div class="profile-section" id="achievementsSection">
-        <h2>Achievements</h2>
-        <p id="achievements"></p>
-      </div>
-    </div>
-  </div>
 
-  <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      const userData = localStorage.getItem("userProfile");
+<div class="profile-card" id="profileCard">
+  <h1>Your Profile</h1>
+  <img src="" id="avatarImg" class="profile-avatar" style="display:none;">
+  <div id="profileFields"></div>
+</div>
 
-      if (!userData) {
-        document.getElementById("profileCard").innerHTML = "<p class='no-data'>No data found. Please subscribe first.</p>";
-        return;
-      }
+<script>
+// Check if subscribed
+if(localStorage.getItem("subscribed") !== "true"){
+  alert("⚠️ No subscription found! Redirecting to Subscribe page.");
+  window.location.href = "subscribe.html";
+} else {
+  const data = JSON.parse(localStorage.getItem("userProfile"));
 
-      const user = JSON.parse(userData);
+  // Avatar
+  if(data.avatar){
+    const avatarImg = document.getElementById("avatarImg");
+    avatarImg.src = data.avatar;
+    avatarImg.style.display = "block";
+  }
 
-      document.getElementById("name").textContent = user.name || "-";
-      document.getElementById("email").textContent = user.email || "-";
-      document.getElementById("phone").textContent = user.phone || "-";
-      document.getElementById("state").textContent = user.state || "-";
-      document.getElementById("country").textContent = user.country || "-";
-      document.getElementById("class").textContent = user.class || "-";
-      document.getElementById("school").textContent = user.school || "-";
-      document.getElementById("skills").textContent = user.skills || "-";
+  const profileFields = document.getElementById("profileFields");
+  const fieldOrder = [
+    {label: "Full Name", key: "name"},
+    {label: "Email", key: "email"},
+    {label: "Phone", key: "phone"},
+    {label: "State", key: "state"},
+    {label: "Country", key: "country"},
+    {label: "Class", key: "class"},
+    {label: "School", key: "school"},
+    {label: "Skills", key: "skills"},
+    {label: "Hobbies", key: "hobbies"},
+    {label: "Achievements", key: "achievements"}
+  ];
 
-      // Hide optional sections if empty
-      if (!user.hobbies) {
-        document.getElementById("hobbiesSection").style.display = "none";
-      } else {
-        document.getElementById("hobbies").textContent = user.hobbies;
-      }
+  fieldOrder.forEach(f => {
+    if(f.key in data && data[f.key].trim() !== ""){
+      const div = document.createElement("div");
+      div.className = "profile-field";
+      div.innerHTML = `<strong>${f.label}:</strong> ${data[f.key]}`;
+      profileFields.appendChild(div);
+    }
+  });
+}
+</script>
 
-      if (!user.achievements) {
-        document.getElementById("achievementsSection").style.display = "none";
-      } else {
-        document.getElementById("achievements").textContent = user.achievements;
-      }
-    });
-  </script>
 </body>
 </html>
