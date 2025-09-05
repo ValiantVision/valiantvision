@@ -3,73 +3,165 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Profile | Valiant Vision</title>
+  <title>My Profile | Valiant Vision</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
+    :root {
+      --vv-green: #76b900;
+      --vv-purple: #4300b9;
+      --vv-bg: #f4f4f7;
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
+      margin: 0;
+      font-family: 'Lora', serif;
+      background: linear-gradient(135deg, rgba(67,0,185,.85), rgba(118,185,0,.85)), var(--vv-bg);
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      padding: 20px;
     }
+
     .profile-card {
       background: #fff;
-      padding: 25px;
-      border-radius: 15px;
-      width: 450px;
-      box-shadow: 0px 6px 15px rgba(0,0,0,0.2);
+      border-radius: 18px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
-    h2 { text-align: center; color: #4300b9; }
-    .field { margin: 10px 0; }
-    .label { font-weight: bold; }
-    .badge {
-      display: inline-block;
-      background: #4300b9;
+
+    .profile-header {
+      background: linear-gradient(135deg, var(--vv-purple), var(--vv-green));
       color: #fff;
-      padding: 5px 10px;
-      border-radius: 12px;
-      font-size: 0.9em;
-      margin-top: 10px;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .profile-header h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 2rem;
+      margin: 0;
+    }
+
+    .profile-body {
+      padding: 30px;
+    }
+
+    .profile-section {
+      margin-bottom: 20px;
+    }
+
+    .profile-section h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--vv-purple);
+      margin-bottom: 8px;
+    }
+
+    .profile-section p {
+      font-size: 1rem;
+      color: #333;
+      margin: 0;
+      padding-left: 10px;
+    }
+
+    .no-data {
+      text-align: center;
+      font-size: 1.2rem;
+      color: red;
+      padding: 40px;
     }
   </style>
 </head>
 <body>
-
   <div class="profile-card" id="profileCard">
-    <h2>Your Profile</h2>
-    <div class="field"><span class="label">Name:</span> <span id="name"></span></div>
-    <div class="field"><span class="label">Email:</span> <span id="email"></span></div>
-    <div class="field"><span class="label">Phone:</span> <span id="phone"></span></div>
-    <div class="field"><span class="label">State:</span> <span id="state"></span></div>
-    <div class="field"><span class="label">Country:</span> <span id="country"></span></div>
-    <div class="field"><span class="label">Class:</span> <span id="class"></span></div>
-    <div class="field"><span class="label">School:</span> <span id="school"></span></div>
-    <div class="field"><span class="label">Skills:</span> <span id="skills"></span></div>
-    <div class="field"><span class="label">Hobbies:</span> <span id="hobbies"></span></div>
-    <div class="field"><span class="label">Achievements:</span> <span id="achievements"></span></div>
-
-    <div class="badge">Subscribed ✅</div>
+    <div class="profile-header">
+      <h1>My Profile</h1>
+    </div>
+    <div class="profile-body">
+      <div class="profile-section">
+        <h2>Full Name</h2>
+        <p id="name"></p>
+      </div>
+      <div class="profile-section">
+        <h2>Email</h2>
+        <p id="email"></p>
+      </div>
+      <div class="profile-section">
+        <h2>Phone</h2>
+        <p id="phone"></p>
+      </div>
+      <div class="profile-section">
+        <h2>State</h2>
+        <p id="state"></p>
+      </div>
+      <div class="profile-section">
+        <h2>Country</h2>
+        <p id="country"></p>
+      </div>
+      <div class="profile-section">
+        <h2>Class</h2>
+        <p id="class"></p>
+      </div>
+      <div class="profile-section">
+        <h2>School</h2>
+        <p id="school"></p>
+      </div>
+      <div class="profile-section">
+        <h2>Skills</h2>
+        <p id="skills"></p>
+      </div>
+      <div class="profile-section" id="hobbiesSection">
+        <h2>Hobbies</h2>
+        <p id="hobbies"></p>
+      </div>
+      <div class="profile-section" id="achievementsSection">
+        <h2>Achievements</h2>
+        <p id="achievements"></p>
+      </div>
+    </div>
   </div>
 
   <script>
-    // Get data from localStorage
-    const data = JSON.parse(localStorage.getItem("subscriptionData"));
+    window.addEventListener("DOMContentLoaded", () => {
+      const userData = localStorage.getItem("userProfile");
 
-    if(data) {
-      document.getElementById("name").textContent = data.name;
-      document.getElementById("email").textContent = data.email;
-      document.getElementById("phone").textContent = data.phone;
-      document.getElementById("state").textContent = data.state;
-      document.getElementById("country").textContent = data.country;
-      document.getElementById("class").textContent = data.class;
-      document.getElementById("school").textContent = data.school;
-      document.getElementById("skills").textContent = data.skills;
-      document.getElementById("hobbies").textContent = data.hobbies;
-      document.getElementById("achievements").textContent = data.achievements;
-    } else {
-      document.getElementById("profileCard").innerHTML = "<h2>No subscription data found!</h2>";
-    }
+      if (!userData) {
+        document.getElementById("profileCard").innerHTML = "<p class='no-data'>No data found. Please subscribe first.</p>";
+        return;
+      }
+
+      const user = JSON.parse(userData);
+
+      document.getElementById("name").textContent = user.name || "-";
+      document.getElementById("email").textContent = user.email || "-";
+      document.getElementById("phone").textContent = user.phone || "-";
+      document.getElementById("state").textContent = user.state || "-";
+      document.getElementById("country").textContent = user.country || "-";
+      document.getElementById("class").textContent = user.class || "-";
+      document.getElementById("school").textContent = user.school || "-";
+      document.getElementById("skills").textContent = user.skills || "-";
+
+      // Hide optional sections if empty
+      if (!user.hobbies) {
+        document.getElementById("hobbiesSection").style.display = "none";
+      } else {
+        document.getElementById("hobbies").textContent = user.hobbies;
+      }
+
+      if (!user.achievements) {
+        document.getElementById("achievementsSection").style.display = "none";
+      } else {
+        document.getElementById("achievements").textContent = user.achievements;
+      }
+    });
   </script>
 </body>
 </html>
