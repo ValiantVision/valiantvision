@@ -1,152 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Subscribe | Valiant Vision</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subscribe | Valiant Vision</title>
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Lora:wght@400;700&display=swap" rel="stylesheet">
 
-  <style>
-    :root {
-      --vv-green: #76b900;
-      --vv-purple: #4300b9;
-      --vv-bg: #f4f4f7;
-      --shadow: 0 10px 30px rgba(0,0,0,.08);
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Lora', serif;
-      background: var(--vv-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background: linear-gradient(135deg, rgba(67,0,185,.85), rgba(118,185,0,.85)),
-                  url('hero.jpg') center/cover no-repeat;
-    }
-    .form-card {
-      background: #fff;
-      padding: 32px;
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      max-width: 600px;
-      width: 100%;
-    }
-    .form-card h1 {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 800;
-      font-size: 1.8rem;
-      color: var(--vv-purple);
-      margin: 0 0 10px;
-    }
-    .form-card p {
-      color: #555;
-      font-size: 1rem;
-      margin-bottom: 18px;
-    }
-    .form-group {
-      margin-bottom: 14px;
-    }
-    .form-group label {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 600;
-      font-size: 0.9rem;
-      display: block;
-      margin-bottom: 6px;
-      color: #333;
-    }
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-family: 'Lora', serif;
-    }
-    .form-group textarea {
-      resize: vertical;
-      min-height: 70px;
-    }
-    button {
-      background: linear-gradient(135deg, var(--vv-purple), var(--vv-green));
-      color: #fff;
-      border: none;
-      padding: 14px 20px;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 700;
-      font-family: 'Montserrat', sans-serif;
-      cursor: pointer;
-      width: 100%;
-      box-shadow: 0 8px 18px rgba(67,0,185,.18);
-      transition: transform 0.1s ease;
-    }
-    button:active {
-      transform: translateY(2px);
-    }
-  </style>
+<style>
+:root {
+  --vv-green: #76b900;
+  --vv-purple: #4300b9;
+  --vv-bg: #f4f4f7;
+  --shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Lora', serif;
+  background: var(--vv-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, rgba(67,0,185,.85), rgba(118,185,0,.85)),
+              url('hero.jpg') center/cover no-repeat;
+}
+.form-card {
+  background: #fff;
+  padding: 32px;
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  max-width: 600px;
+  width: 100%;
+}
+.form-card h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 1.8rem;
+  color: var(--vv-purple);
+  margin: 0 0 10px;
+}
+.form-card p {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 18px;
+}
+.form-group {
+  margin-bottom: 14px;
+}
+.form-group label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 6px;
+  color: #333;
+}
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: 'Lora', serif;
+}
+.form-group textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+button {
+  background: linear-gradient(135deg, var(--vv-purple), var(--vv-green));
+  color: #fff;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: 0 8px 18px rgba(67,0,185,.18);
+  transition: transform 0.1s ease;
+}
+button:active { transform: translateY(2px); }
+</style>
 </head>
 <body>
-  <form class="form-card" id="subscribeForm">
-    <h1>Subscribe to Valiant Vision</h1>
-    <p>Fill in your details to join thousands of learners unlocking creativity every month.</p>
 
-    <!-- Mandatory fields -->
-    <div class="form-group"><label for="name">Full Name*</label><input type="text" id="name" required></div>
-    <div class="form-group"><label for="email">Email*</label><input type="email" id="email" required></div>
-    <div class="form-group"><label for="skills">Skills*</label><textarea id="skills" required></textarea></div>
+<form class="form-card" id="subscribeForm">
+  <h1>Subscribe to Valiant Vision</h1>
+  <p>All fields except Hobbies and Achievements are required.</p>
 
-    <!-- Optional fields -->
-    <div class="form-group"><label for="phone">Phone</label><input type="tel" id="phone"></div>
-    <div class="form-group"><label for="state">State</label><input type="text" id="state"></div>
-    <div class="form-group"><label for="country">Country</label><input type="text" id="country"></div>
-    <div class="form-group"><label for="class">Class</label><input type="text" id="class"></div>
-    <div class="form-group"><label for="school">School</label><input type="text" id="school"></div>
-    <div class="form-group"><label for="hobbies">Hobbies</label><textarea id="hobbies"></textarea></div>
-    <div class="form-group"><label for="achievements">Main Achievements</label><textarea id="achievements"></textarea></div>
+  <div class="form-group"><label for="name">Full Name *</label><input type="text" id="name" required></div>
+  <div class="form-group"><label for="email">Email *</label><input type="email" id="email" required></div>
+  <div class="form-group"><label for="phone">Phone *</label><input type="tel" id="phone" required></div>
+  <div class="form-group"><label for="state">State *</label><input type="text" id="state" required></div>
+  <div class="form-group"><label for="country">Country *</label><input type="text" id="country" required></div>
+  <div class="form-group"><label for="class">Class *</label><input type="text" id="class" required></div>
+  <div class="form-group"><label for="school">School *</label><input type="text" id="school" required></div>
+  <div class="form-group"><label for="skills">Skills *</label><textarea id="skills" required placeholder="Enter your skills"></textarea></div>
+  
+  <div class="form-group"><label for="hobbies">Hobbies</label><textarea id="hobbies" placeholder="Optional"></textarea></div>
+  <div class="form-group"><label for="achievements">Achievements</label><textarea id="achievements" placeholder="Optional"></textarea></div>
+  
+  <div class="form-group">
+    <label for="avatar">Profile Picture (optional)</label>
+    <input type="file" id="avatar" accept="image/*">
+  </div>
 
-    <button type="submit">Join Now</button>
-  </form>
+  <button type="submit">Join Now</button>
+</form>
 
-  <script>
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzQBzQ8BY0-H6qfi2E0WJ1ijWx_gXngz9O5SUyeo3iI6dZXirxEA1xFhdJKkIWWeU3T/exec";
+<script>
+document.getElementById("subscribeForm").addEventListener("submit", function(e){
+  e.preventDefault();
 
-    document.getElementById("subscribeForm").addEventListener("submit", function(e){
-      e.preventDefault();
+  // Collect values
+  const requiredFields = ["name","email","phone","state","country","class","school","skills"];
+  for(let field of requiredFields){
+    if(!document.getElementById(field).value.trim()){
+      alert(`⚠️ ${field.charAt(0).toUpperCase() + field.slice(1)} is required!`);
+      return;
+    }
+  }
 
-      // Get all field values
-      const data = {
-        name: document.getElementById("name").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        phone: document.getElementById("phone").value.trim(),
-        state: document.getElementById("state").value.trim(),
-        country: document.getElementById("country").value.trim(),
-        class: document.getElementById("class").value.trim(),
-        school: document.getElementById("school").value.trim(),
-        skills: document.getElementById("skills").value.trim(),
-        hobbies: document.getElementById("hobbies").value.trim(),
-        achievements: document.getElementById("achievements").value.trim()
-      };
+  const avatarFile = document.getElementById("avatar").files[0];
+  if(avatarFile){
+    const reader = new FileReader();
+    reader.onload = function(){
+      saveData(reader.result);
+    }
+    reader.readAsDataURL(avatarFile);
+  } else {
+    saveData(null);
+  }
 
-      // Send data to Google Sheets
-      fetch(SHEET_URL, {
-        method: "POST",
-        body: JSON.stringify(data)
-      })
-      .then(res => {
-        // Save to localStorage for profile page
-        localStorage.setItem("subscribed", "true");
-        localStorage.setItem("userProfile", JSON.stringify(data));
+  function saveData(avatarBase64){
+    const data = {
+      name: document.getElementById("name").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      state: document.getElementById("state").value.trim(),
+      country: document.getElementById("country").value.trim(),
+      class: document.getElementById("class").value.trim(),
+      school: document.getElementById("school").value.trim(),
+      skills: document.getElementById("skills").value.trim(),
+      hobbies: document.getElementById("hobbies").value.trim(),
+      achievements: document.getElementById("achievements").value.trim(),
+      avatar: avatarBase64
+    };
 
-        alert("✅ Subscription successful!");
-        window.location.href = "profile.html"; // redirect to profile
-      })
-      .catch(err => alert("❌ Error submitting: " + err));
-    });
-  </script>
+    localStorage.setItem("subscribed","true");
+    localStorage.setItem("userProfile",JSON.stringify(data));
+
+    fetch("YOUR_GOOGLE_SCRIPT_URL_HERE", {
+      method: "POST",
+      body: JSON.stringify(data)
+    })
+    .then(res => {
+      alert("✅ Subscription successful!");
+      window.location.href = "profile.html";
+    })
+    .catch(err => alert("❌ Error: " + err));
+  }
+});
+</script>
+
 </body>
 </html>
