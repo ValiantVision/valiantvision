@@ -4,242 +4,85 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profile | Valiant Vision</title>
-
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Lora:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --vv-green: #76b900;
-    --vv-purple: #4300b9;
-    --vv-bg: #f4f4f7;
-    --shadow: 0 10px 30px rgba(0,0,0,.08);
-  }
-  body {
-    margin: 0;
-    font-family: 'Lora', serif;
-    background: var(--vv-bg);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
-  .profile-card {
-    background: #fff;
-    padding: 30px;
-    border-radius: 18px;
-    box-shadow: var(--shadow);
-    max-width: 700px;
-    width: 100%;
-    position: relative;
-  }
-  .profile-card h1 {
-    text-align: center;
-    font-family: 'Montserrat', sans-serif;
-    color: var(--vv-purple);
-  }
-  .profile-image {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    margin: 0 auto 20px auto;
-    background: #ddd url('avatar1.png') center/cover no-repeat;
-    cursor: pointer;
-    position: relative;
-  }
-  .edit-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    cursor: pointer;
-    font-size: 1.5rem;
-  }
-  .profile-field {
-    margin: 10px 0;
-  }
-  .profile-field label {
-    font-weight: 600;
-    margin-right: 10px;
-  }
-  .profile-field span,
-  .profile-field input,
-  .profile-field textarea {
-    font-family: 'Lora', serif;
-    font-size: 1rem;
-  }
-  input, textarea {
-    padding: 6px 8px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    width: 100%;
-    display: none;
-  }
-  .badges {
-    margin-top: 30px;
-    text-align: center;
-  }
-  .badge {
-    display: inline-block;
-    margin: 5px;
-    padding: 10px 15px;
-    background: var(--vv-green);
-    color: #fff;
-    border-radius: 10px;
-    font-weight: bold;
-  }
-  .avatar-options {
-    display: none;
-    position: absolute;
-    top: 140px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-    z-index: 10;
-    padding: 10px;
-  }
-  .avatar-options button {
-    display: block;
-    margin: 5px auto;
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: none;
-    background: var(--vv-purple);
-    color: #fff;
-    cursor: pointer;
-  }
+  body { font-family:'Lora', serif; margin:0; background:#f4f4f7; display:flex; justify-content:center; padding:30px; }
+  .profile-card { background:#fff; border-radius:18px; padding:30px; width:100%; max-width:700px; box-shadow:0 10px 30px rgba(0,0,0,.08); position:relative; }
+  .profile-header { display:flex; align-items:center; justify-content:space-between; }
+  .profile-img { width:100px; height:100px; border-radius:50%; background:#ddd; cursor:pointer; object-fit:cover; }
+  .edit-btn { font-size:1.2rem; cursor:pointer; }
+  .profile-details { margin-top:20px; }
+  .profile-details div { margin-bottom:12px; font-size:1rem; }
+  .badge { margin-top:20px; display:flex; align-items:center; font-weight:600; color:#4300b9; }
+  .badge img { width:50px; height:50px; margin-right:10px; border-radius:12px; }
 </style>
 </head>
 <body>
 
 <div class="profile-card">
-  <div class="profile-image" id="profileImage"></div>
-  <div class="edit-btn" id="editBtn">✏️</div>
-
-  <h1 id="profileName">Name</h1>
-
-  <div class="profile-field">
-    <label>Email:</label> <span id="profileEmail"></span>
-    <input type="email" id="editEmail">
-  </div>
-  <div class="profile-field">
-    <label>Phone:</label> <span id="profilePhone"></span>
-    <input type="text" id="editPhone">
-  </div>
-  <div class="profile-field">
-    <label>State:</label> <span id="profileState"></span>
-    <input type="text" id="editState">
-  </div>
-  <div class="profile-field">
-    <label>Country:</label> <span id="profileCountry"></span>
-    <input type="text" id="editCountry">
-  </div>
-  <div class="profile-field">
-    <label>Class:</label> <span id="profileClass"></span>
-    <input type="text" id="editClass">
-  </div>
-  <div class="profile-field">
-    <label>School:</label> <span id="profileSchool"></span>
-    <input type="text" id="editSchool">
-  </div>
-  <div class="profile-field">
-    <label>Skills:</label> <span id="profileSkills"></span>
-    <textarea id="editSkills"></textarea>
-  </div>
-  <div class="profile-field">
-    <label>Hobbies:</label> <span id="profileHobbies"></span>
-    <textarea id="editHobbies"></textarea>
-  </div>
-  <div class="profile-field">
-    <label>Achievements:</label> <span id="profileAchievements"></span>
-    <textarea id="editAchievements"></textarea>
+  <div class="profile-header">
+    <img id="profileImg" class="profile-img" src="" alt="Profile Image">
+    <span class="edit-btn" title="Edit Profile">✏️</span>
   </div>
 
-  <div class="badges" id="badgesSection">
-    <div class="badge">Subscribed ✅</div>
-  </div>
+  <div class="profile-details" id="profileDetails"></div>
 
-  <div class="avatar-options" id="avatarOptions">
-    <button id="chooseGallery">Select from Gallery</button>
-    <button id="takePhoto">Take Photo</button>
-    <button id="deletePhoto">Delete Photo</button>
+  <div class="badge" id="badge" style="display:none;">
+    <img id="badgeImage" src="">
+    Subscriber Badge
   </div>
 </div>
 
+<input type="file" id="profileInput" accept="image/*" style="display:none;">
+
 <script>
-// Load profile from localStorage
-let user = JSON.parse(localStorage.getItem("subscribedUser"));
-const profileFields = [
-  "Name","Email","Phone","State","Country","Class","School","Skills","Hobbies","Achievements"
-];
-if(user){
-  document.getElementById("profileName").textContent = user.name;
-  document.getElementById("profileEmail").textContent = user.email;
-  document.getElementById("profilePhone").textContent = user.phone;
-  document.getElementById("profileState").textContent = user.state;
-  document.getElementById("profileCountry").textContent = user.country;
-  document.getElementById("profileClass").textContent = user.class;
-  document.getElementById("profileSchool").textContent = user.school;
-  document.getElementById("profileSkills").textContent = user.skills;
-  document.getElementById("profileHobbies").textContent = user.hobbies;
-  document.getElementById("profileAchievements").textContent = user.achievements;
-  if(user.profileImage){
-    document.getElementById("profileImage").style.backgroundImage = `url(${user.profileImage})`;
+let user = JSON.parse(localStorage.getItem("userProfile"));
+if(!user) { alert("No data found!"); window.location.href="subscribe.html"; }
+
+function renderProfile(){
+  document.getElementById("profileDetails").innerHTML = `
+    <div><strong>Name:</strong> ${user.name}</div>
+    <div><strong>Email:</strong> ${user.email}</div>
+    <div><strong>Phone:</strong> ${user.phone}</div>
+    <div><strong>State:</strong> ${user.state}</div>
+    <div><strong>Country:</strong> ${user.country}</div>
+    <div><strong>Class:</strong> ${user.class}</div>
+    <div><strong>School:</strong> ${user.school}</div>
+    <div><strong>Skills:</strong> ${user.skills}</div>
+    <div><strong>Hobbies:</strong> ${user.hobbies}</div>
+    <div><strong>Achievements:</strong> ${user.achievements}</div>
+  `;
+
+  document.getElementById("profileImg").src = user.profileImage || "https://i.pravatar.cc/100";
+  
+  if(user.badge && user.badgeImage){
+    document.getElementById("badge").style.display="flex";
+    document.getElementById("badgeImage").src = user.badgeImage;
   }
 }
 
-// Edit toggle
-const editBtn = document.getElementById("editBtn");
-let editing = false;
-editBtn.addEventListener("click", ()=>{
-  editing = !editing;
-  profileFields.forEach(field => {
-    const span = document.getElementById("profile"+field);
-    const input = document.getElementById("edit"+field);
-    if(editing){
-      input.value = span.textContent;
-      span.style.display = "none";
-      input.style.display = "block";
-    }else{
-      span.textContent = input.value;
-      span.style.display = "inline";
-      input.style.display = "none";
-      user[field.toLowerCase()] = input.value;
-      localStorage.setItem("subscribedUser", JSON.stringify(user));
-    }
-  });
+renderProfile();
+
+// Edit button to update profile info
+document.querySelector(".edit-btn").addEventListener("click", () => {
+  const newName = prompt("Enter Name:", user.name);
+  if(newName) { user.name = newName; localStorage.setItem("userProfile", JSON.stringify(user)); renderProfile(); }
 });
 
-// Profile image click
-const profileImage = document.getElementById("profileImage");
-const avatarOptions = document.getElementById("avatarOptions");
-profileImage.addEventListener("click", ()=>{
-  avatarOptions.style.display = avatarOptions.style.display === "block" ? "none" : "block";
-});
-
-// Avatar buttons
-document.getElementById("chooseGallery").addEventListener("click", ()=>{
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "image/*";
-  input.onchange = e => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function(ev){
-      user.profileImage = ev.target.result;
-      profileImage.style.backgroundImage = `url(${ev.target.result})`;
-      localStorage.setItem("subscribedUser", JSON.stringify(user));
-    }
-    reader.readAsDataURL(file);
-  }
+// Change profile image
+document.getElementById("profileImg").addEventListener("click", () => {
+  const input = document.getElementById("profileInput");
   input.click();
 });
-document.getElementById("deletePhoto").addEventListener("click", ()=>{
-  user.profileImage = "";
-  profileImage.style.backgroundImage = "url('avatar1.png')";
-  localStorage.setItem("subscribedUser", JSON.stringify(user));
-});
-document.getElementById("takePhoto").addEventListener("click", ()=>{
-  alert("Camera option will open (requires HTTPS + camera access)."); 
-  // Optional: implement getUserMedia API
+
+document.getElementById("profileInput").addEventListener("change", (e) => {
+  const reader = new FileReader();
+  reader.onload = () => {
+    user.profileImage = reader.result;
+    localStorage.setItem("userProfile", JSON.stringify(user));
+    renderProfile();
+  };
+  reader.readAsDataURL(e.target.files[0]);
 });
 </script>
 
