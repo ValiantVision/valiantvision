@@ -95,14 +95,17 @@
     <h1>Subscribe to Valiant Vision</h1>
     <p>Fill in your details to join thousands of learners unlocking creativity every month.</p>
 
-    <div class="form-group"><label for="name">Full Name</label><input type="text" id="name" required></div>
-    <div class="form-group"><label for="email">Email</label><input type="email" id="email" required></div>
+    <!-- Mandatory fields -->
+    <div class="form-group"><label for="name">Full Name*</label><input type="text" id="name" required></div>
+    <div class="form-group"><label for="email">Email*</label><input type="email" id="email" required></div>
+    <div class="form-group"><label for="skills">Skills*</label><textarea id="skills" required></textarea></div>
+
+    <!-- Optional fields -->
     <div class="form-group"><label for="phone">Phone</label><input type="tel" id="phone"></div>
     <div class="form-group"><label for="state">State</label><input type="text" id="state"></div>
     <div class="form-group"><label for="country">Country</label><input type="text" id="country"></div>
     <div class="form-group"><label for="class">Class</label><input type="text" id="class"></div>
     <div class="form-group"><label for="school">School</label><input type="text" id="school"></div>
-    <div class="form-group"><label for="skills">Skills</label><textarea id="skills"></textarea></div>
     <div class="form-group"><label for="hobbies">Hobbies</label><textarea id="hobbies"></textarea></div>
     <div class="form-group"><label for="achievements">Main Achievements</label><textarea id="achievements"></textarea></div>
 
@@ -110,67 +113,40 @@
   </form>
 
   <script>
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzQBzQ8BY0-H6qfi2E0WJ1ijWx_gXngz9O5SUyeo3iI6dZXirxEA1xFhdJKkIWWeU3T/exec";
+
     document.getElementById("subscribeForm").addEventListener("submit", function(e){
       e.preventDefault();
 
+      // Get all field values
       const data = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        phone: document.getElementById("phone").value,
-        state: document.getElementById("state").value,
-        country: document.getElementById("country").value,
-        class: document.getElementById("class").value,
-        school: document.getElementById("school").value,
-        skills: document.getElementById("skills").value,
-        hobbies: document.getElementById("hobbies").value,
-        achievements: document.getElementById("achievements").value
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        state: document.getElementById("state").value.trim(),
+        country: document.getElementById("country").value.trim(),
+        class: document.getElementById("class").value.trim(),
+        school: document.getElementById("school").value.trim(),
+        skills: document.getElementById("skills").value.trim(),
+        hobbies: document.getElementById("hobbies").value.trim(),
+        achievements: document.getElementById("achievements").value.trim()
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbzQBzQ8BY0-H6qfi2E0WJ1ijWx_gXngz9O5SUyeo3iI6dZXirxEA1xFhdJKkIWWeU3T/exec", {
+      // Send data to Google Sheets
+      fetch(SHEET_URL, {
         method: "POST",
         body: JSON.stringify(data)
       })
-      .then(res => alert("✅ Subscription successful!"))
-      .catch(err => alert("❌ Error: " + err));
+      .then(res => {
+        // Save to localStorage for profile page
+        localStorage.setItem("subscribed", "true");
+        localStorage.setItem("userProfile", JSON.stringify(data));
+
+        alert("✅ Subscription successful!");
+        window.location.href = "profile.html"; // redirect to profile
+      })
+      .catch(err => alert("❌ Error submitting: " + err));
     });
   </script>
-  <script>
-  document.getElementById("subscribeForm").addEventListener("submit", function(e){
-    e.preventDefault();
-
-    const data = {
-      name: document.getElementById("name").value,
-      email: document.getElementById("email").value,
-      phone: document.getElementById("phone").value,
-      state: document.getElementById("state").value,
-      country: document.getElementById("country").value,
-      class: document.getElementById("class").value,
-      school: document.getElementById("school").value,
-      skills: document.getElementById("skills").value,
-      hobbies: document.getElementById("hobbies").value,
-      achievements: document.getElementById("achievements").value
-    };
-
-    fetch("https://script.google.com/macros/s/AKfycbzQBzQ8BY0-H6qfi2E0WJ1ijWx_gXngz9O5SUyeo3iI6dZXirxEA1xFhdJKkIWWeU3T/exec", {
-      method: "POST",
-      body: JSON.stringify(data)
-    })
-    .then(res => {
-      // ✅ Save subscription status in localStorage
-      localStorage.setItem("subscribed", "true");
-
-      // ✅ Save user profile info for profile.html
-      localStorage.setItem("userProfile", JSON.stringify(data));
-
-      alert("✅ Subscription successful!");
-      
-      // ✅ Redirect to profile page
-      window.location.href = "profile.html";
-    })
-    .catch(err => alert("❌ Error: " + err));
-  });
-</script>
-
 </body>
 </html>
-
