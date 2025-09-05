@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profile | Valiant Vision</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
   :root {
     --vv-green: #76b900;
@@ -12,261 +12,235 @@
     --vv-bg: #f4f4f7;
     --shadow: 0 10px 30px rgba(0,0,0,.08);
   }
-  *{box-sizing:border-box;}
   body {
-    margin:0;
+    margin: 0;
     font-family: 'Lora', serif;
     background: var(--vv-bg);
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    padding:20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
   }
   .profile-card {
-    background:#fff;
-    border-radius:18px;
-    padding:30px;
-    max-width:700px;
-    width:100%;
-    box-shadow:var(--shadow);
+    background: #fff;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    max-width: 700px;
+    width: 100%;
+    position: relative;
   }
   .profile-card h1 {
-    font-family:'Montserrat', sans-serif;
-    font-weight:800;
-    color:var(--vv-purple);
-    font-size:2rem;
-    margin-bottom:10px;
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--vv-purple);
   }
-  .profile-card label {
-    font-family:'Montserrat', sans-serif;
-    font-weight:600;
-    display:block;
-    margin-bottom:4px;
-    color:#333;
-  }
-  .profile-card input,
-  .profile-card textarea {
-    width:100%;
-    padding:10px 12px;
-    margin-bottom:15px;
-    border:1px solid #ddd;
-    border-radius:10px;
-    font-size:1rem;
-  }
-  .profile-card textarea { resize:vertical; min-height:70px;}
-  button {
-    background:linear-gradient(135deg,var(--vv-purple),var(--vv-green));
-    color:#fff;
-    border:none;
-    padding:12px 20px;
-    border-radius:12px;
-    font-size:1rem;
-    font-weight:700;
-    cursor:pointer;
-    width:100%;
-    box-shadow:0 8px 18px rgba(67,0,185,.18);
-    transition: transform 0.1s ease;
-  }
-  button:active { transform:translateY(2px); }
-  .avatar-container {
-    display:flex;
-    justify-content:center;
-    margin-bottom:20px;
-  }
-  .avatar-container img {
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    border:4px solid var(--vv-purple);
-    object-fit:cover;
-  }
-  .badges-container {
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    margin-top:20px;
-  }
-  .badge-card {
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    width:100px;
-    text-align:center;
-    padding:10px;
-    border-radius:10px;
-    background:#f5f5f5;
-    box-shadow:0 5px 15px rgba(0,0,0,0.08);
-  }
-  .badge-card img {
-    width:50px;
-    height:50px;
-    margin-bottom:6px;
+  .profile-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 20px auto;
+    background: #ddd url('avatar1.png') center/cover no-repeat;
+    cursor: pointer;
+    position: relative;
   }
   .edit-btn {
-    margin-bottom:20px;
-    background:#4300b9;
-    width:auto;
-    padding:8px 16px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    font-size: 1.5rem;
+  }
+  .profile-field {
+    margin: 10px 0;
+  }
+  .profile-field label {
+    font-weight: 600;
+    margin-right: 10px;
+  }
+  .profile-field span,
+  .profile-field input,
+  .profile-field textarea {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+  }
+  input, textarea {
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    display: none;
+  }
+  .badges {
+    margin-top: 30px;
+    text-align: center;
+  }
+  .badge {
+    display: inline-block;
+    margin: 5px;
+    padding: 10px 15px;
+    background: var(--vv-green);
+    color: #fff;
+    border-radius: 10px;
+    font-weight: bold;
+  }
+  .avatar-options {
+    display: none;
+    position: absolute;
+    top: 140px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    z-index: 10;
+    padding: 10px;
+  }
+  .avatar-options button {
+    display: block;
+    margin: 5px auto;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--vv-purple);
+    color: #fff;
+    cursor: pointer;
   }
 </style>
 </head>
 <body>
 
 <div class="profile-card">
-  <div class="avatar-container">
-    <img id="profileAvatar" src="images/default-avatar.png" alt="Profile Avatar">
+  <div class="profile-image" id="profileImage"></div>
+  <div class="edit-btn" id="editBtn">✏️</div>
+
+  <h1 id="profileName">Name</h1>
+
+  <div class="profile-field">
+    <label>Email:</label> <span id="profileEmail"></span>
+    <input type="email" id="editEmail">
   </div>
-  <button class="edit-btn" id="editProfileBtn">Edit Profile</button>
-  
-  <form id="profileForm">
-    <label>Full Name</label>
-    <input type="text" id="name" required>
+  <div class="profile-field">
+    <label>Phone:</label> <span id="profilePhone"></span>
+    <input type="text" id="editPhone">
+  </div>
+  <div class="profile-field">
+    <label>State:</label> <span id="profileState"></span>
+    <input type="text" id="editState">
+  </div>
+  <div class="profile-field">
+    <label>Country:</label> <span id="profileCountry"></span>
+    <input type="text" id="editCountry">
+  </div>
+  <div class="profile-field">
+    <label>Class:</label> <span id="profileClass"></span>
+    <input type="text" id="editClass">
+  </div>
+  <div class="profile-field">
+    <label>School:</label> <span id="profileSchool"></span>
+    <input type="text" id="editSchool">
+  </div>
+  <div class="profile-field">
+    <label>Skills:</label> <span id="profileSkills"></span>
+    <textarea id="editSkills"></textarea>
+  </div>
+  <div class="profile-field">
+    <label>Hobbies:</label> <span id="profileHobbies"></span>
+    <textarea id="editHobbies"></textarea>
+  </div>
+  <div class="profile-field">
+    <label>Achievements:</label> <span id="profileAchievements"></span>
+    <textarea id="editAchievements"></textarea>
+  </div>
 
-    <label>Email</label>
-    <input type="email" id="email" required>
+  <div class="badges" id="badgesSection">
+    <div class="badge">Subscribed ✅</div>
+  </div>
 
-    <label>Phone</label>
-    <input type="tel" id="phone" required>
-
-    <label>State</label>
-    <input type="text" id="state" required>
-
-    <label>Country</label>
-    <input type="text" id="country" required>
-
-    <label>Class</label>
-    <input type="text" id="class" required>
-
-    <label>School</label>
-    <input type="text" id="school" required>
-
-    <label>Skills</label>
-    <textarea id="skills" required></textarea>
-
-    <label>Hobbies</label>
-    <textarea id="hobbies"></textarea>
-
-    <label>Main Achievements</label>
-    <textarea id="achievements"></textarea>
-
-    <label>Profile Picture (optional, Base64)</label>
-    <input type="file" id="avatarUpload" accept="image/*">
-
-    <button type="submit">Save Profile</button>
-  </form>
-
-  <div class="section-title" style="margin-top:20px; font-weight:700; font-size:1.2rem;">My Badges</div>
-  <div class="badges-container" id="badgeSection">
-    <!-- badges appear here -->
+  <div class="avatar-options" id="avatarOptions">
+    <button id="chooseGallery">Select from Gallery</button>
+    <button id="takePhoto">Take Photo</button>
+    <button id="deletePhoto">Delete Photo</button>
   </div>
 </div>
 
 <script>
-const profileForm = document.getElementById('profileForm');
-const editBtn = document.getElementById('editProfileBtn');
-const profileAvatar = document.getElementById('profileAvatar');
-const badgeSection = document.getElementById('badgeSection');
-const avatarUpload = document.getElementById('avatarUpload');
-
-// Possible badges
-const allBadges = [
-  {id:'creative_star', title:'Creative Star', img:'images/badge1.png'},
-  {id:'early_learner', title:'Early Learner', img:'images/badge2.png'},
-  {id:'program_master', title:'Program Master', img:'images/badge3.png'},
-  {id:'future_program', title:'Future Program', img:'images/badge4.png'}
+// Load profile from localStorage
+let user = JSON.parse(localStorage.getItem("subscribedUser"));
+const profileFields = [
+  "Name","Email","Phone","State","Country","Class","School","Skills","Hobbies","Achievements"
 ];
-
-// Load user data
-let userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-let userBadges = JSON.parse(localStorage.getItem('userBadges') || '[]');
-
-// Populate form
-function populateForm(){
-  if(Object.keys(userProfile).length){
-    document.getElementById('name').value = userProfile.name || '';
-    document.getElementById('email').value = userProfile.email || '';
-    document.getElementById('phone').value = userProfile.phone || '';
-    document.getElementById('state').value = userProfile.state || '';
-    document.getElementById('country').value = userProfile.country || '';
-    document.getElementById('class').value = userProfile.class || '';
-    document.getElementById('school').value = userProfile.school || '';
-    document.getElementById('skills').value = userProfile.skills || '';
-    document.getElementById('hobbies').value = userProfile.hobbies || '';
-    document.getElementById('achievements').value = userProfile.achievements || '';
-    if(userProfile.avatar) profileAvatar.src = userProfile.avatar;
-  }
-  renderBadges();
-}
-
-// Render badges
-function renderBadges(){
-  badgeSection.innerHTML = '';
-  if(localStorage.getItem("subscribed") === "true"){
-    allBadges.forEach(badge => {
-      if(userBadges.includes(badge.id)){
-        const badgeCard = document.createElement('div');
-        badgeCard.classList.add('badge-card');
-        badgeCard.innerHTML = `<img src="${badge.img}" alt="${badge.title}"><span>${badge.title}</span>`;
-        badgeSection.appendChild(badgeCard);
-      }
-    });
+if(user){
+  document.getElementById("profileName").textContent = user.name;
+  document.getElementById("profileEmail").textContent = user.email;
+  document.getElementById("profilePhone").textContent = user.phone;
+  document.getElementById("profileState").textContent = user.state;
+  document.getElementById("profileCountry").textContent = user.country;
+  document.getElementById("profileClass").textContent = user.class;
+  document.getElementById("profileSchool").textContent = user.school;
+  document.getElementById("profileSkills").textContent = user.skills;
+  document.getElementById("profileHobbies").textContent = user.hobbies;
+  document.getElementById("profileAchievements").textContent = user.achievements;
+  if(user.profileImage){
+    document.getElementById("profileImage").style.backgroundImage = `url(${user.profileImage})`;
   }
 }
 
-// Edit button toggle
-editBtn.addEventListener('click',()=>{
-  const inputs = profileForm.querySelectorAll('input,textarea');
-  inputs.forEach(i=>i.disabled = !i.disabled);
-  profileForm.querySelector('button[type="submit"]').style.display = inputs[0].disabled ? 'none' : 'block';
+// Edit toggle
+const editBtn = document.getElementById("editBtn");
+let editing = false;
+editBtn.addEventListener("click", ()=>{
+  editing = !editing;
+  profileFields.forEach(field => {
+    const span = document.getElementById("profile"+field);
+    const input = document.getElementById("edit"+field);
+    if(editing){
+      input.value = span.textContent;
+      span.style.display = "none";
+      input.style.display = "block";
+    }else{
+      span.textContent = input.value;
+      span.style.display = "inline";
+      input.style.display = "none";
+      user[field.toLowerCase()] = input.value;
+      localStorage.setItem("subscribedUser", JSON.stringify(user));
+    }
+  });
 });
 
-// Avatar upload
-avatarUpload.addEventListener('change', function(){
-  const file = this.files[0];
-  if(file){
+// Profile image click
+const profileImage = document.getElementById("profileImage");
+const avatarOptions = document.getElementById("avatarOptions");
+profileImage.addEventListener("click", ()=>{
+  avatarOptions.style.display = avatarOptions.style.display === "block" ? "none" : "block";
+});
+
+// Avatar buttons
+document.getElementById("chooseGallery").addEventListener("click", ()=>{
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.onchange = e => {
+    const file = e.target.files[0];
     const reader = new FileReader();
-    reader.onload = function(e){
-      profileAvatar.src = e.target.result;
-      userProfile.avatar = e.target.result;
+    reader.onload = function(ev){
+      user.profileImage = ev.target.result;
+      profileImage.style.backgroundImage = `url(${ev.target.result})`;
+      localStorage.setItem("subscribedUser", JSON.stringify(user));
     }
     reader.readAsDataURL(file);
   }
+  input.click();
 });
-
-// Save profile
-profileForm.addEventListener('submit',function(e){
-  e.preventDefault();
-  userProfile = {
-    name: document.getElementById('name').value,
-    email: document.getElementById('email').value,
-    phone: document.getElementById('phone').value,
-    state: document.getElementById('state').value,
-    country: document.getElementById('country').value,
-    class: document.getElementById('class').value,
-    school: document.getElementById('school').value,
-    skills: document.getElementById('skills').value,
-    hobbies: document.getElementById('hobbies').value,
-    achievements: document.getElementById('achievements').value,
-    avatar: userProfile.avatar || profileAvatar.src
-  };
-  localStorage.setItem('userProfile', JSON.stringify(userProfile));
-  alert('✅ Profile saved!');
-  renderBadges();
+document.getElementById("deletePhoto").addEventListener("click", ()=>{
+  user.profileImage = "";
+  profileImage.style.backgroundImage = "url('avatar1.png')";
+  localStorage.setItem("subscribedUser", JSON.stringify(user));
 });
-
-// Example: Assign a badge programmatically
-// earnBadge('creative_star');
-function earnBadge(badgeId){
-  if(!userBadges.includes(badgeId)){
-    userBadges.push(badgeId);
-    localStorage.setItem('userBadges', JSON.stringify(userBadges));
-    renderBadges();
-  }
-}
-
-// Initialize form
-populateForm();
+document.getElementById("takePhoto").addEventListener("click", ()=>{
+  alert("Camera option will open (requires HTTPS + camera access)."); 
+  // Optional: implement getUserMedia API
+});
 </script>
 
 </body>
