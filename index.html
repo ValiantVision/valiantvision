@@ -9,148 +9,139 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Lora:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-  :root{
-    --vv-green:#76b900;
-    --vv-purple:#4300b9;
-    --vv-dark:#141316;
-    --vv-text:#2c2c2c;
-    --vv-muted:#6b6b6b;
-    --vv-bg:#f4f4f7;
-    --shadow:0 10px 30px rgba(0,0,0,.08);
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0; padding:0; font-family:'Lora', serif; background:var(--vv-bg); color:var(--vv-text); line-height:1.6; overflow-x:hidden;}
+:root{
+  --vv-green:#76b900;    /* vivid green */
+  --vv-purple:#4300b9;   /* vivid purple */
+  --vv-dark:#141316;
+  --vv-text:#2c2c2c;
+  --vv-muted:#6b6b6b;
+  --vv-bg:#f4f4f7;
+  --shadow:0 10px 30px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;}
+html,body{margin:0; padding:0;}
+body{
+  font-family:'Lora', serif;
+  color:var(--vv-text);
+  background:var(--vv-bg);
+  line-height:1.6;
+  overflow-x:hidden;
+}
 
-  /* ===== NAVBAR ===== */
-  .nav{
-    position:sticky; top:0; z-index:50;
-    background:#fff; border-bottom:1px solid #ececf0;
-    box-shadow:0 6px 14px rgba(67,0,185,0.05);
-  }
-  .nav-inner{
-    max-width:1100px; margin:0 auto; padding:10px 20px;
-    display:flex; align-items:center; justify-content:space-between; gap:16px;
-  }
-  .brand{display:flex; align-items:center; gap:12px}
-  .brand img{height:48px; width:auto}
-  .brand .name{font:800 1.5rem/1 'Montserrat', sans-serif; color:var(--vv-purple)}
+/* ===== NAVBAR ===== */
+.nav{
+  position:sticky; top:0; z-index:50;
+  background:#fff; border-bottom:1px solid #ececf0;
+  box-shadow:0 6px 14px rgba(67,0,185,0.05);
+}
+.nav-inner{
+  max-width:1100px; margin:0 auto; padding:10px 20px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+}
+.brand{display:flex; align-items:center; gap:12px}
+.brand img{height:48px; width:auto}
+.brand .name{font:800 1.5rem/1 'Montserrat', sans-serif; color:var(--vv-purple)}
+.menu{
+  display:flex; gap:18px; align-items:center;
+}
+.menu a{
+  font:600 0.95rem/1 'Montserrat', sans-serif;
+  color:var(--vv-purple); text-decoration:none;
+  padding:8px 12px; border-radius:10px; transition:all .2s ease;
+}
+.menu a:hover,.menu a.active{ background:var(--vv-purple); color:#fff }
 
-  .menu{display:flex; gap:18px; align-items:center}
-  .menu a{
-    font:600 0.95rem/1 'Montserrat', sans-serif;
-    color:var(--vv-purple); text-decoration:none;
-    padding:8px 12px; border-radius:10px; transition:all .2s ease;
-  }
-  .menu a:hover,.menu a.active{ background:var(--vv-purple); color:#fff }
+/* Hamburger menu */
+.hamburger {
+  display:none;
+  flex-direction: column;
+  cursor: pointer;
+  gap:5px;
+}
+.hamburger div{
+  width:25px; height:3px; background-color:var(--vv-purple);
+  border-radius:3px;
+}
 
-  .ai-avatar img{border-radius:50%; width:36px; height:36px; cursor:pointer;}
+/* Mobile menu */
+.mobile-menu {
+  display:none;
+  flex-direction:column;
+  background:#fff;
+  position:absolute;
+  top:65px; right:0;
+  width:200px;
+  border:1px solid #ececf0;
+  border-radius:10px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.1);
+  z-index:100;
+}
+.mobile-menu a{
+  padding:10px 15px;
+  border-bottom:1px solid #ececf0;
+}
+.mobile-menu a:last-child{ border-bottom:none; }
 
-  /* Hamburger menu for mobile */
-  .hamburger{display:none; flex-direction:column; cursor:pointer; gap:6px}
-  .hamburger div{width:25px; height:3px; background:var(--vv-purple); border-radius:2px; transition:0.3s;}
-  .mobile-menu{display:none; flex-direction:column; position:absolute; top:70px; left:0; right:0; background:#fff; padding:10px 20px; box-shadow:0 5px 15px rgba(0,0,0,0.2); z-index:100;}
-  .mobile-menu a{margin:8px 0; color:var(--vv-purple); text-decoration:none; font-weight:600;}
+/* ===== HERO ===== */
+.hero{
+  position:relative; isolation:isolate;
+  min-height:72vh; display:grid; place-items:center;
+  padding:72px 20px 56px;
+  background:
+    radial-gradient(1200px 500px at 10% -10%, rgba(118,185,0,.35),transparent 60%),
+    radial-gradient(1200px 500px at 110% 10%, rgba(67,0,185,.35),transparent 60%),
+    #0f0d2a;
+  overflow:hidden;
+  text-align:center;
+}
+.hero::before{
+  content:"";
+  position:absolute; inset:0; z-index:-1;
+  opacity:.35; filter:contrast(110%) saturate(110%) blur(1px);
+}
+.hero-card{
+  width:100%; max-width:920px;
+  background:rgba(255,255,255,.92);
+  border-radius:24px; box-shadow:var(--shadow);
+  padding:32px; backdrop-filter:saturate(130%) blur(4px);
+}
+.hero h1{font-family:'Montserrat',sans-serif;font-weight:800;font-size:2.4rem;color:#111;margin:0.5rem 0;}
+.hero p{max-width:760px;margin:.5rem auto 1.25rem;color:#333;font-size:1.05rem;}
+.hero .tagline{
+  font-family:'Montserrat',sans-serif;
+  font-weight:800;
+  font-size:1.8rem;
+  color:var(--vv-green);
+  margin-top:0.5rem;
+  letter-spacing:1px;
+}
+.btn{
+  background:linear-gradient(135deg,var(--vv-purple),var(--vv-green));
+  color:#fff;border:0;padding:14px 20px;border-radius:12px;
+  font-weight:700;font-family:'Montserrat',sans-serif;cursor:pointer;
+  box-shadow:0 8px 18px rgba(67,0,185,.18);transition:.2s;
+}
+.btn:hover{opacity:.9}
 
-  /* ===== HERO ===== */
-  .hero{
-    position:relative; isolation:isolate;
-    min-height:72vh; display:grid; place-items:center;
-    padding:72px 20px 56px;
-    background:
-      radial-gradient(1200px 500px at 10% -10%, rgba(118,185,0,.35),transparent 60%),
-      radial-gradient(1200px 500px at 110% 10%, rgba(67,0,185,.35),transparent 60%),
-      #0f0d2a;
-    overflow:hidden;
-    color:#fff;
-    text-align:center;
-  }
-  .hero-card{
-    width:100%; max-width:920px;
-    background:rgba(255,255,255,.95);
-    border-radius:24px; box-shadow:var(--shadow);
-    padding:32px; backdrop-filter:saturate(130%) blur(4px);
-    text-align:center;
-  }
-  .hero h1{font-family:'Montserrat',sans-serif;font-weight:800;font-size:2.4rem;color:#111}
-  .hero p{max-width:760px;margin:.75rem auto 1.25rem;color:#333;font-size:1.05rem}
+/* ===== SECTIONS ===== */
+section{max-width:1100px;margin:64px auto;padding:0 20px}
+section.card{ background:#fff; border-radius:20px; box-shadow:var(--shadow); padding:28px; }
+h2.section-title{ font-family:'Montserrat',sans-serif; font-weight:800; font-size:2rem; margin:.25rem 0 1rem; color:#222 }
+.kit-list{list-style:none;padding:0}
+.kit-list li{background:#fff;margin-bottom:12px;padding:14px 16px;border-left:4px solid var(--vv-purple);border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,.05)}
 
-  .tagline{
-    font-family:'Montserrat',sans-serif;
-    font-weight:800;
-    font-size:1.6rem;
-    margin-top:12px;
-    background: linear-gradient(90deg, #4300b9, #76b900);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media (max-width:900px){.grid-3{grid-template-columns:1fr}}
+.cardlet{background:#fff;border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+.cardlet h3{margin:.2rem 0 .35rem;color:var(--vv-purple);font-family:'Montserrat',sans-serif}
 
-  .btn{
-    background:linear-gradient(135deg,var(--vv-purple),var(--vv-green));
-    color:#fff;border:0;padding:14px 20px;border-radius:12px;
-    font-weight:700;font-family:'Montserrat',sans-serif;cursor:pointer;
-    box-shadow:0 8px 18px rgba(67,0,185,.18);transition:.2s;
-  }
-  .btn:hover{opacity:.9}
+footer{margin-top:72px;padding:28px 20px;text-align:center;color:#8a8a98}
 
-  /* ===== SECTIONS ===== */
-  section{max-width:1100px;margin:64px auto;padding:0 20px}
-  section.card{ background:#fff; border-radius:20px; box-shadow:var(--shadow); padding:28px; }
-  h2.section-title{ font-family:'Montserrat',sans-serif; font-weight:800; font-size:2rem; margin:.25rem 0 1rem; color:#222 }
-  .kit-list{list-style:none;padding:0}
-  .kit-list li{background:#fff;margin-bottom:12px;padding:14px 16px;border-left:4px solid var(--vv-purple);border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,.05)}
-
-  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  @media (max-width:900px){.grid-3{grid-template-columns:1fr}}
-  .cardlet{background:#fff;border-radius:16px;padding:18px;box-shadow:var(--shadow)}
-  .cardlet h3{margin:.2rem 0 .35rem;color:var(--vv-purple);font-family:'Montserrat',sans-serif}
-
-  footer{margin-top:72px;padding:28px 20px;text-align:center;color:#8a8a98}
-
-  /* Responsive */
-  @media(max-width:900px){
-    .menu{display:none}
-    .hamburger{display:flex}
-  }
-
-  /* Home badge animation */
-  .home-badge {
-    display: inline-block;
-    margin-top: 15px;
-    background: linear-gradient(135deg, var(--vv-green), var(--vv-purple));
-    color: white;
-    padding: 10px 18px;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 1rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    opacity: 0;
-    transform: translateY(30px);
-    animation: popIn 0.6s forwards;
-  }
-  @keyframes popIn {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Chatbot widget */
-  #chat-icon {position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: #4caf50; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; color: white; font-size: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 9999; transition: transform 0.3s;}
-  #chat-icon:hover { transform: scale(1.1); }
-  #chatbox {position: fixed; bottom: 90px; right: 20px; width: 350px; height: 450px; background-color: #2e2e2e; border-radius: 16px; display: none; flex-direction: column; box-shadow: 0 8px 25px rgba(0,0,0,0.4); z-index: 9999; overflow: hidden; animation: slideIn 0.3s ease;}
-  @keyframes slideIn {from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; }}
-  #chat-header { background-color: #4caf50; padding: 10px; color: white; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
-  #close-btn { cursor: pointer; font-weight: bold; }
-  #messages { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;}
-  .message { max-width: 80%; padding: 10px; border-radius: 12px; color: #fff; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease;}
-  .user-message { background-color: #555; align-self: flex-end; border-bottom-right-radius: 0;}
-  .ai-message { background-color: #4caf50; align-self: flex-start; border-bottom-left-radius: 0;}
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);}}
-  #input-container { display: flex; padding: 10px; border-top: 1px solid #444;}
-  #user-input { flex: 1; padding: 10px; border-radius: 12px; border: none; outline: none; background-color: #444; color: #fff;}
-  #send-btn { padding: 10px 15px; margin-left: 8px; border: none; border-radius: 12px; background-color: #4caf50; color: white; cursor: pointer;}
-  #send-btn:hover { background-color: #45a049; }
-
+/* Mobile adjustments */
+@media (max-width:768px){
+  .menu{display:none;}
+  .hamburger{display:flex;}
+}
 </style>
 </head>
 <body>
@@ -162,39 +153,28 @@
       <img src="Valiant Vision.jpg" alt="Valiant Vision logo">
       <div class="name">Valiant Vision</div>
     </div>
-
-    <!-- Desktop menu -->
     <div class="menu">
       <a href="#about" class="active">About Us</a>
       <a href="#problem">Problem</a>
       <a href="#solution">Our Solution</a>
       <a href="subscribe.html">Subscribe</a>
       <a href="whiteboard.html">Whiteboard</a>
-      <!-- AI Avatar for desktop -->
-      <div id="ai-login" class="ai-avatar">
-        <img src="ai-avatar.png" alt="AI Login">
-      </div>
+      <a id="ai-login" href="login.html">
+        <img src="ai-avatar.png" alt="AI Avatar" style="width:32px;height:32px;border-radius:50%;">
+      </a>
     </div>
-
-    <!-- Hamburger for mobile -->
     <div class="hamburger" id="hamburger">
       <div></div>
       <div></div>
       <div></div>
     </div>
   </div>
-
-  <!-- Mobile menu content -->
-  <div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu" id="mobile-menu">
     <a href="#about">About Us</a>
     <a href="#problem">Problem</a>
     <a href="#solution">Our Solution</a>
     <a href="subscribe.html">Subscribe</a>
     <a href="whiteboard.html">Whiteboard</a>
-    <!-- AI Avatar for mobile -->
-    <div id="ai-login-mobile" class="ai-avatar" style="margin-top:10px;">
-      <img src="ai-avatar.png" alt="AI Login">
-    </div>
   </div>
 </nav>
 
@@ -206,7 +186,6 @@
     <div class="tagline">The Way It's Meant To Be Learnt</div>
     <a href="subscribe.html"><button class="btn">Subscribe Now</button></a>
   </div>
-  <div id="home-badge" style="display:none;"></div>
 </header>
 
 <!-- ABOUT -->
@@ -241,13 +220,35 @@
 
 <footer>© 2025 Valiant Vision • Made for curious learners</footer>
 
+<!-- Hamburger Script -->
+<script>
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobile-menu');
+hamburger.addEventListener('click', ()=>{
+  mobileMenu.style.display = mobileMenu.style.display === 'flex' ? 'none' : 'flex';
+});
+</script>
+
 <!-- AI Chatbot Widget -->
+<style>
+#chat-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color:#4caf50; border-radius:50%; cursor:pointer; display:flex; justify-content:center; align-items:center; color:white; font-size:30px; box-shadow:0 5px 15px rgba(0,0,0,0.3); z-index:9999; transition: transform 0.3s;}
+#chat-icon:hover { transform: scale(1.1);}
+#chatbox { position: fixed; bottom:90px; right:20px; width:350px; height:450px; background:#2e2e2e; border-radius:16px; display:none; flex-direction:column; box-shadow:0 8px 25px rgba(0,0,0,0.4); z-index:9999; overflow:hidden;}
+#chat-header { background:#4caf50; padding:10px; color:white; font-weight:bold; display:flex; justify-content:space-between; align-items:center;}
+#close-btn{cursor:pointer;font-weight:bold;}
+#messages{flex:1; padding:10px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;}
+.message{max-width:80%; padding:10px; border-radius:12px; color:#fff; word-wrap:break-word; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+.user-message{background-color:#555; align-self:flex-end; border-bottom-right-radius:0;}
+.ai-message{background-color:#4caf50; align-self:flex-start; border-bottom-left-radius:0;}
+#input-container{display:flex; padding:10px; border-top:1px solid #444;}
+#user-input{flex:1; padding:10px; border-radius:12px; border:none; outline:none; background:#444; color:#fff;}
+#send-btn{padding:10px 15px; margin-left:8px; border:none; border-radius:12px; background:#4caf50; color:white; cursor:pointer;}
+#send-btn:hover{background:#45a049;}
+</style>
+
 <div id="chat-icon">💬</div>
 <div id="chatbox">
-  <div id="chat-header">
-    AI Assistant
-    <span id="close-btn">✖</span>
-  </div>
+  <div id="chat-header">AI Assistant <span id="close-btn">✖</span></div>
   <div id="messages"></div>
   <div id="input-container">
     <input type="text" id="user-input" placeholder="Ask me anything...">
@@ -256,72 +257,49 @@
 </div>
 
 <script>
-  // Hamburger toggle
-  const hamburger = document.getElementById('hamburger');
-  const mobileMenu = document.getElementById('mobileMenu');
-  hamburger.addEventListener('click', () => {
-    mobileMenu.style.display = mobileMenu.style.display === 'flex' ? 'none' : 'flex';
-  });
+const scriptURL = "https://valiantvision-ai.narendersindhu1977.workers.dev/";
 
-  // AI Avatar click
-  function aiLogin() { window.location.href="login.html"; }
-  document.getElementById('ai-login').addEventListener('click', aiLogin);
-  document.getElementById('ai-login-mobile').addEventListener('click', aiLogin);
+const chatIcon = document.getElementById('chat-icon');
+const chatBox = document.getElementById('chatbox');
+const closeBtn = document.getElementById('close-btn');
 
-  // Show badge if subscribed
-  window.addEventListener("load", function() {
-    if (localStorage.getItem("subscribed") === "true") {
-      const badgeContainer = document.getElementById("home-badge");
-      const badge = document.createElement("div");
-      badge.className = "home-badge";
-      badge.innerHTML = "🏅 Initial Skill Badge";
-      badgeContainer.appendChild(badge);
-      badgeContainer.style.display = "block";
-    }
-  });
+chatIcon.addEventListener('click', () => { chatBox.style.display='flex'; });
+closeBtn.addEventListener('click', ()=>{ chatBox.style.display='none'; });
 
-  // Chatbot toggle
-  const chatIcon = document.getElementById('chat-icon');
-  const chatBox = document.getElementById('chatbox');
-  const closeBtn = document.getElementById('close-btn');
+document.getElementById('send-btn').addEventListener('click', handleSend);
+document.getElementById('user-input').addEventListener('keypress', function(e){ if(e.key==='Enter') handleSend(); });
 
-  chatIcon.addEventListener('click', () => { chatBox.style.display = 'flex'; });
-  closeBtn.addEventListener('click', () => { chatBox.style.display = 'none'; });
+async function handleSend(){
+  const input=document.getElementById('user-input');
+  const message=input.value.trim();
+  if(!message) return;
+  addMessage(message,'user-message');
+  input.value='';
+  addMessage("Thinking... 🤔",'ai-message');
+  try{
+    const response=await fetch(scriptURL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({prompt:message})
+    });
+    const contentType=response.headers.get("content-type")||"";
+    if(!contentType.includes("application/json")) throw new Error("Server returned HTML instead of JSON.");
+    const data=await response.json();
+    const messagesDiv=document.getElementById('messages');
+    const lastMsg=messagesDiv.lastChild;
+    if(lastMsg && lastMsg.textContent==="Thinking... 🤔") lastMsg.remove();
+    addMessage(data.result||"No response from AI",'ai-message');
+  } catch(err){ console.error(err); addMessage("Error connecting to AI.",'ai-message'); }
+}
 
-  const scriptURL = "https://valiantvision-ai.narendersindhu1977.workers.dev/";
-  document.getElementById('send-btn').addEventListener('click', handleSend);
-  document.getElementById('user-input').addEventListener('keypress', function(e){ if(e.key==='Enter') handleSend(); });
-
-  async function handleSend(){
-    const input = document.getElementById('user-input');
-    const message = input.value.trim();
-    if(!message) return;
-    addMessage(message, 'user-message'); input.value='';
-    addMessage("Thinking... 🤔", 'ai-message');
-    try {
-      const response = await fetch(scriptURL,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({prompt:message})
-      });
-      const contentType = response.headers.get("content-type") || "";
-      if(!contentType.includes("application/json")) throw new Error("Server returned HTML instead of JSON.");
-      const data = await response.json();
-      const messagesDiv = document.getElementById('messages');
-      const lastMsg = messagesDiv.lastChild;
-      if(lastMsg && lastMsg.textContent==="Thinking... 🤔") lastMsg.remove();
-      addMessage(data.result || "No response from AI", 'ai-message');
-    } catch(err){ console.error(err); addMessage("Error connecting to AI.", 'ai-message'); }
-  }
-
-  function addMessage(text, className){
-    const messages = document.getElementById('messages');
-    const msgDiv = document.createElement('div');
-    msgDiv.className = 'message '+className;
-    msgDiv.textContent = text;
-    messages.appendChild(msgDiv);
-    messages.scrollTop = messages.scrollHeight;
-  }
+function addMessage(text,className){
+  const messages=document.getElementById('messages');
+  const msgDiv=document.createElement('div');
+  msgDiv.className='message '+className;
+  msgDiv.textContent=text;
+  messages.appendChild(msgDiv);
+  messages.scrollTop=messages.scrollHeight;
+}
 </script>
 
 </body>
