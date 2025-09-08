@@ -83,16 +83,32 @@
   </div>
 
   <script>
-    document.getElementById("loginForm").addEventListener("submit", function(event) {
+    // 🔗 Replace with your deployed Google Apps Script Web App URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYMfiMxvO-8GgvEN24mEko-4TJRim_Q8uR6r3XAJAe5ceRXnIVs6mHsx9o5rIhNKNA/exec";
+
+    document.getElementById("loginForm").addEventListener("submit", async function(event) {
       event.preventDefault();
+
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
-      if(email && password){
-        alert("Login successful ✅");
-        window.location.href = "profile.html"; // Redirect to profile page
-      } else {
-        alert("Please fill all fields ❌");
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert(result.message);
+          window.location.href = "profile.html"; // ✅ redirect to profile page
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        alert("Error: " + error);
       }
     });
   </script>
