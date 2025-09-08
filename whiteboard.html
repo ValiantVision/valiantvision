@@ -1,135 +1,588 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Full Whiteboard</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Full Responsive Whiteboard</title>
 <style>
-  html,body{margin:0;height:100%;background:#f8fafc;font-family:sans-serif;}
-  #board{position:fixed;inset:0;background:#fff;touch-action:none;}
-  .toolbar{
-    position:fixed;top:10px;left:50%;transform:translateX(-50%);
-    background:#fff;padding:8px 10px;border-radius:12px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.15);z-index:2000;
-    display:flex;gap:8px;flex-wrap:wrap;
+  :root{
+    --nav-h:56px;
+    --toolbar-h:96px;
+    --accent:#2563eb;
+    --bg:#f3f6fb;
   }
-  button,select,input{border:0;padding:6px 10px;border-radius:8px;cursor:pointer;}
-  select{background:#eef2ff;font-weight:600;}
-  .note{position:absolute;background:#fff59d;border:1px solid #555;
-        border-radius:8px;min-width:120px;min-height:80px;z-index:1500;
-        box-shadow:0 3px 8px rgba(0,0,0,0.2);display:flex;flex-direction:column;}
-  .note .hdr{background:rgba(0,0,0,0.1);padding:4px;cursor:grab;font-weight:bold;}
-  .note textarea{flex:1;border:0;padding:6px;resize:none;background:transparent;}
+  html,body{height:100%;margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);overflow:hidden;-webkit-user-select:none;-ms-user-select:none;user-select:none}
+  /* Navbar */
+  .navbar{
+    position:fixed;top:0;left:0;right:0;height:var(--nav-h);
+    background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:3000;
+    box-shadow:0 4px 14px rgba(2,6,23,0.15);
+  }
+  .nav-left{display:flex;gap:12px;align-items:center}
+  .brand{font-weight:700;font-size:18px}
+  .nav-links{display:flex;gap:12px}
+  .nav-links a{color:#fff;text-decoration:none;font-weight:600}
+  .hamburger{display:none;font-size:22px;cursor:pointer}
+  .mobile-menu{display:none;position:fixed;top:var(--nav-h);left:0;right:0;background:#123a9e;color:#fff;z-index:2999;flex-direction:column}
+  .mobile-menu a{padding:10px;border-bottom:1px solid rgba(255,255,255,0.1);text-decoration:none;color:#fff}
+  /* Canvas area */
+  #canvasWrap{position:fixed;top:var(--nav-h);left:0;right:0;bottom:var(--toolbar-h);overflow:hidden}
+  canvas{display:block;width:100%;height:100%;background:#fff;touch-action:none}
+  /* Toolbar bottom */
+  .toolbar{
+    position:fixed;left:50%;transform:translateX(-50%);bottom:12px;
+    background:#fff;padding:10px;border-radius:14px;z-index:3000;display:flex;gap:8px;align-items:center;
+    box-shadow:0 8px 24px rgba(5,10,30,0.12);width:calc(100% - 28px);max-width:1100px;flex-wrap:wrap;
+  }
+  select,button,input[type=color],input[type=range]{border:0;padding:8px 10px;border-radius:8px;cursor:pointer;background:#f1f5f9}
+  button.primary{background:var(--accent);color:#fff;font-weight:700}
+  .note{
+    position:absolute;background:#fff9a6;border:1px solid #333;border-radius:10px;min-width:120px;min-height:80px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.12);z-index:2500;display:flex;flex-direction:column;overflow:hidden;
+  }
+  .note .hdr{background:rgba(0,0,0,0.06);padding:6px 8px;cursor:grab;display:flex;justify-content:space-between;align-items:center}
+  .note textarea{flex:1;border:0;padding:8px;background:transparent;outline:none;resize:none}
+  /* selection outline & handles */
+  .sel-outline{position:absolute;border:2px dashed rgba(220,20,60,0.9);pointer-events:none;z-index:2600}
+  .handle{position:absolute;width:12px;height:12px;background:#fff;border:2px solid #222;box-sizing:border-box;z-index:2601;border-radius:2px}
+  /* responsive */
+  @media(max-width:760px){
+    .nav-links{display:none}
+    .hamburger{display:block}
+    .toolbar{left:8px;transform:none;right:8px;padding:8px}
+  }
 </style>
 </head>
 <body>
-<canvas id="board"></canvas>
+  <div class="navbar">
+    <div class="nav-left"><div class="brand">MySite</div></div>
+    <div class="nav-links">
+      <a href="#">Home</a><a href="#">Board</a><a href="#">Notes</a><a href="#">Profile</a>
+    </div>
+    <div class="hamburger" id="hamb">☰</div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#">Home</a><a href="#">Board</a><a href="#">Notes</a><a href="#">Profile</a>
+  </div>
 
-<div class="toolbar">
-  <select id="tool">
-    <option value="pen">✏ Pen</option>
-    <option value="eraser">🩹 Eraser</option>
-    <option value="select">🔲 Select</option>
-  </select>
+  <div id="canvasWrap"><canvas id="board"></canvas></div>
 
-  <select id="shapeTool">
-    <option value="">Shapes ▼</option>
-    <option value="line">Line</option>
-    <option value="rect">Rectangle</option>
-    <option value="circle">Circle</option>
-    <option value="ellipse">Ellipse</option>
-    <option value="triangle">Triangle</option>
-    <option value="star">Star</option>
-    <option value="arrow">Arrow</option>
-    <option value="polygon">Polygon (6)</option>
-  </select>
+  <div class="toolbar" id="toolbar">
+    <select id="mode">
+      <option value="pen">✏️ Pen</option>
+      <option value="select">🔲 Select</option>
+      <option value="erase">🩹 Eraser</option>
+    </select>
 
-  <input type="color" id="color" value="#000000"/>
-  <input type="range" id="size" min="1" max="30" value="3"/>
-  <button onclick="addNote()">📝 Note</button>
-  <button onclick="deleteSelected()">❌ Delete</button>
-  <button onclick="clearBoard()">🧹 Clear</button>
-</div>
+    <select id="shapes">
+      <option value="">📐 Shapes</option>
+      <option value="line">Line</option>
+      <option value="rect">Rectangle</option>
+      <option value="circle">Circle</option>
+      <option value="ellipse">Ellipse</option>
+      <option value="triangle">Triangle</option>
+      <option value="arrow">Arrow</option>
+      <option value="star">Star</option>
+      <option value="polygon">Polygon (n)</option>
+    </select>
+
+    <input type="color" id="color" value="#000000" title="Color">
+    <input type="range" id="thickness" min="1" max="30" value="3" title="Size">
+
+    <button onclick="addNote()">📝 Add Note</button>
+    <button onclick="deleteSelected()">❌ Delete</button>
+    <button onclick="undo()">↶ Undo</button>
+    <button onclick="redo()">↷ Redo</button>
+    <button class="primary" onclick="exportPNG()">⬇️ Export PNG</button>
+    <button onclick="clearAll()">🧹 Clear</button>
+  </div>
 
 <script>
-const canvas=document.getElementById("board"),ctx=canvas.getContext("2d");
-function resize(){canvas.width=innerWidth;canvas.height=innerHeight;redraw();}
-window.onresize=resize;resize();
+/* === setup canvas size to available area === */
+const canvas = document.getElementById('board'), wrap = document.getElementById('canvasWrap');
+const ctx = canvas.getContext('2d');
 
-let tool="pen",shapeType="",color="#000",size=3,shapes=[],drawing=false,temp=null,startX=0,startY=0;
-document.getElementById("tool").onchange=e=>{tool=e.target.value;shapeType="";};
-document.getElementById("shapeTool").onchange=e=>{shapeType=e.target.value;tool=shapeType? "shape":tool;};
-document.getElementById("color").oninput=e=>color=e.target.value;
-document.getElementById("size").oninput=e=>size=+e.target.value;
+function fit(){
+  // use clientWidth / clientHeight to account for available area
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  // preserve drawing scale: we will redraw from shapes array so it's fine
+  canvas.width = Math.max(1, Math.floor(w));
+  canvas.height = Math.max(1, Math.floor(h));
+  redraw();
+}
+window.addEventListener('resize', fit);
+fit();
 
-canvas.addEventListener("pointerdown",e=>{
-  const p=getPos(e);startX=p.x;startY=p.y;drawing=true;
-  if(tool==="pen"){temp={type:"pen",color,size,points:[[p.x,p.y]]};shapes.push(temp);}
-  if(tool==="eraser"){erase(p);}
-  if(tool==="shape"&&shapeType){temp={type:shapeType,color,size,x1:p.x,y1:p.y,x2:p.x,y2:p.y};}
+/* === state === */
+let mode = 'pen';                // pen | select | erase
+let shapeMode = '';              // blank or shape type
+let color = '#000000';
+let thickness = 3;
+let shapes = [];                 // array of shape objects
+let notes = [];                  // DOM notes
+let isPointerDown = false;
+let currentPointerId = null;
+let start = {x:0,y:0};
+let preview = null;              // temporary preview shape
+let selected = null;             // {type:'shape'|'note', index, el}  index only for shape
+let dragState = null;            // {mode:'move'|'resize'|'draw', ...}
+const HIT_TOL = 8;
+
+/* === history for undo/redo === */
+let history = [], hIndex = -1;
+function snapshot(){ // save shapes + notes (positions + text)
+  // deep copy shapes
+  const s = JSON.parse(JSON.stringify(shapes));
+  // notes: store bounding + text
+  const n = Array.from(document.querySelectorAll('.note')).map(nEl=>{
+    const r = nEl.getBoundingClientRect();
+    const wrapR = wrap.getBoundingClientRect();
+    return {left: nEl.style.left, top: nEl.style.top, width: nEl.style.width, height: nEl.style.height, text: nEl.querySelector('textarea').value};
+  });
+  // apply new entry
+  history.splice(hIndex+1);
+  history.push({shapes:s, notes:n});
+  hIndex = history.length-1;
+  // keep history size reasonable
+  if(history.length>60){ history.shift(); hIndex--; }
+}
+function restoreSnapshot(idx){
+  if(idx<0 || idx>=history.length) return;
+  const state = history[idx];
+  shapes = JSON.parse(JSON.stringify(state.shapes));
+  // remove current notes and recreate
+  document.querySelectorAll('.note').forEach(n=>n.remove());
+  for(const n of state.notes){
+    placeNoteFromData(n);
+  }
+  selected = null; removeSelectionUI(); redraw();
+  hIndex = idx;
+}
+
+/* === toolbar bindings === */
+document.getElementById('mode').addEventListener('change', e=>{
+  mode = e.target.value;
+  if(mode !== 'select'){ deselectAll(); }
 });
-canvas.addEventListener("pointermove",e=>{
-  if(!drawing)return;const p=getPos(e);
-  if(tool==="pen"){temp.points.push([p.x,p.y]);redraw();}
-  if(tool==="eraser"){erase(p);}
-  if(tool==="shape"&&temp){temp.x2=p.x;temp.y2=p.y;redraw();drawPreview(temp);}
+document.getElementById('shapes').addEventListener('change', e=>{
+  shapeMode = e.target.value;
+  if(shapeMode) mode = 'shape';
 });
-canvas.addEventListener("pointerup",e=>{
-  if(!drawing)return;drawing=false;
-  if(tool==="shape"&&temp){shapes.push({...temp});temp=null;redraw();}
+document.getElementById('color').addEventListener('input', e=> color = e.target.value);
+document.getElementById('thickness').addEventListener('input', e=> thickness = +e.target.value);
+
+/* === mobile menu === */
+document.getElementById('hamb').addEventListener('click', ()=>{
+  const m = document.getElementById('mobileMenu');
+  m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
 });
 
-function getPos(e){const r=canvas.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};}
-function erase(p){ctx.clearRect(p.x-size,p.y-size,size*2,size*2);}
-function redraw(){ctx.clearRect(0,0,canvas.width,canvas.height);for(const s of shapes)drawShape(s);}
-function drawShape(s){
-  ctx.strokeStyle=s.color;ctx.lineWidth=s.size;ctx.beginPath();
-  if(s.type==="pen"){ctx.moveTo(s.points[0][0],s.points[0][1]);for(const pt of s.points)ctx.lineTo(pt[0],pt[1]);ctx.stroke();}
-  if(s.type==="line"){ctx.moveTo(s.x1,s.y1);ctx.lineTo(s.x2,s.y2);ctx.stroke();}
-  if(s.type==="rect"){ctx.strokeRect(s.x1,s.y1,s.x2-s.x1,s.y2-s.y1);}
-  if(s.type==="circle"){let r=Math.hypot(s.x2-s.x1,s.y2-s.y1);ctx.arc(s.x1,s.y1,r,0,2*Math.PI);ctx.stroke();}
-  if(s.type==="ellipse"){ctx.ellipse((s.x1+s.x2)/2,(s.y1+s.y2)/2,Math.abs(s.x2-s.x1)/2,Math.abs(s.y2-s.y1)/2,0,0,2*Math.PI);ctx.stroke();}
-  if(s.type==="triangle"){ctx.moveTo(s.x1,s.y2);ctx.lineTo((s.x1+s.x2)/2,s.y1);ctx.lineTo(s.x2,s.y2);ctx.closePath();ctx.stroke();}
-  if(s.type==="star"){drawStar(s.x1,s.y1,s.x2,s.y2);} 
-  if(s.type==="arrow"){drawArrow(s.x1,s.y1,s.x2,s.y2);}
-  if(s.type==="polygon"){drawPolygon(s.x1,s.y1,s.x2,s.y2,6);}
-}
-function drawPreview(s){ctx.save();ctx.setLineDash([6,6]);drawShape(s);ctx.restore();}
-function drawStar(x1,y1,x2,y2){
-  const cx=(x1+x2)/2,cy=(y1+y2)/2,r=Math.hypot(x2-x1,y2-y1)/2,sp=5;
-  ctx.moveTo(cx,cy-r);
-  for(let i=1;i<=sp*2;i++){const ang=i*Math.PI/sp;const rr=i%2?r/2:r;ctx.lineTo(cx+rr*Math.sin(ang),cy-rr*Math.cos(ang));}
-  ctx.closePath();ctx.stroke();
-}
-function drawArrow(x1,y1,x2,y2){
-  ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
-  const ang=Math.atan2(y2-y1,x2-x1),len=10;
-  ctx.beginPath();ctx.moveTo(x2,y2);
-  ctx.lineTo(x2-len*Math.cos(ang-Math.PI/6),y2-len*Math.sin(ang-Math.PI/6));
-  ctx.lineTo(x2-len*Math.cos(ang+Math.PI/6),y2-len*Math.sin(ang+Math.PI/6));
-  ctx.closePath();ctx.fillStyle=color;ctx.fill();
-}
-function drawPolygon(x1,y1,x2,y2,n){
-  const cx=(x1+x2)/2,cy=(y1+y2)/2,r=Math.hypot(x2-x1,y2-y1)/2;
-  ctx.moveTo(cx+r,cy);
-  for(let i=1;i<=n;i++){const ang=i*2*Math.PI/n;ctx.lineTo(cx+r*Math.cos(ang),cy+r*Math.sin(ang));}
-  ctx.closePath();ctx.stroke();
+/* === pointer helpers === */
+function getEventPos(e){
+  const rect = canvas.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
 }
 
+/* pointer events */
+canvas.addEventListener('pointerdown', (ev)=>{ ev.preventDefault(); canvas.setPointerCapture(ev.pointerId); onPointerDown(ev); }, {passive:false});
+canvas.addEventListener('pointermove', (ev)=>{ if(ev.pointerId === currentPointerId) onPointerMove(ev); }, {passive:false});
+canvas.addEventListener('pointerup', (ev)=>{ if(ev.pointerId === currentPointerId) onPointerUp(ev); }, {passive:false});
+canvas.addEventListener('pointercancel', (ev)=>{ if(ev.pointerId === currentPointerId) onPointerUp(ev); }, {passive:false});
+
+function onPointerDown(e){
+  isPointerDown = true;
+  currentPointerId = e.pointerId;
+  const p = getEventPos(e);
+  start = {...p};
+  if(mode === 'pen'){
+    const stroke = {type:'pen', color, thickness, points:[[p.x,p.y]]};
+    shapes.push(stroke);
+    dragState = {mode:'drawing', obj:stroke};
+    redraw();
+  } else if(mode === 'erase'){
+    // erase shapes whose bounding boxes intersect eraser circle
+    eraseAt(p.x,p.y,thickness*1.5);
+    snapshot();
+  } else if(mode === 'shape' && shapeMode){
+    preview = {type:shapeMode, color, thickness, x1:p.x, y1:p.y, x2:p.x, y2:p.y};
+    dragState = {mode:'preview', preview};
+  } else if(mode === 'select'){
+    // find topmost shape hit
+    const hit = hitTest(p.x,p.y);
+    if(hit){ selectShape(hit.index); // start move
+      dragState = {mode:'move', startX:p.x, startY:p.y, index:hit.index};
+    } else {
+      // check for note under pointer
+      const note = getNoteAt(p.x,p.y);
+      if(note){ selectNote(note); } else { deselectAll(); }
+    }
+  }
+}
+
+function onPointerMove(e){
+  if(!isPointerDown) return;
+  const p = getEventPos(e);
+  if(!dragState) return;
+  if(dragState.mode === 'drawing'){
+    dragState.obj.points.push([p.x,p.y]);
+    redraw();
+  } else if(dragState.mode === 'preview'){
+    preview.x2 = p.x; preview.y2 = p.y;
+    redraw();
+    drawPreview(preview);
+  } else if(dragState.mode === 'move'){
+    const idx = dragState.index;
+    const dx = p.x - dragState.startX, dy = p.y - dragState.startY;
+    moveShapeBy(idx, dx, dy);
+    dragState.startX = p.x; dragState.startY = p.y;
+    redraw();
+    showSelectionOutline(idx);
+  }
+}
+
+function onPointerUp(e){
+  isPointerDown = false;
+  currentPointerId = null;
+  if(dragState && dragState.mode === 'drawing'){ dragState = null; snapshot(); return; }
+  if(dragState && dragState.mode === 'preview'){
+    shapes.push({...preview});
+    preview = null;
+    dragState = null;
+    redraw();
+    snapshot();
+    return;
+  }
+  if(dragState && dragState.mode === 'move'){ dragState = null; snapshot(); return; }
+}
+
+/* === drawing & preview functions === */
+function redraw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(const s of shapes) drawShapeOnCtx(s, ctx);
+}
+
+function drawShapeOnCtx(s, C){
+  C.strokeStyle = s.color || '#000';
+  C.lineWidth = s.thickness || s.size || 2;
+  C.lineCap = 'round'; C.lineJoin = 'round';
+  C.beginPath();
+  if(s.type === 'pen'){
+    const pts = s.points;
+    if(!pts || pts.length===0) return;
+    C.moveTo(pts[0][0], pts[0][1]);
+    for(let i=1;i<pts.length;i++) C.lineTo(pts[i][0], pts[i][1]);
+    C.stroke();
+  } else if(s.type === 'line'){
+    C.moveTo(s.x1,s.y1); C.lineTo(s.x2,s.y2); C.stroke();
+  } else if(s.type === 'rect'){
+    C.strokeRect(s.x1,s.y1,s.x2-s.x1,s.y2-s.y1);
+  } else if(s.type === 'circle'){
+    const r = Math.hypot(s.x2-s.x1,s.y2-s.y1);
+    C.beginPath(); C.arc(s.x1,s.y1,r,0,Math.PI*2); C.stroke();
+  } else if(s.type === 'ellipse'){
+    C.beginPath(); C.ellipse((s.x1+s.x2)/2,(s.y1+s.y2)/2,Math.abs(s.x2-s.x1)/2,Math.abs(s.y2-s.y1)/2,0,0,Math.PI*2); C.stroke();
+  } else if(s.type === 'triangle'){
+    C.moveTo((s.x1+s.x2)/2,s.y1); C.lineTo(s.x1,s.y2); C.lineTo(s.x2,s.y2); C.closePath(); C.stroke();
+  } else if(s.type === 'arrow'){
+    drawArrow(C,s.x1,s.y1,s.x2,s.y2,s.color);
+  } else if(s.type === 'star'){
+    drawStar(C,s.x1,s.y1,s.x2,s.y2);
+  } else if(s.type === 'polygon'){
+    drawPolygon(C,s.x1,s.y1,s.x2,s.y2,s.sides||6);
+  }
+}
+
+function drawPreview(s){
+  ctx.save(); ctx.setLineDash([8,6]); ctx.strokeStyle = s.color; ctx.lineWidth = s.thickness; drawShapeOnCtx(s, ctx); ctx.restore();
+}
+
+/* === shape helpers: arrow star polygon === */
+function drawArrow(C,x1,y1,x2,y2){
+  C.strokeStyle = C.strokeStyle; C.lineWidth = C.lineWidth;
+  C.beginPath(); C.moveTo(x1,y1); C.lineTo(x2,y2); C.stroke();
+  const ang = Math.atan2(y2-y1,x2-x1); const L=12;
+  C.beginPath();
+  C.moveTo(x2,y2);
+  C.lineTo(x2 - L*Math.cos(ang - Math.PI/6), y2 - L*Math.sin(ang - Math.PI/6));
+  C.lineTo(x2 - L*Math.cos(ang + Math.PI/6), y2 - L*Math.sin(ang + Math.PI/6));
+  C.closePath(); C.fillStyle = C.strokeStyle; C.fill();
+}
+function drawStar(C,x1,y1,x2,y2){
+  const cx=(x1+x2)/2, cy=(y1+y2)/2, R=Math.hypot(x2-x1,y2-y1)/2;
+  const spikes=5, inner=R/2; let rot=Math.PI/2*3; const step=Math.PI/spikes;
+  C.beginPath(); C.moveTo(cx,cy-R);
+  for(let i=0;i<spikes;i++){ C.lineTo(cx+Math.cos(rot)*R, cy+Math.sin(rot)*R); rot+=step; C.lineTo(cx+Math.cos(rot)*inner, cy+Math.sin(rot)*inner); rot+=step; }
+  C.closePath(); C.stroke();
+}
+function drawPolygon(C,x1,y1,x2,y2,sides){
+  const cx=(x1+x2)/2, cy=(y1+y2)/2, R=Math.hypot(x2-x1,y2-y1)/2;
+  C.beginPath(); for(let i=0;i<sides;i++){ const a = (i/sides)*Math.PI*2; const px = cx + R*Math.cos(a); const py = cy + R*Math.sin(a); if(i===0) C.moveTo(px,py); else C.lineTo(px,py); } C.closePath(); C.stroke();
+}
+
+/* === hit-testing & select/move/resize UI === */
+let outlineEl = null, handleEls = [];
+function hitTest(x,y){
+  for(let i=shapes.length-1;i>=0;i--){
+    const s = shapes[i];
+    if(s.type==='pen'){
+      // bounding box test
+      let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+      for(const p of s.points){ minX=Math.min(minX,p[0]); minY=Math.min(minY,p[1]); maxX=Math.max(maxX,p[0]); maxY=Math.max(maxY,p[1]); }
+      if(x >= minX-HIT_TOL && x <= maxX+HIT_TOL && y >= minY-HIT_TOL && y <= maxY+HIT_TOL) return {index:i};
+    } else if(s.type==='line'){
+      if(pointNearSegment(x,y,s.x1,s.y1,s.x2,s.y2, Math.max(HIT_TOL, s.thickness+2))) return {index:i};
+    } else if(s.type==='rect'){
+      const minX=Math.min(s.x1,s.x2), maxX=Math.max(s.x1,s.x2), minY=Math.min(s.y1,s.y2), maxY=Math.max(s.y1,s.y2);
+      if(x>=minX-HIT_TOL && x<=maxX+HIT_TOL && y>=minY-HIT_TOL && y<=maxY+HIT_TOL) return {index:i};
+    } else if(s.type==='circle' || s.type==='ellipse' || s.type==='triangle' || s.type==='star' || s.type==='polygon'){
+      const minX=Math.min(s.x1,s.x2), maxX=Math.max(s.x1,s.x2), minY=Math.min(s.y1,s.y2), maxY=Math.max(s.y1,s.y2);
+      if(x>=minX-HIT_TOL && x<=maxX+HIT_TOL && y>=minY-HIT_TOL && y<=maxY+HIT_TOL) return {index:i};
+    }
+  }
+  return null;
+}
+function pointNearSegment(px,py,x1,y1,x2,y2, tol){
+  const A = px - x1, B = py - y1, C = x2 - x1, D = y2 - y1;
+  const dot = A * C + B * D; const len_sq = C*C + D*D;
+  let param = len_sq !== 0 ? dot / len_sq : -1;
+  let xx, yy;
+  if(param < 0){ xx = x1; yy = y1; } else if(param > 1){ xx = x2; yy = y2; } else { xx = x1 + param*C; yy = y1 + param*D; }
+  const dx = px - xx, dy = py - yy; return Math.hypot(dx,dy) <= tol;
+}
+
+// selection outline and handles
+function showSelectionOutline(index){
+  removeSelectionUI();
+  if(index == null || index < 0 || index >= shapes.length) return;
+  selected = {type:'shape', index};
+  const s = shapes[index];
+  // bounding box
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  if(s.type==='pen'){ for(const p of s.points){ minX=Math.min(minX,p[0]); minY=Math.min(minY,p[1]); maxX=Math.max(maxX,p[0]); maxY=Math.max(maxY,p[1]); } }
+  else { minX = Math.min(s.x1,s.x2); minY = Math.min(s.y1,s.y2); maxX = Math.max(s.x1,s.x2); maxY = Math.max(s.y1,s.y2); }
+  // outline
+  outlineEl = document.createElement('div'); outlineEl.className='sel-outline';
+  outlineEl.style.left = (minX-6)+'px'; outlineEl.style.top = (minY-6)+'px';
+  outlineEl.style.width = (Math.max(6, maxX - minX) + 12) + 'px'; outlineEl.style.height = (Math.max(6, maxY - minY) + 12) + 'px';
+  document.body.appendChild(outlineEl);
+  // handles: nw ne sw se
+  const handles = [
+    {left:minX-8, top:minY-8, anchor:'nw'},
+    {left:maxX+4, top:minY-8, anchor:'ne'},
+    {left:minX-8, top:maxY+4, anchor:'sw'},
+    {left:maxX+4, top:maxY+4, anchor:'se'},
+  ];
+  handleEls = handles.map(h=>{
+    const el = document.createElement('div'); el.className='handle';
+    el.style.left = h.left+'px'; el.style.top = h.top+'px';
+    el.dataset.anchor = h.anchor;
+    document.body.appendChild(el);
+    // pointerdown for resizing
+    el.addEventListener('pointerdown', ev=>{
+      ev.stopPropagation(); ev.preventDefault();
+      // capture initial values
+      const p = {x:ev.clientX, y:ev.clientY};
+      const sidx = index;
+      dragState = {mode:'resize', startX:p.x, startY:p.y, index:sidx, anchor:el.dataset.anchor};
+      // attach move/up to window to ensure smooth resize
+      function mv(ev2){
+        const curr = {x:ev2.clientX, y:ev2.clientY};
+        const dx = curr.x - dragState.startX, dy = curr.y - dragState.startY;
+        applyResizeHandle(sidx, dragState.anchor, dx, dy);
+        dragState.startX = curr.x; dragState.startY = curr.y;
+        redraw(); showSelectionOutline(index);
+      }
+      function up(){
+        snapshot(); window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up);
+        dragState = null;
+      }
+      window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
+    });
+    return el;
+  });
+}
+function removeSelectionUI(){
+  if(outlineEl){ outlineEl.remove(); outlineEl = null; }
+  while(handleEls.length) handleEls.pop().remove();
+  selected = null;
+}
+function deselectAll(){ removeSelectionUI(); document.querySelectorAll('.note').forEach(n=>n.classList.remove('selected')); selected = null; }
+function selectShape(index){ showSelectionOutline(index); }
+function applyResizeHandle(index, anchor, dx, dy){
+  const s = shapes[index];
+  if(!s) return;
+  if(anchor==='nw'){ s.x1 += dx; s.y1 += dy; }
+  if(anchor==='ne'){ s.x2 += dx; s.y1 += dy; }
+  if(anchor==='sw'){ s.x1 += dx; s.y2 += dy; }
+  if(anchor==='se'){ s.x2 += dx; s.y2 += dy; }
+}
+
+/* move shape */
+function moveShapeBy(index, dx, dy){
+  const s = shapes[index];
+  if(!s) return;
+  if(s.type === 'pen'){ for(const p of s.points){ p[0]+=dx; p[1]+=dy; } }
+  else { s.x1 += dx; s.y1 += dy; s.x2 += dx; s.y2 += dy; }
+}
+
+/* erase by removing shapes whose bbox intersects eraser circle */
+function eraseAt(x,y,r){
+  // remove shapes whose bounding box intersects the circle
+  shapes = shapes.filter(s=>{
+    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+    if(s.type==='pen'){ for(const p of s.points){ minX=Math.min(minX,p[0]); minY=Math.min(minY,p[1]); maxX=Math.max(maxX,p[0]); maxY=Math.max(maxY,p[1]); } }
+    else { minX = Math.min(s.x1,s.x2); minY = Math.min(s.y1,s.y2); maxX = Math.max(s.x1,s.x2); maxY = Math.max(s.y1,s.y2); }
+    // nearest point in bbox to circle center
+    const nx = Math.max(minX, Math.min(x, maxX));
+    const ny = Math.max(minY, Math.min(y, maxY));
+    const dist = Math.hypot(nx-x, ny-y);
+    return dist > r; // keep shapes that are outside eraser
+  });
+  redraw(); snapshot();
+}
+
+/* === notes: add, drag, restore === */
 function addNote(){
-  const n=document.createElement("div");n.className="note";n.style.left="100px";n.style.top="100px";
-  n.innerHTML=`<div class="hdr">Note</div><textarea></textarea>`;
+  const n = document.createElement('div'); n.className='note';
+  n.style.left = '80px'; n.style.top = '120px'; n.style.width = '200px'; n.style.height = '140px';
+  n.innerHTML = `<div class="hdr"><span>Note</span><span><button title="Delete" style="border:none;background:transparent;cursor:pointer">✖</button></span></div><textarea></textarea>`;
   document.body.appendChild(n);
-  const hdr=n.querySelector(".hdr");hdr.onpointerdown=e=>{
-    const sx=e.clientX,sy=e.clientY,l=parseInt(n.style.left),t=parseInt(n.style.top);
-    function mv(ev){n.style.left=(l+ev.clientX-sx)+"px";n.style.top=(t+ev.clientY-sy)+"px";}
-    function up(){window.removeEventListener("pointermove",mv);}
-    window.addEventListener("pointermove",mv);window.addEventListener("pointerup",up,{once:true});
-  };
+  // delete button
+  n.querySelector('button').addEventListener('click', (ev)=>{ ev.stopPropagation(); n.remove(); snapshot(); });
+  // header drag
+  const hdr = n.querySelector('.hdr');
+  hdr.addEventListener('pointerdown', ev=>{
+    ev.stopPropagation(); ev.preventDefault();
+    const sx = ev.clientX, sy = ev.clientY;
+    const initL = parseFloat(n.style.left || 0), initT = parseFloat(n.style.top || 0);
+    function mv(ev2){ n.style.left = (initL + ev2.clientX - sx) + 'px'; n.style.top = (initT + ev2.clientY - sy) + 'px'; }
+    function up(){ snapshot(); window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); }
+    window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
+  });
+  // select on click
+  n.addEventListener('pointerdown', ev=>{ ev.stopPropagation(); deselectAll(); n.classList.add('selected'); selected = {type:'note', el:n}; });
+  snapshot();
+}
+function placeNoteFromData(d){
+  const n = document.createElement('div'); n.className='note';
+  n.style.left = d.left; n.style.top = d.top; n.style.width = d.width; n.style.height = d.height;
+  n.innerHTML = `<div class="hdr"><span>Note</span><span><button title="Delete" style="border:none;background:transparent;cursor:pointer">✖</button></span></div><textarea></textarea>`;
+  n.querySelector('textarea').value = d.text || '';
+  document.body.appendChild(n);
+  n.querySelector('button').addEventListener('click', ev=>{ ev.stopPropagation(); n.remove(); snapshot(); });
+  const hdr = n.querySelector('.hdr');
+  hdr.addEventListener('pointerdown', ev=>{
+    ev.stopPropagation(); ev.preventDefault();
+    const sx = ev.clientX, sy = ev.clientY;
+    const initL = parseFloat(n.style.left || 0), initT = parseFloat(n.style.top || 0);
+    function mv(ev2){ n.style.left = (initL + ev2.clientX - sx) + 'px'; n.style.top = (initT + ev2.clientY - sy) + 'px'; }
+    function up(){ snapshot(); window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); }
+    window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
+  });
+  n.addEventListener('pointerdown', ev=>{ ev.stopPropagation(); deselectAll(); n.classList.add('selected'); selected = {type:'note', el:n}; });
 }
 
-function deleteSelected(){shapes.pop();redraw();}
-function clearBoard(){shapes=[];ctx.clearRect(0,0,canvas.width,canvas.height);document.querySelectorAll(".note").forEach(n=>n.remove());}
+/* get note element at canvas-relative point */
+function getNoteAt(x,y){
+  const notesEls = document.querySelectorAll('.note');
+  for(const n of notesEls){
+    const r = n.getBoundingClientRect();
+    const wrapR = wrap.getBoundingClientRect();
+    // compute relative to canvasWrap
+    const left = r.left - wrapR.left, top = r.top - wrapR.top;
+    if(x >= left && x <= left + r.width && y >= top && y <= top + r.height) return n;
+  }
+  return null;
+}
+function selectNote(el){
+  deselectAll();
+  el.classList.add('selected');
+  selected = {type:'note', el};
+}
+
+/* delete selected */
+function deleteSelected(){
+  if(!selected) return;
+  if(selected.type === 'note'){ selected.el.remove(); selected = null; removeSelectionUI(); snapshot(); }
+  else if(selected.type === 'shape'){ shapes.splice(selected.index,1); selected = null; removeSelectionUI(); redraw(); snapshot(); }
+}
+
+/* clear all */
+function clearAll(){ shapes=[]; document.querySelectorAll('.note').forEach(n=>n.remove()); deselectAll(); redraw(); snapshot(); }
+
+/* undo/redo */
+function undo(){ if(hIndex > 0) restoreSnapshot(hIndex-1); }
+function redo(){ if(hIndex < history.length-1) restoreSnapshot(hIndex+1); }
+
+/* export PNG (draw shapes + notes onto new canvas to include notes text) */
+function exportPNG(){
+  const out = document.createElement('canvas');
+  out.width = canvas.width; out.height = canvas.height;
+  const C = out.getContext('2d');
+  // white bg
+  C.fillStyle = '#fff'; C.fillRect(0,0,out.width,out.height);
+  // draw shapes
+  for(const s of shapes) drawShapeOnCtx(s, C);
+  // draw notes (relative to canvasWrap)
+  const wrapRect = wrap.getBoundingClientRect();
+  document.querySelectorAll('.note').forEach(n=>{
+    const r = n.getBoundingClientRect();
+    const left = r.left - wrapRect.left, top = r.top - wrapRect.top;
+    // background
+    C.fillStyle = '#fff59d'; C.fillRect(left, top, r.width, r.height);
+    C.strokeStyle = '#333'; C.strokeRect(left, top, r.width, r.height);
+    // text
+    const txt = (n.querySelector('textarea').value || '').split('\n');
+    C.fillStyle = '#000'; C.font = '14px Arial';
+    let lineY = top + 20;
+    for(const line of txt){
+      C.fillText(line, left + 6, lineY);
+      lineY += 18;
+    }
+  });
+  // download
+  const url = out.toDataURL('image/png');
+  const a = document.createElement('a'); a.href = url; a.download = 'whiteboard.png'; a.click();
+}
+
+/* initial snapshot */
+snapshot();
+
+/* keyboard delete */
+window.addEventListener('keydown', (e)=>{ if(e.key === 'Delete' || e.key === 'Backspace') deleteSelected(); });
+
+/* click on canvas to select shapes when in select mode */
+canvas.addEventListener('click', (ev)=>{
+  if(mode !== 'select') return;
+  const p = getEventPos(ev);
+  const h = hitTest(p.x,p.y);
+  if(h){ selectShape(h.index); showSelectionOutline(h.index); }
+  else {
+    const note = getNoteAt(p.x,p.y);
+    if(note) selectNote(note); else deselectAll();
+  }
+});
+
+/* helper to get event pos relative to canvasWrap (for notes) */
+function getEventPos(e){
+  const rect = canvas.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+
+/* utility: remove selection UI */
+function removeSelectionUI(){
+  if(outlineEl){ outlineEl.remove(); outlineEl = null; }
+  while(handleEls.length) handleEls.pop().remove();
+  selected = null;
+}
+
+/* utility: show selection outline for notes is done via 'selected' class on note CSS */
+function showSelectionOutline(idx){
+  // uses elements created in showSelectionOutline function
+}
+
+/* helper to place note data (used for restoring history) already implemented above in placeNoteFromData */
+
 </script>
 </body>
 </html>
