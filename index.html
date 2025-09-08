@@ -18,14 +18,8 @@
     --vv-bg:#f4f4f7;
     --shadow:0 10px 30px rgba(0,0,0,.08);
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    font-family:'Lora', serif;
-    color:var(--vv-text);
-    background:var(--vv-bg);
-    line-height:1.6;
-  }
+  *{box-sizing:border-box}
+  html,body{margin:0; padding:0; font-family:'Lora', serif; background:var(--vv-bg); color:var(--vv-text); line-height:1.6; overflow-x:hidden;}
 
   /* ===== NAVBAR ===== */
   .nav{
@@ -41,9 +35,7 @@
   .brand img{height:48px; width:auto}
   .brand .name{font:800 1.5rem/1 'Montserrat', sans-serif; color:var(--vv-purple)}
 
-  .menu{
-    display:flex; gap:18px; align-items:center;
-  }
+  .menu{display:flex; gap:18px; align-items:center}
   .menu a{
     font:600 0.95rem/1 'Montserrat', sans-serif;
     color:var(--vv-purple); text-decoration:none;
@@ -51,36 +43,13 @@
   }
   .menu a:hover,.menu a.active{ background:var(--vv-purple); color:#fff }
 
-  /* AI Avatar */
-  .ai-avatar {
-    width:42px; height:42px;
-    background: linear-gradient(135deg,var(--vv-purple),var(--vv-green));
-    border-radius:50%;
-    position:relative;
-    cursor:pointer;
-  }
-  .ai-avatar::after {
-    content:""; width:18px; height:18px;
-    background:var(--vv-bg);
-    border-radius:50%;
-    position:absolute; top:0; right:0;
-    transform: translate(25%, -25%);
-  }
+  .ai-avatar img{border-radius:50%; width:36px; height:36px; cursor:pointer;}
 
-  /* Hamburger Menu */
-  .hamburger{
-    display:none; flex-direction:column; cursor:pointer; gap:5px;
-  }
-  .hamburger div{
-    width:25px; height:3px; background:var(--vv-purple); border-radius:2px;
-  }
-  .mobile-menu{
-    display:none; position:absolute; top:100%; left:0; width:100%;
-    background:#fff; flex-direction:column; padding:10px 0; box-shadow:0 6px 14px rgba(67,0,185,0.1);
-  }
-  .mobile-menu a{
-    padding:10px 20px; border-bottom:1px solid #ececf0;
-  }
+  /* Hamburger menu for mobile */
+  .hamburger{display:none; flex-direction:column; cursor:pointer; gap:6px}
+  .hamburger div{width:25px; height:3px; background:var(--vv-purple); border-radius:2px; transition:0.3s;}
+  .mobile-menu{display:none; flex-direction:column; position:absolute; top:70px; left:0; right:0; background:#fff; padding:10px 20px; box-shadow:0 5px 15px rgba(0,0,0,0.2); z-index:100;}
+  .mobile-menu a{margin:8px 0; color:var(--vv-purple); text-decoration:none; font-weight:600;}
 
   /* ===== HERO ===== */
   .hero{
@@ -92,22 +61,27 @@
       radial-gradient(1200px 500px at 110% 10%, rgba(67,0,185,.35),transparent 60%),
       #0f0d2a;
     overflow:hidden;
-    text-align:center;
     color:#fff;
+    text-align:center;
   }
-  .hero h1{font-family:'Montserrat',sans-serif;font-weight:800;font-size:2.6rem;margin-bottom:1rem;}
-  .hero p{font-size:1.15rem; margin-bottom:1.5rem; color:#eee;}
-  .hero .tagline{
+  .hero-card{
+    width:100%; max-width:920px;
+    background:rgba(255,255,255,.95);
+    border-radius:24px; box-shadow:var(--shadow);
+    padding:32px; backdrop-filter:saturate(130%) blur(4px);
+    text-align:center;
+  }
+  .hero h1{font-family:'Montserrat',sans-serif;font-weight:800;font-size:2.4rem;color:#111}
+  .hero p{max-width:760px;margin:.75rem auto 1.25rem;color:#333;font-size:1.05rem}
+
+  .tagline{
     font-family:'Montserrat',sans-serif;
     font-weight:800;
-    font-size:1.5rem;
-    color:#fff;
-    background: linear-gradient(135deg, var(--vv-green), var(--vv-purple));
-    display:inline-block;
-    padding:12px 24px;
-    border-radius:30px;
-    box-shadow:0 6px 20px rgba(0,0,0,0.3);
-    margin-bottom:1.5rem;
+    font-size:1.6rem;
+    margin-top:12px;
+    background: linear-gradient(90deg, #4300b9, #76b900);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .btn{
@@ -133,10 +107,50 @@
   footer{margin-top:72px;padding:28px 20px;text-align:center;color:#8a8a98}
 
   /* Responsive */
-  @media(max-width:768px){
-    .menu{display:none;}
-    .hamburger{display:flex;}
+  @media(max-width:900px){
+    .menu{display:none}
+    .hamburger{display:flex}
   }
+
+  /* Home badge animation */
+  .home-badge {
+    display: inline-block;
+    margin-top: 15px;
+    background: linear-gradient(135deg, var(--vv-green), var(--vv-purple));
+    color: white;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: popIn 0.6s forwards;
+  }
+  @keyframes popIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Chatbot widget */
+  #chat-icon {position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: #4caf50; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; color: white; font-size: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 9999; transition: transform 0.3s;}
+  #chat-icon:hover { transform: scale(1.1); }
+  #chatbox {position: fixed; bottom: 90px; right: 20px; width: 350px; height: 450px; background-color: #2e2e2e; border-radius: 16px; display: none; flex-direction: column; box-shadow: 0 8px 25px rgba(0,0,0,0.4); z-index: 9999; overflow: hidden; animation: slideIn 0.3s ease;}
+  @keyframes slideIn {from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; }}
+  #chat-header { background-color: #4caf50; padding: 10px; color: white; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
+  #close-btn { cursor: pointer; font-weight: bold; }
+  #messages { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;}
+  .message { max-width: 80%; padding: 10px; border-radius: 12px; color: #fff; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease;}
+  .user-message { background-color: #555; align-self: flex-end; border-bottom-right-radius: 0;}
+  .ai-message { background-color: #4caf50; align-self: flex-start; border-bottom-left-radius: 0;}
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);}}
+  #input-container { display: flex; padding: 10px; border-top: 1px solid #444;}
+  #user-input { flex: 1; padding: 10px; border-radius: 12px; border: none; outline: none; background-color: #444; color: #fff;}
+  #send-btn { padding: 10px 15px; margin-left: 8px; border: none; border-radius: 12px; background-color: #4caf50; color: white; cursor: pointer;}
+  #send-btn:hover { background-color: #45a049; }
+
 </style>
 </head>
 <body>
@@ -148,36 +162,50 @@
       <img src="Valiant Vision.jpg" alt="Valiant Vision logo">
       <div class="name">Valiant Vision</div>
     </div>
+
+    <!-- Desktop menu -->
     <div class="menu">
       <a href="#about" class="active">About Us</a>
       <a href="#problem">Problem</a>
       <a href="#solution">Our Solution</a>
       <a href="subscribe.html">Subscribe</a>
       <a href="whiteboard.html">Whiteboard</a>
-      <div class="ai-avatar" id="ai-login" title="AI Login"></div>
+      <!-- AI Avatar for desktop -->
+      <div id="ai-login" class="ai-avatar">
+        <img src="ai-avatar.png" alt="AI Login">
+      </div>
     </div>
+
+    <!-- Hamburger for mobile -->
     <div class="hamburger" id="hamburger">
       <div></div>
       <div></div>
       <div></div>
     </div>
   </div>
-  <div class="mobile-menu" id="mobile-menu">
+
+  <!-- Mobile menu content -->
+  <div class="mobile-menu" id="mobileMenu">
     <a href="#about">About Us</a>
     <a href="#problem">Problem</a>
     <a href="#solution">Our Solution</a>
     <a href="subscribe.html">Subscribe</a>
     <a href="whiteboard.html">Whiteboard</a>
-    <div class="ai-avatar" id="ai-login-mobile" title="AI Login" style="margin:10px auto;"></div>
+    <!-- AI Avatar for mobile -->
+    <div id="ai-login-mobile" class="ai-avatar" style="margin-top:10px;">
+      <img src="ai-avatar.png" alt="AI Login">
+    </div>
   </div>
 </nav>
 
 <!-- HERO -->
 <header class="hero">
-  <div class="tagline">The Way It's Meant To Be Learnt</div>
-  <h1>Give Your Curiosity a Home</h1>
-  <p>Unlock monthly creativity kits designed by mentors from leading universities. Join our journey of learning by doing.</p>
-  <a href="subscribe.html"><button class="btn">Subscribe Now</button></a>
+  <div class="hero-card">
+    <h1>Give Your Curiosity a Home</h1>
+    <p>Unlock monthly creativity kits designed by mentors from leading universities. Join our journey of learning by doing.</p>
+    <div class="tagline">The Way It's Meant To Be Learnt</div>
+    <a href="subscribe.html"><button class="btn">Subscribe Now</button></a>
+  </div>
   <div id="home-badge" style="display:none;"></div>
 </header>
 
@@ -213,26 +241,34 @@
 
 <footer>© 2025 Valiant Vision • Made for curious learners</footer>
 
-<!-- Mobile Menu Script -->
-<script>
-  const hamburger = document.getElementById('hamburger');
-  const mobileMenu = document.getElementById('mobile-menu');
-  hamburger.addEventListener('click',()=>{
-    mobileMenu.style.display = mobileMenu.style.display==='flex'?'none':'flex';
-  });
-</script>
+<!-- AI Chatbot Widget -->
+<div id="chat-icon">💬</div>
+<div id="chatbox">
+  <div id="chat-header">
+    AI Assistant
+    <span id="close-btn">✖</span>
+  </div>
+  <div id="messages"></div>
+  <div id="input-container">
+    <input type="text" id="user-input" placeholder="Ask me anything...">
+    <button id="send-btn">Send</button>
+  </div>
+</div>
 
-<!-- AI Login Click -->
 <script>
-  function aiLogin(){
-    alert("AI Login Clicked!"); // Replace with actual login logic
-  }
+  // Hamburger toggle
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    mobileMenu.style.display = mobileMenu.style.display === 'flex' ? 'none' : 'flex';
+  });
+
+  // AI Avatar click
+  function aiLogin() { window.location.href="login.html"; }
   document.getElementById('ai-login').addEventListener('click', aiLogin);
   document.getElementById('ai-login-mobile').addEventListener('click', aiLogin);
-</script>
 
-<!-- Home Badge -->
-<script>
+  // Show badge if subscribed
   window.addEventListener("load", function() {
     if (localStorage.getItem("subscribed") === "true") {
       const badgeContainer = document.getElementById("home-badge");
@@ -243,85 +279,49 @@
       badgeContainer.style.display = "block";
     }
   });
-</script>
 
-<!-- AI Chatbot (same as your previous code) -->
-<style>
-#chat-icon {
-  position: fixed; bottom: 20px; right: 20px;
-  width: 60px; height: 60px; background-color: #4caf50;
-  border-radius: 50%; cursor:pointer; display:flex; justify-content:center; align-items:center;
-  color:white; font-size:30px; box-shadow:0 5px 15px rgba(0,0,0,0.3); z-index:9999; transition: transform 0.3s;
-}
-#chat-icon:hover{transform:scale(1.1);}
-#chatbox{position:fixed;bottom:90px;right:20px;width:350px;height:450px;background:#2e2e2e;border-radius:16px;display:none;flex-direction:column;box-shadow:0 8px 25px rgba(0,0,0,0.4);z-index:9999;overflow:hidden;animation:slideIn 0.3s ease;}
-@keyframes slideIn{from{transform:translateY(100px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-#chat-header{background-color:#4caf50;padding:10px;color:white;font-weight:bold;display:flex;justify-content:space-between;align-items:center;}
-#close-btn{cursor:pointer;font-weight:bold;}
-#messages{flex:1;padding:10px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
-.message{max-width:80%;padding:10px;border-radius:12px;color:#fff;word-wrap:break-word;box-shadow:0 2px 5px rgba(0,0,0,0.2);animation:fadeIn 0.3s ease;}
-.user-message{background-color:#555;align-self:flex-end;border-bottom-right-radius:0;}
-.ai-message{background-color:#4caf50;align-self:flex-start;border-bottom-left-radius:0;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-#input-container{display:flex;padding:10px;border-top:1px solid #444;}
-#user-input{flex:1;padding:10px;border-radius:12px;border:none;outline:none;background-color:#444;color:#fff;}
-#send-btn{padding:10px 15px;margin-left:8px;border:none;border-radius:12px;background-color:#4caf50;color:white;cursor:pointer;}
-#send-btn:hover{background-color:#45a049;}
-</style>
+  // Chatbot toggle
+  const chatIcon = document.getElementById('chat-icon');
+  const chatBox = document.getElementById('chatbox');
+  const closeBtn = document.getElementById('close-btn');
 
-<div id="chat-icon">💬</div>
-<div id="chatbox">
-  <div id="chat-header">AI Assistant <span id="close-btn">✖</span></div>
-  <div id="messages"></div>
-  <div id="input-container">
-    <input type="text" id="user-input" placeholder="Ask me anything...">
-    <button id="send-btn">Send</button>
-  </div>
-</div>
+  chatIcon.addEventListener('click', () => { chatBox.style.display = 'flex'; });
+  closeBtn.addEventListener('click', () => { chatBox.style.display = 'none'; });
 
-<script>
-const scriptURL = "https://valiantvision-ai.narendersindhu1977.workers.dev/";
-const chatIcon = document.getElementById('chat-icon');
-const chatBox = document.getElementById('chatbox');
-const closeBtn = document.getElementById('close-btn');
+  const scriptURL = "https://valiantvision-ai.narendersindhu1977.workers.dev/";
+  document.getElementById('send-btn').addEventListener('click', handleSend);
+  document.getElementById('user-input').addEventListener('keypress', function(e){ if(e.key==='Enter') handleSend(); });
 
-chatIcon.addEventListener('click',()=>{chatBox.style.display='flex';});
-closeBtn.addEventListener('click',()=>{chatBox.style.display='none';});
-
-document.getElementById('send-btn').addEventListener('click', handleSend);
-document.getElementById('user-input').addEventListener('keypress', function(e){
-  if(e.key==='Enter') handleSend();
-});
-
-async function handleSend(){
-  const input = document.getElementById('user-input');
-  const message = input.value.trim();
-  if(!message) return;
-  addMessage(message,'user-message');
-  input.value='';
-  addMessage("Thinking... 🤔",'ai-message');
-  try{
-    const response = await fetch(scriptURL,{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({prompt:message})});
-    const contentType = response.headers.get("content-type") || "";
-    if(!contentType.includes("application/json")) throw new Error("Server returned HTML instead of JSON. Check Cloudflare Worker.");
-    const data = await response.json();
-    const messagesDiv = document.getElementById('messages');
-    const lastMsg = messagesDiv.lastChild;
-    if(lastMsg && lastMsg.textContent==="Thinking... 🤔") lastMsg.remove();
-    addMessage(data.result || "No response from AI",'ai-message');
-  } catch(err){
-    console.error(err); addMessage("Error connecting to AI.",'ai-message');
+  async function handleSend(){
+    const input = document.getElementById('user-input');
+    const message = input.value.trim();
+    if(!message) return;
+    addMessage(message, 'user-message'); input.value='';
+    addMessage("Thinking... 🤔", 'ai-message');
+    try {
+      const response = await fetch(scriptURL,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({prompt:message})
+      });
+      const contentType = response.headers.get("content-type") || "";
+      if(!contentType.includes("application/json")) throw new Error("Server returned HTML instead of JSON.");
+      const data = await response.json();
+      const messagesDiv = document.getElementById('messages');
+      const lastMsg = messagesDiv.lastChild;
+      if(lastMsg && lastMsg.textContent==="Thinking... 🤔") lastMsg.remove();
+      addMessage(data.result || "No response from AI", 'ai-message');
+    } catch(err){ console.error(err); addMessage("Error connecting to AI.", 'ai-message'); }
   }
-}
 
-function addMessage(text,className){
-  const messages=document.getElementById('messages');
-  const msgDiv=document.createElement('div');
-  msgDiv.className='message '+className;
-  msgDiv.textContent=text;
-  messages.appendChild(msgDiv);
-  messages.scrollTop=messages.scrollHeight;
-}
+  function addMessage(text, className){
+    const messages = document.getElementById('messages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'message '+className;
+    msgDiv.textContent = text;
+    messages.appendChild(msgDiv);
+    messages.scrollTop = messages.scrollHeight;
+  }
 </script>
 
 </body>
