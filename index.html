@@ -74,11 +74,6 @@ body{
     overflow:hidden;
     text-align:center;
 }
-.hero::before{
-    content:"";
-    position:absolute; inset:0; z-index:-1;
-    opacity:.35; filter:contrast(110%) saturate(110%) blur(1px);
-}
 .hero-card{
     width:100%; max-width:920px;
     background:rgba(255,255,255,.92);
@@ -140,113 +135,6 @@ footer{margin-top:72px;padding:28px 20px;text-align:center;color:#8a8a98}
     background:url('ai-avatar.png') center/cover no-repeat;
     display:inline-block;
 }
-
-/* CHATBOT STYLES */
-#chat-icon {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  background-color: #4caf50;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-size: 30px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  z-index: 9999;
-  transition: transform 0.3s;
-}
-#chat-icon:hover { transform: scale(1.1); }
-
-#chatbox {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  width: 350px;
-  height: 450px;
-  background-color: #2e2e2e;
-  border-radius: 16px;
-  display: none;
-  flex-direction: column;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-  z-index: 9999;
-  overflow: hidden;
-  animation: slideIn 0.3s ease;
-}
-@keyframes slideIn {
-  from { transform: translateY(100px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-#chat-header {
-  background-color: #4caf50;
-  padding: 10px;
-  color: white;
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-#close-btn { cursor: pointer; font-weight: bold; }
-#messages {
-  flex: 1;
-  padding: 10px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.message {
-  max-width: 80%;
-  padding: 10px;
-  border-radius: 12px;
-  color: #fff;
-  word-wrap: break-word;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  animation: fadeIn 0.3s ease;
-}
-.user-message {
-  background-color: #555;
-  align-self: flex-end;
-  border-bottom-right-radius: 0;
-}
-.ai-message {
-  background-color: #4caf50;
-  align-self: flex-start;
-  border-bottom-left-radius: 0;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px);}
-  to { opacity: 1; transform: translateY(0);}
-}
-#input-container {
-  display: flex;
-  padding: 10px;
-  border-top: 1px solid #444;
-}
-#user-input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 12px;
-  border: none;
-  outline: none;
-  background-color: #444;
-  color: #fff;
-}
-#send-btn {
-  padding: 10px 15px;
-  margin-left: 8px;
-  border: none;
-  border-radius: 12px;
-  background-color: #4caf50;
-  color: white;
-  cursor: pointer;
-}
-#send-btn:hover { background-color: #45a049; }
-
 </style>
 </head>
 <body>
@@ -320,17 +208,6 @@ footer{margin-top:72px;padding:28px 20px;text-align:center;color:#8a8a98}
 
 <footer>© 2025 Valiant Vision • Made for curious learners</footer>
 
-<!-- AI Chatbot -->
-<div id="chat-icon">💬</div>
-<div id="chatbox">
-  <div id="chat-header">AI Assistant <span id="close-btn">✖</span></div>
-  <div id="messages"></div>
-  <div id="input-container">
-    <input type="text" id="user-input" placeholder="Ask me anything...">
-    <button id="send-btn">Send</button>
-  </div>
-</div>
-
 <script>
 // Hamburger toggle
 const hamburger = document.getElementById('hamburger');
@@ -344,47 +221,13 @@ const aiLogin = document.getElementById('ai-login');
 aiLogin.addEventListener('click', ()=>{
     window.location.href='login.html';
 });
-
-// Chat toggle
-const chatIcon = document.getElementById('chat-icon');
-const chatBox = document.getElementById('chatbox');
-const closeBtn = document.getElementById('close-btn');
-chatIcon.addEventListener('click', ()=>{ chatBox.style.display='flex'; });
-closeBtn.addEventListener('click', ()=>{ chatBox.style.display='none'; });
-
-// Chat send
-document.getElementById('send-btn').addEventListener('click', handleSend);
-document.getElementById('user-input').addEventListener('keypress', function(e){
-  if(e.key==='Enter') handleSend();
-});
-const scriptURL="https://valiantvision-ai.narendersindhu1977.workers.dev/";
-
-async function handleSend(){
-  const input=document.getElementById('user-input');
-  const message=input.value.trim();
-  if(!message) return;
-  addMessage(message,'user-message');
-  input.value='';
-  addMessage("Thinking... 🤔",'ai-message');
-  try{
-    const response=await fetch(scriptURL,{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({prompt:message})});
-    const contentType=response.headers.get("content-type")||"";
-    if(!contentType.includes("application/json")) throw new Error("Server returned HTML instead of JSON.");
-    const data=await response.json();
-    const messagesDiv=document.getElementById('messages');
-    const lastMsg=messagesDiv.lastChild;
-    if(lastMsg && lastMsg.textContent==="Thinking... 🤔") lastMsg.remove();
-    addMessage(data.result || "No response from AI",'ai-message');
-  } catch(err){ console.error(err); addMessage("Error connecting to AI.",'ai-message'); }
-}
-function addMessage(text,className){
-  const messages=document.getElementById('messages');
-  const msgDiv=document.createElement('div');
-  msgDiv.className='message '+className;
-  msgDiv.textContent=text;
-  messages.appendChild(msgDiv);
-  messages.scrollTop=messages.scrollHeight;
-}
 </script>
+
+<!-- Chatling AI Embed -->
+<script>
+  window.chtlConfig = { chatbotId: "2961329212" }
+</script>
+<script async data-id="2961329212" id="chtl-script" type="text/javascript" src="https://chatling.ai/js/embed.js"></script>
+
 </body>
 </html>
