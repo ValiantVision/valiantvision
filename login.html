@@ -180,14 +180,16 @@
 </div>
 
 <script>
-function login() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
+function login(){
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
 
-  if (username && password) {
-    alert("Login Successful for " + username);
+  if(username && password){
+    // Save username to localStorage
     localStorage.setItem("loggedInUser", username);
-    updateAvatar(username);
+
+    // Redirect to main page
+    window.location.href = "index.html";
   } else {
     alert("Please enter username and password.");
   }
@@ -210,3 +212,4 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
