@@ -128,12 +128,26 @@ footer{margin-top:72px;padding:28px 20px;text-align:center;color:#8a8a98}
     .hamburger{display:flex;}
 }
 
-/* AI avatar for login */
-.ai-login{
-    width:38px; height:38px; border-radius:50%;
-    cursor:pointer;
-    background:url('ai-avatar.png') center/cover no-repeat;
-    display:inline-block;
+/* AI avatar (auto-generated gradient) */
+.ai-login {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: linear-gradient(135deg, var(--vv-purple), var(--vv-green));
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(67,0,185,0.3);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.ai-login:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 16px rgba(67,0,185,0.45);
 }
 </style>
 </head>
@@ -222,6 +236,25 @@ aiLogin.addEventListener('click', ()=>{
     window.location.href='login.html';
 });
 </script>
+<script>
+// Dynamic AI avatar with gradient + initial
+const aiLoginDiv = document.getElementById('ai-login');
+const aiName = "AI"; // change later if you want user initials
+aiLoginDiv.textContent = aiName[0];
+
+function randomGradient() {
+  const colors = [
+    ['#4300b9', '#76b900'],
+    ['#ff7a00', '#4300b9'],
+    ['#00c6ff', '#0072ff'],
+    ['#ff0080', '#7928ca']
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+const [c1, c2] = randomGradient();
+aiLoginDiv.style.background = `linear-gradient(135deg, ${c1}, ${c2})`;
+</script>
+
 
 <!-- Chatling AI Embed -->
 <script>
@@ -231,3 +264,4 @@ aiLogin.addEventListener('click', ()=>{
 
 </body>
 </html>
+
