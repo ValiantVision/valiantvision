@@ -238,6 +238,10 @@ footer{margin-top:72px;padding:28px 20px;text-align:center;color:#8a8a98}
     <a href="profile.html">My Profile</a>
   </div>
   <div class="ai-login" id="ai-login" title="AI Assistant"></div>
+  <a href="#" id="logout-btn" style="display:none; background:var(--vv-purple); color:#fff; padding:8px 16px; border-radius:8px; font-family:'Montserrat',sans-serif; font-weight:600; text-decoration:none; transition:0.2s;">
+  Logout
+</a>
+
 </div>
 
   </div>
@@ -325,9 +329,62 @@ aiLoginDiv.style.background = `linear-gradient(135deg, ${c1}, ${c2})`;
   window.chtlConfig = { chatbotId: "2961329212" }
 </script>
 <script async data-id="2961329212" id="chtl-script" type="text/javascript" src="https://chatling.ai/js/embed.js"></script>
+<script>
+window.onload = function(){
+  const user = localStorage.getItem("loggedInUser");
+  if(user){
+    // Change login button text or avatar name dynamically
+    const aiAvatar = document.getElementById("ai-avatar");
+    if(aiAvatar){
+      aiAvatar.innerHTML = `<div style="font-family:'Montserrat',sans-serif;font-weight:700;color:#4300b9;">
+        Welcome, ${user}
+      </div>`;
+    }
+  }
+};
+</script>
+<script>
+// Handle user session
+window.onload = function(){
+  const user = localStorage.getItem("loggedInUser");
+  const aiLogin = document.getElementById("ai-login");
+  const logoutBtn = document.getElementById("logout-btn");
+
+  if(user){
+    // If user is logged in
+    aiLogin.textContent = user[0].toUpperCase(); // show initial
+    aiLogin.title = `Logged in as ${user}`;
+    logoutBtn.style.display = "inline-block";
+    
+    aiLogin.addEventListener('click', ()=>{
+      window.location.href = "profile.html"; // open profile page
+    });
+  } else {
+    // Not logged in
+    aiLogin.textContent = "L"; // for Login
+    aiLogin.title = "Login";
+    logoutBtn.style.display = "none";
+    
+    aiLogin.addEventListener('click', ()=>{
+      window.location.href = "login.html"; // go to login
+    });
+  }
+};
+
+// Logout function
+function logout(){
+  localStorage.removeItem("loggedInUser");
+  window.location.reload();
+}
+
+document.getElementById("logout-btn").addEventListener("click", logout);
+</script>
+
+
 
 </body>
 </html>
+
 
 
 
