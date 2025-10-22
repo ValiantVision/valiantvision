@@ -211,6 +211,13 @@ footer{margin-top:72px;padding:28px 20px;text-align:center;color:#8a8a98}
   opacity: 1;
   transform: translateX(50%) translateY(5px);
 }
+
+/* Whiteboard overlay */
+#whiteboard-container{
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); backdrop-filter:blur(6px); z-index:1000;
+}
+#whiteboard{width:100%; height:100%; position:relative; overflow:hidden;}
+#whiteboard-container button{margin-right:8px;}
 </style>
 </head>
 <body>
@@ -229,21 +236,19 @@ footer{margin-top:72px;padding:28px 20px;text-align:center;color:#8a8a98}
     </div>
 
     <div class="menu" id="menu">
-  <div class="nav-links">
-    <a href="#about" class="active">About Us</a>
-    <a href="#problem">Problem</a>
-    <a href="#solution">Our Solution</a>
-    <a href="subscribe.html">Subscribe</a>
-    <a href="whiteboard.html">Whiteboard</a>
-    <a href="profile.html">My Profile</a>
-  </div>
-  <div class="ai-login" id="ai-login" title="AI Assistant"></div>
-  <a href="#" id="logout-btn" style="display:none; background:var(--vv-purple); color:#fff; padding:8px 16px; border-radius:8px; font-family:'Montserrat',sans-serif; font-weight:600; text-decoration:none; transition:0.2s;">
-  Logout
-</a>
-
-</div>
-
+      <div class="nav-links">
+        <a href="#about" class="active">About Us</a>
+        <a href="#problem">Problem</a>
+        <a href="#solution">Our Solution</a>
+        <a href="subscribe.html">Subscribe</a>
+        <a href="#" id="whiteboard-link">Whiteboard</a>
+        <a href="profile.html">My Profile</a>
+      </div>
+      <div class="ai-login" id="ai-login" title="AI Assistant"></div>
+      <a href="#" id="logout-btn" style="display:none; background:var(--vv-purple); color:#fff; padding:8px 16px; border-radius:8px; font-family:'Montserrat',sans-serif; font-weight:600; text-decoration:none; transition:0.2s;">
+      Logout
+      </a>
+    </div>
   </div>
 </nav>
 
@@ -290,6 +295,94 @@ footer{margin-top:72px;padding:28px 20px;text-align:center;color:#8a8a98}
 
 <footer>© 2025 Valiant Vision • Made for curious learners</footer>
 
+<!-- WHITEBOARD OVERLAY -->
+<div id="whiteboard-container">
+  <div id="whiteboard">
+    <div style="position:absolute;top:12px;left:12px; z-index:200;">
+      <button id="closeWhiteboard" class="btn">Close</button>
+      <button id="clearWhiteboard" class="btn">Clear</button>
+      <button id="saveWhiteboard" class="btn">Save</button>
+    </div>
+    <canvas id="wbCanvas" width="1200" height="700" style="border:1px solid #ccc; display:block; margin:auto; background:rgba(255,255,255,0.9);"></canvas>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script>
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyD16sdf6IAT6PdtQ6EHaVazHZGQ0HfegRQ",
+  authDomain: "valiantvisionwhiteboard-c7556.firebaseapp.com",
+  projectId: "valiantvisionwhiteboard-c7556",
+  storageBucket: "valiantvisionwhiteboard-c7556.appspot.com",
+  messagingSenderId: "1083615368437",
+  appId: "1:1083615368437:web:d34603807479c84a5a21bc",
+  databaseURL: "https://valiantvisionwhiteboard-c7556-default-rtdb.firebaseio.com"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database().ref('whiteboard');
+
+// Whiteboard Logic
+const wbContainer = document.getElementById('whiteboard-container');
+const canvas = document.getElementById('wbCanvas');
+const ctx = canvas.getContext('2d');
+let drawing=false;
+
+canvas.addEventListener('mousedown',e=>{
+  drawing=true;
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX,e.offsetY);
+});
+canvas.addEventListener('mouseup',()=>{drawing=false;});
+canvas.addEventListener('mousemove',e=>{
+  if(drawing){
+    ctx.lineTo(e.offsetX,e.offsetY);
+    ctx.strokeStyle='#4300b9';
+    ctx.lineWidth=2;
+    ctx.stroke();
+  }
+});
+
+// Save & clear
+document.getElementById('clearWhiteboard').addEventListener('click', ()=>{
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  db.set(null);
+});
+
+document.getElementById('saveWhiteboard').addEventListener('click', ()=>{
+  const link = document.createElement('a');
+  link.download='whiteboard.png';
+  link.href=canvas.toDataURL();
+  link.click();
+});
+
+// Open whiteboard
+document.getElementById('whiteboard-link').addEventListener('click', e=>{
+  e.preventDefault();
+  wbContainer.style.display='block';
+});
+
+// Close whiteboard
+document.getElementById('closeWhiteboard').addEventListener('click', ()=>{
+  wbContainer.style.display='none';
+});
+
+// Firebase Sync
+canvas.addEventListener('mouseup', ()=>{
+  const dataUrl = canvas.toDataURL();
+  db.set({img:dataUrl});
+});
+db.on('value', snapshot=>{
+  const val = snapshot.val();
+  if(val && val.img){
+    let img = new Image();
+    img.onload=function(){ctx.drawImage(img,0,0);}
+    img.src=val.img;
+  }
+});
+</script>
+
 <script>
 // Hamburger toggle
 const hamburger = document.getElementById('hamburger');
@@ -298,94 +391,28 @@ hamburger.addEventListener('click', () => {
     menu.classList.toggle('show');
 });
 
-// AI login click
+// AI login click & session
 const aiLogin = document.getElementById('ai-login');
-aiLogin.addEventListener('click', ()=>{
-    window.location.href='login.html';
-});
-</script>
-<script>
-// Dynamic AI avatar with gradient + initial
-const aiLoginDiv = document.getElementById('ai-login');
-const aiName = "L"; // change later if you want user initials
-aiLoginDiv.textContent = aiName[0];
-
-function randomGradient() {
-  const colors = [
-    ['#4300b9', '#76b900'],
-    ['#ff7a00', '#4300b9'],
-    ['#00c6ff', '#0072ff'],
-    ['#ff0080', '#7928ca']
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
+const logoutBtn = document.getElementById('logout-btn');
+window.onload=function(){
+  const user=localStorage.getItem("loggedInUser");
+  if(user){
+    aiLogin.textContent=user[0].toUpperCase();
+    aiLogin.title=`Logged in as ${user}`;
+    logoutBtn.style.display="inline-block";
+    aiLogin.onclick=()=>window.location.href="profile.html";
+  }else{
+    aiLogin.textContent="L";
+    aiLogin.title="Login";
+    logoutBtn.style.display="none";
+    aiLogin.onclick=()=>window.location.href="login.html";
+  }
 }
-const [c1, c2] = randomGradient();
-aiLoginDiv.style.background = `linear-gradient(135deg, ${c1}, ${c2})`;
-</script>
-
-
-<!-- Chatling AI Embed -->
-<script>
-  window.chtlConfig = { chatbotId: "2961329212" }
-</script>
-<script async data-id="2961329212" id="chtl-script" type="text/javascript" src="https://chatling.ai/js/embed.js"></script>
-<script>
-window.onload = function(){
-  const user = localStorage.getItem("loggedInUser");
-  if(user){
-    // Change login button text or avatar name dynamically
-    const aiAvatar = document.getElementById("ai-avatar");
-    if(aiAvatar){
-      aiAvatar.innerHTML = `<div style="font-family:'Montserrat',sans-serif;font-weight:700;color:#4300b9;">
-        Welcome, ${user}
-      </div>`;
-    }
-  }
-};
-</script>
-<script>
-// Handle user session
-window.onload = function(){
-  const user = localStorage.getItem("loggedInUser");
-  const aiLogin = document.getElementById("ai-login");
-  const logoutBtn = document.getElementById("logout-btn");
-
-  if(user){
-    // If user is logged in
-    aiLogin.textContent = user[0].toUpperCase(); // show initial
-    aiLogin.title = `Logged in as ${user}`;
-    logoutBtn.style.display = "inline-block";
-    
-    aiLogin.addEventListener('click', ()=>{
-      window.location.href = "profile.html"; // open profile page
-    });
-  } else {
-    // Not logged in
-    aiLogin.textContent = "L"; // for Login
-    aiLogin.title = "Login";
-    logoutBtn.style.display = "none";
-    
-    aiLogin.addEventListener('click', ()=>{
-      window.location.href = "login.html"; // go to login
-    });
-  }
-};
-
-// Logout function
-function logout(){
+logoutBtn.addEventListener("click", ()=>{
   localStorage.removeItem("loggedInUser");
   window.location.reload();
-}
-
-document.getElementById("logout-btn").addEventListener("click", logout);
+});
 </script>
-
-
 
 </body>
 </html>
-
-
-
-
-
