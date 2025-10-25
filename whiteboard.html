@@ -1,1010 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Whiteboard - Valiant Vision (Complete)</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valiant Vision Whiteboard</title>
 <style>
-  /* ---------------- THEME & LAYOUT (match your image) ---------------- */
-  :root{
-    --vv-dark:#0b1220;
-    --vv-panel:#0e1620;
-    --vv-green:#00c853;
-    --vv-accent:#5b34c8;
-    --vv-muted:#98a0ab;
-    --vv-card:#f5f6f8;
-    --vv-shadow: 0 12px 40px rgba(6,10,20,0.35);
+  /* Full-screen blurred background matching main theme */
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #6a11cb, #2575fc); /* Example main theme gradient */
   }
-  html,body{height:100%;margin:0;font-family:Lora,serif;background:linear-gradient(180deg,#0c2b34,#1b3a42);-webkit-font-smoothing:antialiased;color:#111;}
-  /* blur overlay */
-  .vv-blur-overlay{ position:fixed; inset:0; z-index:998; pointer-events:none; backdrop-filter: blur(10px) saturate(110%); background: linear-gradient(180deg, rgba(11,18,32,0.55), rgba(5,66,60,0.22)); }
 
-  .app{ width:100%; max-width:1200px; margin:28px auto; border-radius:14px; overflow:hidden; box-shadow:var(--vv-shadow); background:linear-gradient(180deg,#0e1620,#0b1220); display:flex; flex-direction:column; }
-  .header{ display:flex; gap:14px; align-items:center; padding:18px 22px; color:#fff; }
-  .title{ font-family:Montserrat, sans-serif; font-weight:700; letter-spacing:1px; font-size:18px; }
-  .toolbar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .tool-btn{ background: rgba(255,255,255,0.04); color:#fff; border:none; padding:10px 14px; border-radius:10px; font-weight:700; cursor:pointer; }
-  .tool-btn.active{ background: linear-gradient(90deg,var(--vv-green),var(--vv-accent)); box-shadow:0 6px 18px rgba(0,0,0,0.35); color:#fff; }
-  .tool-btn.ghost{ background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); }
+  #blur-bg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    backdrop-filter: blur(10px);
+    z-index: 0;
+  }
 
-  .body{ display:flex; gap:0; background:#fff; }
-  .left{ width:72%; min-width:520px; padding:18px; background:linear-gradient(180deg,#e9eef1,#f3f5f7); box-sizing:border-box; }
-  .canvas-card{ background:#fff; border-radius:10px; border:2px solid rgba(3,5,10,0.06); padding:18px; position:relative; overflow:visible; }
-  canvas#wb-canvas{ width:100%; height:520px; border-radius:8px; display:block; touch-action:none; background:linear-gradient(180deg,#ffffff,#fbfdff); }
+  #whiteboard {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%; height: 80%;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    cursor: crosshair;
+    z-index: 1;
+  }
 
-  .right{ width:28%; min-width:260px; background:linear-gradient(180deg,#101419,#0b1116); color:#fff; padding:18px; box-sizing:border-box; }
-  .panel-section{ margin-bottom:18px; background:rgba(255,255,255,0.03); padding:12px; border-radius:10px; }
-  .panel-title{ font-weight:700; color:#fff; margin-bottom:8px; font-size:14px; }
-  .shape-grid{ display:flex; gap:8px; flex-wrap:wrap; }
-  .shape-item{ background:transparent; border:1px dashed rgba(255,255,255,0.06); color:#fff; padding:8px; border-radius:8px; cursor:pointer; min-width:44px; text-align:center; }
-
-  select#fontPicker{ width:100%; padding:8px; border-radius:8px; border:none; font-weight:700; background:rgba(255,255,255,0.03); color:#fff; }
-  input[type=color], input[type=number]{ padding:8px; border-radius:8px; border:none; background:rgba(255,255,255,0.03); color:#fff; }
-
-  .swatches{ display:flex; gap:8px; margin-top:8px; }
-  .sw{ width:30px;height:30px;border-radius:6px;cursor:pointer;border:2px solid rgba(255,255,255,0.06); }
-
-  .text-editor { position:absolute; z-index:1500; min-width:160px; min-height:28px; padding:8px 10px; border-radius:8px; background: rgba(255,255,255,0.98); color:#111; box-shadow:0 12px 30px rgba(10,10,20,0.2); outline:none; white-space:pre-wrap; overflow:auto; }
-
-  .sticky-note{ position:absolute; z-index:1600; min-width:120px; min-height:80px; padding:10px; border-radius:8px; box-shadow:0 14px 35px rgba(0,0,0,0.32); resize:both; overflow:auto; border:2px solid rgba(0,0,0,0.08); cursor:move; }
-  .sticky-header{ display:flex; justify-content:space-between; gap:8px; margin-bottom:6px; font-weight:700; }
-
-  .handle { position:absolute; width:12px; height:12px; background:#fff; border:2px solid rgba(0,0,0,0.6); border-radius:2px; box-sizing:border-box; z-index:1400; touch-action:none; }
-  .handle.corner{ background:#fff; }
-
-  .control-row{ display:flex; gap:8px; align-items:center; }
-
-  .small{ font-size:12px; padding:6px 8px; border-radius:8px; }
-
-  @media (max-width:920px){
-    .app{ margin:12px; }
-    .body{ flex-direction:column; }
-    .left{ width:100%; min-width:0; }
-    .right{ width:100%; min-width:0; margin-top:8px; }
-    canvas#wb-canvas{ height:420px; }
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 20px;
   }
 </style>
 </head>
 <body>
-<!-- blur overlay like your page -->
-<div class="vv-blur-overlay" id="vvBlur"></div>
-
-<div class="app" role="application" aria-label="Valiant Vision Whiteboard">
-  <div class="header">
-    <div class="title">WHITEBOARD</div>
-    <div class="toolbar" role="toolbar" aria-label="tools">
-      <button class="tool-btn" id="btnPen">Pen</button>
-      <button class="tool-btn" id="btnEraser">Eraser</button>
-      <button class="tool-btn" id="btnShapes">Shapes ▾</button>
-      <button class="tool-btn" id="btnText">Text</button>
-      <button class="tool-btn" id="btnSticky">Sticky Notes</button>
-      <button class="tool-btn ghost" id="btnClear">Clear All</button>
-
-      <!-- advanced: undo/redo, export, login -->
-      <button class="tool-btn ghost" id="btnUndo">Undo</button>
-      <button class="tool-btn ghost" id="btnRedo">Redo</button>
-      <button class="tool-btn ghost" id="btnExport">Export PNG</button>
-      <button class="tool-btn ghost" id="btnExportJ">Export JPG</button>
-      <button class="tool-btn ghost" id="btnSave">Save</button>
-      <button class="tool-btn ghost" id="btnShare">Share</button>
-      <button class="tool-btn ghost" id="btnLogin">Login</button>
-    </div>
-  </div>
-
-  <div class="body">
-    <div class="left">
-      <div class="canvas-card" id="canvasCard">
-        <canvas id="wb-canvas" width="1000" height="650"></canvas>
-        <!-- handles will be appended to canvasCard as absolute elements -->
-      </div>
-    </div>
-
-    <div class="right">
-      <div class="panel-section">
-        <div class="panel-title">Shapes</div>
-        <div class="shape-grid" id="shapesGrid">
-          <div class="shape-item" data-shape="line">—</div>
-          <div class="shape-item" data-shape="dotted">-·-·</div>
-          <div class="shape-item" data-shape="rect">▭</div>
-          <div class="shape-item" data-shape="circle">○</div>
-          <div class="shape-item" data-shape="ellipse">◎</div>
-          <div class="shape-item" data-shape="triangle">△</div>
-          <div class="shape-item" data-shape="star">★</div>
-          <div class="shape-item" data-shape="arrow">➤</div>
-          <div class="shape-item" data-shape="polygon">⬠</div>
-          <div class="shape-item" data-shape="curve">∿</div>
-        </div>
-      </div>
-
-      <div class="panel-section">
-        <div class="panel-title">Text</div>
-        <label style="display:block;margin-bottom:8px;color:var(--vv-muted)">Font</label>
-        <select id="fontPicker" aria-label="Font picker"></select>
-        <div style="display:flex;gap:8px;margin-top:8px;">
-          <input id="fontSize" type="number" min="8" max="120" value="20" style="width:72px;padding:8px;border-radius:6px;border:none;background:rgba(255,255,255,0.03);color:#fff"/>
-          <label style="display:flex;gap:6px;align-items:center;color:#fff"><input id="boldToggle" type="checkbox"/> <strong>B</strong></label>
-          <label style="display:flex;gap:6px;align-items:center;color:#fff"><input id="italicToggle" type="checkbox"/> <em>I</em></label>
-        </div>
-        <div style="margin-top:10px;">
-          <label style="display:block;color:var(--vv-muted);margin-bottom:6px">Color</label>
-          <input id="colorPicker" type="color" value="#0b1220" style="width:100%;height:40px;border-radius:8px;border:none;"/>
-        </div>
-      </div>
-
-      <div class="panel-section">
-        <div class="panel-title">Sticky Notes</div>
-        <div style="color:var(--vv-muted)">Click a color to create a sticky</div>
-        <div class="swatches" id="swatches">
-          <div class="sw" data-color="#fff18d" style="background:#fff18d"></div>
-          <div class="sw" data-color="#ffd0d0" style="background:#ffd0d0"></div>
-          <div class="sw" data-color="#d0ffd8" style="background:#d0ffd8"></div>
-          <div class="sw" data-color="#d7e8ff" style="background:#d7e8ff"></div>
-          <div class="sw" data-color="#ffe2c4" style="background:#ffe2c4"></div>
-        </div>
-        <div style="margin-top:10px;">
-          <button class="tool-btn" id="addStickyBtn">Add Sticky</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Login dialog (simple) -->
-<div id="loginModal" style="display:none; position:fixed; inset:0; z-index:2000; align-items:center; justify-content:center; background:rgba(0,0,0,0.4);">
-  <div style="background:white;padding:18px;border-radius:10px; width:320px;">
-    <h3 style="margin:0 0 10px 0;">Login (Mock)</h3>
-    <input id="loginName" placeholder="Enter name" style="width:100%;padding:8px;margin-bottom:8px"/>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button id="loginCancel" style="padding:8px 12px">Cancel</button>
-      <button id="loginDo" style="padding:8px 12px;background:var(--vv-green);color:white;border:none;border-radius:6px">Login</button>
-    </div>
-  </div>
+<div id="blur-bg"></div>
+<div id="whiteboard">
+  <canvas id="canvas"></canvas>
 </div>
 
 <script>
-/* ===================== Utilities & Setup ===================== */
-const fonts = [
-  "Arial","Verdana","Times New Roman","Courier New","Georgia","Trebuchet MS","Impact","Comic Sans MS",
-  "Tahoma","Lucida Console","Palatino","Garamond","Bookman","Candara","Monaco","Futura",
-  "Century Gothic","Calibri","Optima","Franklin Gothic Medium"
-];
-const fontPicker = document.getElementById('fontPicker');
-fonts.forEach(f=>{
-  const o = document.createElement('option'); o.value = f; o.innerText = f; o.style.fontFamily = f; fontPicker.appendChild(o);
-});
-fontPicker.value = fonts[0];
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
 
-const canvas = document.getElementById('wb-canvas');
-const canvasCard = document.getElementById('canvasCard');
-const ctx = canvas.getContext('2d');
-
-function resizeCanvas(){
-  const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = Math.round(rect.width * dpr);
-  canvas.height = Math.round(rect.height * dpr);
-  canvas.style.width = rect.width + 'px';
-  canvas.style.height = rect.height + 'px';
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  redrawAll();
-}
-window.addEventListener('resize', resizeCanvas);
-setTimeout(resizeCanvas, 60);
-
-/* ===================== State & Objects ===================== */
-let tool = 'pen'; // pen | eraser | shape | text | select
-let currentShape = 'line';
-let strokeColor = '#0b1220';
-let strokeWidth = 3;
-let fontSize = 20;
-let fontFamily = fonts[0];
-let bold = false, italic = false;
-
-let objects = []; // persistent objects (strokes, shapes, texts)
-let history = [], future = []; // undo/redo stacks
-
-// selected object for moving/resizing
-let selected = null;
-let handles = []; // DOM handle elements
-
-/* object id helper */
-function genId(prefix='o'){ return prefix + '_' + Date.now() + '_' + Math.floor(Math.random()*1000); }
-
-/* ===================== Drawing routines ===================== */
-function clearCanvas(){ ctx.clearRect(0,0,canvas.width,canvas.height); }
-function redrawAll(){
-  clearCanvas();
-  // draw each object
-  for(const o of objects){
-    if(o.type === 'stroke') drawStroke(o);
-    else if(o.type === 'shape') drawShape(o);
-    else if(o.type === 'text') drawTextObj(o);
+  // Resize canvas to match container
+  function resizeCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
   }
-  // draw selection handles if any
-  drawSelectionOutline();
-}
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 
-function drawStroke(o){
-  ctx.save();
-  ctx.beginPath();
-  for(let i=0;i<o.path.length;i++){
-    const p = o.path[i];
-    if(i===0) ctx.moveTo(p.x,p.y);
-    else ctx.lineTo(p.x,p.y);
-  }
-  ctx.strokeStyle = o.color;
-  ctx.lineWidth = o.width;
-  ctx.lineCap = 'round'; ctx.lineJoin='round';
-  ctx.stroke();
-  ctx.restore();
-}
+  // Drawing state
+  let drawing = false;
+  let lastX = 0;
+  let lastY = 0;
 
-function drawShape(o){
-  ctx.save();
-  ctx.strokeStyle = o.color;
-  ctx.lineWidth = o.width;
-  ctx.setLineDash(o.dash || []);
-  switch(o.shape){
-    case 'line':
-    case 'dotted':
-      ctx.beginPath(); ctx.moveTo(o.x1,o.y1); ctx.lineTo(o.x2,o.y2); ctx.stroke(); break;
-    case 'rect':
-      ctx.strokeRect(o.x1,o.y1, o.x2 - o.x1, o.y2 - o.y1); break;
-    case 'circle':
-      const r = Math.hypot(o.x2-o.x1, o.y2-o.y1);
-      ctx.beginPath(); ctx.arc(o.x1,o.y1, r, 0, Math.PI*2); ctx.stroke(); break;
-    case 'ellipse':
-      ctx.beginPath(); ctx.ellipse(o.x1,o.y1, Math.abs(o.x2-o.x1), Math.abs(o.y2-o.y1), 0, 0, Math.PI*2); ctx.stroke(); break;
-    case 'triangle':
-      ctx.beginPath(); ctx.moveTo(o.x1,o.y1); ctx.lineTo(o.x2,o.y2); ctx.lineTo(o.x1 - (o.x2 - o.x1), o.y2); ctx.closePath(); ctx.stroke(); break;
-    case 'arrow': drawArrow(ctx, o.x1,o.y1,o.x2,o.y2); break;
-    case 'star': drawStar(ctx, o.x1,o.y1,5, Math.hypot(o.x2-o.x1,o.y2-o.y1)/2, Math.hypot(o.x2-o.x1,o.y2-o.y1)/4); break;
-    case 'polygon': drawPolygon(ctx, o.x1,o.y1, o.sides || 6, Math.hypot(o.x2-o.x1,o.y2-o.y1)); break;
-    case 'curve':
-      ctx.beginPath(); ctx.moveTo(o.x1,o.y1); ctx.quadraticCurveTo((o.x1+o.x2)/2, o.y1 - 40, o.x2, o.y2); ctx.stroke(); break;
-  }
-  ctx.setLineDash([]);
-  ctx.restore();
-}
-
-function drawTextObj(o){
-  ctx.save();
-  ctx.font = `${o.bold ? 'bold ' : ''}${o.italic ? 'italic ' : ''}${o.size}px ${o.font}`;
-  ctx.fillStyle = o.color;
-  const lines = o.text.split('\n');
-  const lh = o.size * 1.2;
-  for(let i=0;i<lines.length;i++){
-    ctx.fillText(lines[i], o.x, o.y + i*lh);
-  }
-  ctx.restore();
-}
-
-/* helpers: arrow/star/polygon */
-function drawArrow(c,x1,y1,x2,y2){
-  c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2);
-  const headLen = 12; const ang = Math.atan2(y2-y1,x2-x1);
-  c.lineTo(x2-headLen*Math.cos(ang-Math.PI/6), y2-headLen*Math.sin(ang-Math.PI/6));
-  c.moveTo(x2,y2); c.lineTo(x2-headLen*Math.cos(ang+Math.PI/6), y2-headLen*Math.sin(ang+Math.PI/6));
-  c.stroke();
-}
-function drawStar(c,cx,cy,pts,outer,inner){
-  const angle = Math.PI/pts;
-  c.beginPath();
-  for(let i=0;i<2*pts;i++){
-    const r = i%2===0 ? outer : inner;
-    const a = i*angle - Math.PI/2;
-    const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a);
-    if(i===0) c.moveTo(x,y); else c.lineTo(x,y);
-  }
-  c.closePath(); c.stroke();
-}
-function drawPolygon(c,x,y,sides,r){
-  c.beginPath();
-  for(let i=0;i<sides;i++){
-    const a = (2*Math.PI*i/sides) - Math.PI/2;
-    const px = x + r*Math.cos(a), py = y + r*Math.sin(a);
-    if(i===0) c.moveTo(px,py); else c.lineTo(px,py);
-  }
-  c.closePath(); c.stroke();
-}
-
-/* ===================== Selection, handles, hit testing ===================== */
-function bboxForObject(o){
-  if(o.type === 'text'){
-    ctx.save();
-    ctx.font = `${o.bold ? 'bold ' : ''}${o.italic ? 'italic ' : ''}${o.size}px ${o.font}`;
-    const lines = o.text.split('\n');
-    let maxw = 0;
-    lines.forEach(l => { maxw = Math.max(maxw, ctx.measureText(l).width); });
-    ctx.restore();
-    const h = lines.length * o.size * 1.2;
-    return { x: o.x, y: o.y - o.size, w: maxw, h: h };
-  } else if(o.type === 'shape'){
-    const x1 = Math.min(o.x1, o.x2), y1 = Math.min(o.y1, o.y2);
-    const w = Math.abs(o.x2 - o.x1), h = Math.abs(o.y2 - o.y1);
-    if(o.shape === 'circle' || o.shape === 'star' || o.shape === 'polygon'){
-      const r = Math.hypot(o.x2 - o.x1, o.y2 - o.y1);
-      return { x: o.x1 - r, y: o.y1 - r, w: 2*r, h: 2*r };
-    }
-    return { x: x1, y: y1, w: w, h: h };
-  } else if(o.type === 'stroke'){
-    // approximate bounding box of stroke path
-    const xs = o.path.map(p => p.x), ys = o.path.map(p => p.y);
-    const minx = Math.min(...xs), maxx = Math.max(...xs), miny = Math.min(...ys), maxy = Math.max(...ys);
-    return { x: minx - o.width, y: miny - o.width, w: (maxx - minx) + o.width*2, h: (maxy - miny) + o.width*2 };
-  }
-  return null;
-}
-
-function hitTest(x,y){
-  // return topmost object containing point (x,y)
-  for(let i = objects.length - 1; i >= 0; i--){
-    const o = objects[i];
-    const b = bboxForObject(o);
-    if(!b) continue;
-    if(x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h){
-      return o;
-    }
-  }
-  return null;
-}
-
-function showSelection(o){
-  selected = o;
-  removeHandles();
-  if(!o) { redrawAll(); return; }
-  const b = bboxForObject(o);
-  if(!b) { redrawAll(); return; }
-  // draw outline on canvas
-  redrawAll();
-  ctx.save();
-  ctx.strokeStyle = '#2b6ef6';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([6,4]);
-  ctx.strokeRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12);
-  ctx.restore();
-  // create DOM handles: 8 corners + center for move
-  const coords = [
-    {left:b.x - 8, top:b.y - 8, cursor:'nwse-resize', pos:'tl'},
-    {left:b.x + b.w/2 - 8, top:b.y - 8, cursor:'ns-resize', pos:'t'},
-    {left:b.x + b.w - 8, top:b.y - 8, cursor:'nesw-resize', pos:'tr'},
-    {left:b.x - 8, top:b.y + b.h/2 - 8, cursor:'ew-resize', pos:'l'},
-    {left:b.x + b.w - 8, top:b.y + b.h/2 - 8, cursor:'ew-resize', pos:'r'},
-    {left:b.x - 8, top:b.y + b.h - 8, cursor:'nesw-resize', pos:'bl'},
-    {left:b.x + b.w/2 - 8, top:b.y + b.h - 8, cursor:'ns-resize', pos:'b'},
-    {left:b.x + b.w - 8, top:b.y + b.h - 8, cursor:'nwse-resize', pos:'br'},
-  ];
-  coords.forEach(c=>{
-    const h = document.createElement('div');
-    h.className = 'handle corner';
-    h.style.left = (c.left) + 'px';
-    h.style.top = (c.top) + 'px';
-    h.style.position = 'absolute';
-    h.style.cursor = c.cursor;
-    h.dataset.pos = c.pos;
-    canvasCard.appendChild(h);
-    handles.push(h);
-    makeHandleInteractive(h);
+  // Start drawing
+  canvas.addEventListener('mousedown', (e) => {
+    drawing = true;
+    [lastX, lastY] = [e.offsetX, e.offsetY];
   });
-}
 
-function removeHandles(){
-  handles.forEach(h => h.remove());
-  handles = [];
-  selected = null;
-  redrawAll();
-}
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('mouseout', () => drawing = false);
 
-/* make handles draggable to resize selected object */
-function makeHandleInteractive(handle){
-  let down = false, sx=0, sy=0, orig = null, pos = handle.dataset.pos;
-  function start(e){
-    e.preventDefault(); e.stopPropagation();
-    down = true;
-    const p = (e.touches && e.touches[0]) || e;
-    sx = p.clientX; sy = p.clientY;
-    orig = JSON.parse(JSON.stringify(selected)); // shallow clone
-    document.addEventListener('pointermove', move);
-    document.addEventListener('pointerup', end);
-    document.addEventListener('touchmove', move, {passive:false});
-    document.addEventListener('touchend', end);
-  }
-  function move(e){
-    if(!down) return;
-    const p = (e.touches && e.touches[0]) || e;
-    const dx = p.clientX - sx, dy = p.clientY - sy;
-    // compute delta relative to canvasCard bounding rect
-    const rect = canvasCard.getBoundingClientRect();
-    const dxC = dx, dyC = dy;
-    // depending on pos update selected object fields
-    if(!selected) return;
-    if(selected.type === 'text'){
-      // move or resize text by changing size or position
-      if(pos === 'tl'){ selected.x = orig.x + dxC; selected.y = orig.y + dyC; }
-      else if(pos === 'tr'){ selected.y = orig.y + dyC; /* adjust width via font-size? we'll scale font */ selected.size = Math.max(8, orig.size + dxC*0.05); }
-      else if(pos === 'bl'){ selected.x = orig.x + dxC; selected.size = Math.max(8, orig.size - dyC*0.05); }
-      else if(pos === 'br'){ selected.size = Math.max(8, orig.size + (dxC+dyC)*0.05); }
-      else if(pos === 't'){ selected.y = orig.y + dyC; }
-      else if(pos === 'b'){ selected.size = Math.max(8, orig.size + dyC*0.05); }
-      else if(pos === 'l'){ selected.x = orig.x + dxC; }
-      else if(pos === 'r'){ /* maybe adjust width via font scaling */ selected.size = Math.max(8, orig.size + dxC*0.05); }
-    } else if(selected.type === 'shape'){
-      // update x1,y1,x2,y2
-      if(pos === 'tl'){ selected.x1 = orig.x1 + dxC; selected.y1 = orig.y1 + dyC; }
-      else if(pos === 'tr'){ selected.x2 = orig.x2 + dxC; selected.y1 = orig.y1 + dyC; }
-      else if(pos === 'bl'){ selected.x1 = orig.x1 + dxC; selected.y2 = orig.y2 + dyC; }
-      else if(pos === 'br'){ selected.x2 = orig.x2 + dxC; selected.y2 = orig.y2 + dyC; }
-      else if(pos === 't'){ selected.y1 = orig.y1 + dyC; }
-      else if(pos === 'b'){ selected.y2 = orig.y2 + dyC; }
-      else if(pos === 'l'){ selected.x1 = orig.x1 + dxC; }
-      else if(pos === 'r'){ selected.x2 = orig.x2 + dxC; }
-    } else if(selected.type === 'stroke'){
-      // translate stroke
-      if(pos){ // any handle moves whole stroke
-        for(let i=0;i<selected.path.length;i++){ selected.path[i].x = orig.path[i].x + dxC; selected.path[i].y = orig.path[i].y + dyC; }
-      }
-    }
-    redrawAll();
-    // reposition handles
-    removeHandles(); showSelection(selected);
-  }
-  function end(e){
-    down = false;
-    document.removeEventListener('pointermove', move);
-    document.removeEventListener('pointerup', end);
-    document.removeEventListener('touchmove', move);
-    document.removeEventListener('touchend', end);
-    pushHistory();
-  }
-  handle.addEventListener('pointerdown', start);
-  handle.addEventListener('touchstart', start, {passive:false});
-}
-
-/* draw selection outline on top (called in redrawAll) */
-function drawSelectionOutline(){
-  if(!selected) return;
-  const b = bboxForObject(selected);
-  if(!b) return;
-  ctx.save();
-  ctx.strokeStyle = '#2b6ef6';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([6,4]);
-  ctx.strokeRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12);
-  ctx.restore();
-}
-
-/* ===================== Hit and click, drag to move ===================== */
-let pointerDownState = false, pointerStart = null, dragging = false;
-canvas.addEventListener('pointerdown', (ev) => {
-  if(ev.button !== undefined && ev.button !== 0) return; // only left mouse
-  const pos = getCanvasPos(ev);
-  pointerDownState = true; pointerStart = pos; dragging = false;
-  const hit = hitTest(pos.x, pos.y);
-  if(hit){
-    // select and prepare for move
-    showSelection(hit);
-    setActiveTool('select');
-    // store original for move
-    selected._moveOrig = JSON.parse(JSON.stringify(selected));
-  } else {
-    // click on empty - if text tool selected, open editor; else start drawing depending on tool
-    if(tool === 'text'){
-      openTextEditor(pos.x, pos.y);
-    } else {
-      // start normal draw flow handled below by pointer handlers for drawing
-      // (we will not do anything here; actual drawing handled via pointer events added separately)
-      // also clear selection
-      removeHandles();
-      selected = null;
-    }
-  }
-});
-
-canvas.addEventListener('pointermove', (ev) => {
-  if(!pointerDownState) return;
-  const pos = getCanvasPos(ev);
-  if(selected && selected._moveOrig && !dragging){
-    const dx = pos.x - pointerStart.x, dy = pos.y - pointerStart.y;
-    if(Math.hypot(dx,dy) > 4) dragging = true;
-  }
-  if(dragging && selected && selected._moveOrig){
-    // translate selected object
-    if(selected.type === 'text'){
-      selected.x = selected._moveOrig.x + (pos.x - pointerStart.x);
-      selected.y = selected._moveOrig.y + (pos.y - pointerStart.y);
-    } else if(selected.type === 'shape'){
-      selected.x1 = selected._moveOrig.x1 + (pos.x - pointerStart.x);
-      selected.y1 = selected._moveOrig.y1 + (pos.y - pointerStart.y);
-      selected.x2 = selected._moveOrig.x2 + (pos.x - pointerStart.x);
-      selected.y2 = selected._moveOrig.y2 + (pos.y - pointerStart.y);
-    } else if(selected.type === 'stroke'){
-      for(let i=0;i<selected.path.length;i++){
-        selected.path[i].x = selected._moveOrig.path[i].x + (pos.x - pointerStart.x);
-        selected.path[i].y = selected._moveOrig.path[i].y + (pos.y - pointerStart.y);
-      }
-    }
-    redrawAll();
-    removeHandles(); showSelection(selected);
-  }
-});
-
-canvas.addEventListener('pointerup', (ev) => {
-  pointerDownState = false;
-  if(selected && selected._moveOrig && dragging){
-    delete selected._moveOrig; dragging = false; pushHistory();
-  }
-});
-
-/* touch fallback */
-canvas.addEventListener('touchstart', (ev)=>{ if(ev.touches.length === 1) canvas.dispatchEvent(new PointerEvent('pointerdown', {clientX:ev.touches[0].clientX, clientY:ev.touches[0].clientY})) }, {passive:false});
-canvas.addEventListener('touchmove', (ev)=>{ if(ev.touches.length === 1) canvas.dispatchEvent(new PointerEvent('pointermove', {clientX:ev.touches[0].clientX, clientY:ev.touches[0].clientY})); }, {passive:false});
-canvas.addEventListener('touchend', (ev)=> canvas.dispatchEvent(new PointerEvent('pointerup')));
-
-/* ===================== Drawing tool flow (pen/eraser/shape), with preview and commit ===================== */
-let drawingTemp = null;
-function getCanvasPos(evt){
-  const rect = canvas.getBoundingClientRect();
-  let clientX, clientY;
-  if(evt.touches && evt.touches.length) { clientX = evt.touches[0].clientX; clientY = evt.touches[0].clientY; }
-  else { clientX = evt.clientX; clientY = evt.clientY; }
-  return { x: clientX - rect.left, y: clientY - rect.top };
-}
-
-canvas.addEventListener('pointerdown', function(e){
-  if(tool === 'pen' || tool === 'eraser' || tool === 'shape'){
-    if(e.button !== undefined && e.button !== 0) return;
-    const p = getCanvasPos(e);
-    if(tool === 'pen' || tool === 'eraser'){
-      drawingTemp = { type:'stroke', color: tool === 'eraser' ? '#ffffff' : strokeColor, width: strokeWidth, path:[ {x:p.x, y:p.y} ] };
-    } else if(tool === 'shape'){
-      drawingTemp = { type:'shape', shape: currentShape, color: strokeColor, width: strokeWidth, x1:p.x, y1:p.y, x2:p.x, y2:p.y, dash: currentShape === 'dotted' ? [6,6] : [] };
-    }
-  }
-}, {passive:false});
-
-canvas.addEventListener('pointermove', function(e){
-  if(!drawingTemp) return;
-  const p = getCanvasPos(e);
-  if(drawingTemp.type === 'stroke'){
-    drawingTemp.path.push({x:p.x, y:p.y});
-    redrawAll();
-    drawStroke(drawingTemp);
-  } else if(drawingTemp.type === 'shape'){
-    drawingTemp.x2 = p.x; drawingTemp.y2 = p.y;
-    redrawAll();
-    drawShape(drawingTemp);
-  }
-}, {passive:false});
-
-canvas.addEventListener('pointerup', function(e){
-  if(!drawingTemp) return;
-  // commit
-  objects.push(drawingTemp);
-  drawingTemp = null;
-  pushHistory();
-  redrawAll();
-}, {passive:false});
-
-/* touch mapping to pointer events for drawing */
-canvas.addEventListener('touchstart', (e)=>{ if(e.touches.length===1) canvas.dispatchEvent(new PointerEvent('pointerdown', {clientX:e.touches[0].clientX, clientY:e.touches[0].clientY})); }, {passive:false});
-canvas.addEventListener('touchmove', (e)=>{ if(e.touches.length===1) canvas.dispatchEvent(new PointerEvent('pointermove', {clientX:e.touches[0].clientX, clientY:e.touches[0].clientY})); }, {passive:false});
-canvas.addEventListener('touchend', (e)=> canvas.dispatchEvent(new PointerEvent('pointerup')));
-
-/* ===================== Text editor overlay (in-place contenteditable) ===================== */
-let activeEditor = null;
-function openTextEditor(x,y, existingObj=null){
-  closeTextEditor();
-  const editor = document.createElement('div');
-  editor.contentEditable = true;
-  editor.className = 'text-editor';
-  // place relative to canvas-card
-  const rect = canvas.getBoundingClientRect();
-  // clamp position
-  const left = Math.max(6, Math.min(x, rect.width - 120));
-  const top = Math.max(6, Math.min(y, rect.height - 40));
-  editor.style.left = left + 'px';
-  editor.style.top = top + 'px';
-  editor.style.fontSize = (fontSize || 20) + 'px';
-  editor.style.fontFamily = fontFamily;
-  editor.style.color = strokeColor;
-  editor.style.fontWeight = bold ? '700' : '400';
-  editor.style.fontStyle = italic ? 'italic' : 'normal';
-  if(existingObj){
-    editor.innerText = existingObj.text;
-    editor.dataset.editingId = existingObj.id;
-    editor.style.left = existingObj.x + 'px';
-    editor.style.top = (existingObj.y - existingObj.size*0.85) + 'px';
-    editor.style.fontSize = existingObj.size + 'px';
-    editor.style.fontFamily = existingObj.font;
-    editor.style.color = existingObj.color;
-  }
-  canvasCard.appendChild(editor);
-  editor.focus();
-
-  // commit on blur or Ctrl+Enter
-  function commit(){
-    const txt = editor.innerText || '';
-    if(txt.trim().length === 0){
-      if(editor.dataset.editingId){
-        objects = objects.filter(o => !(o.type==='text' && o.id === editor.dataset.editingId));
-      }
-      closeTextEditor(); redrawAll(); pushHistory();
-      return;
-    }
-    const obj = {
-      type:'text',
-      text: txt.replace(/\r\n?/g,'\n'),
-      x: parseFloat(editor.style.left),
-      y: parseFloat(editor.style.top) + (parseInt(window.getComputedStyle(editor).fontSize,10) || fontSize),
-      font: editor.style.fontFamily || fontFamily,
-      size: parseInt(window.getComputedStyle(editor).fontSize,10) || fontSize,
-      color: editor.style.color || strokeColor,
-      bold: (editor.style.fontWeight === '700' || editor.style.fontWeight === 'bold'),
-      italic: (editor.style.fontStyle === 'italic'),
-      id: editor.dataset.editingId || genId('t')
-    };
-    // replace if editing
-    if(editor.dataset.editingId){
-      const idx = objects.findIndex(o => o.type === 'text' && o.id === editor.dataset.editingId);
-      if(idx >= 0) objects[idx] = obj; else objects.push(obj);
-    } else objects.push(obj);
-    closeTextEditor();
-    redrawAll();
-    pushHistory();
-  }
-
-  editor.addEventListener('keydown', (ev)=>{
-    if((ev.ctrlKey || ev.metaKey) && ev.key === 'Enter'){ ev.preventDefault(); commit(); }
-    if(ev.key === 'Escape'){ ev.preventDefault(); closeTextEditor(); redrawAll(); }
-  });
-  editor.addEventListener('blur', ()=> setTimeout(()=> { commit(); }, 80));
-  activeEditor = editor;
-}
-
-function closeTextEditor(){
-  if(activeEditor){ activeEditor.remove(); activeEditor = null; }
-}
-
-/* double-click to edit existing text */
-canvas.addEventListener('dblclick', (ev)=>{
-  const p = getCanvasPos(ev);
-  for(let i = objects.length -1; i>=0; i--){
-    const o = objects[i];
-    if(o.type === 'text'){
-      const b = bboxForObject(o);
-      if(p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h){
-        openTextEditor(o.x, o.y - o.size*0.85, o);
-        return;
-      }
-    }
-  }
-});
-
-/* ===================== Undo / Redo ===================== */
-function pushHistory(){
-  // push deep copy
-  history.push(JSON.parse(JSON.stringify(objects)));
-  // limit history length
-  if(history.length > 50) history.shift();
-  future = [];
-  updateUndoRedoButtons();
-}
-function undo(){
-  if(history.length === 0) return;
-  future.push(JSON.parse(JSON.stringify(objects)));
-  const prev = history.pop();
-  objects = JSON.parse(JSON.stringify(prev));
-  removeHandles(); redrawAll(); updateUndoRedoButtons();
-}
-function redo(){
-  if(future.length === 0) return;
-  history.push(JSON.parse(JSON.stringify(objects)));
-  const next = future.pop();
-  objects = JSON.parse(JSON.stringify(next));
-  removeHandles(); redrawAll(); updateUndoRedoButtons();
-}
-function updateUndoRedoButtons(){
-  document.getElementById('btnUndo').disabled = history.length === 0;
-  document.getElementById('btnRedo').disabled = future.length === 0;
-}
-document.getElementById('btnUndo').addEventListener('click', undo);
-document.getElementById('btnRedo').addEventListener('click', redo);
-
-/* initial push so Undo works after first action */
-pushHistory();
-
-/* ===================== Export PNG/JPEG (bake DOM sticky notes) ===================== */
-async function exportAs(type='png'){
-  // We need to composite canvas + DOM sticky notes into an image.
-  // Approach:
-  // 1. clone canvas bitmap
-  // 2. draw DOM sticky-note elements onto an offscreen canvas using html2canvas-like approach
-  // Since we cannot fetch external libraries, we will:
-  //  - render canvas as base
-  //  - for each sticky-note, rasterize using foreignObject via SVG (works in modern browsers)
-  const canvasRect = canvas.getBoundingClientRect();
-  const outCanvas = document.createElement('canvas');
-  const dpr = window.devicePixelRatio || 1;
-  outCanvas.width = Math.round(canvasRect.width * dpr);
-  outCanvas.height = Math.round(canvasRect.height * dpr);
-  const outCtx = outCanvas.getContext('2d');
-  // draw main drawing canvas
-  outCtx.drawImage(canvas, 0, 0, outCanvas.width, outCanvas.height);
-
-  // draw sticky notes that overlap canvas: find sticky elements appended to document
-  const stickyElems = Array.from(document.querySelectorAll('.sticky-note'));
-  for(const s of stickyElems){
-    const r = s.getBoundingClientRect();
-    // compute overlap with canvas area
-    const canvasRectPage = canvas.getBoundingClientRect();
-    const overlapX = r.left - canvasRectPage.left;
-    const overlapY = r.top - canvasRectPage.top;
-    // create SVG foreignObject containing the sticky's HTML (simple)
-    const scale = dpr;
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${s.offsetWidth*scale}' height='${s.offsetHeight*scale}'>
-      <foreignObject width='100%' height='100%'>
-        <div xmlns='http://www.w3.org/1999/xhtml' style='font-family: ${getComputedStyle(s).fontFamily}; width: ${s.offsetWidth}px; height: ${s.offsetHeight}px;'>
-          ${s.innerHTML}
-        </div>
-      </foreignObject>
-    </svg>`;
-    const img = new Image();
-    const svgBlob = new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
-    const url = URL.createObjectURL(svgBlob);
-    await new Promise((res)=>{
-      img.onload = () => {
-        outCtx.drawImage(img, Math.round(overlapX*scale), Math.round(overlapY*scale), Math.round(s.offsetWidth*scale), Math.round(s.offsetHeight*scale));
-        URL.revokeObjectURL(url);
-        res();
-      };
-      img.onerror = ()=> { URL.revokeObjectURL(url); res(); };
-      img.src = url;
-    });
-  }
-
-  // download
-  const mime = type === 'jpg' ? 'image/jpeg' : 'image/png';
-  const dataUrl = outCanvas.toDataURL(mime, 0.92);
-  const a = document.createElement('a'); a.href = dataUrl; a.download = `whiteboard_export.${type === 'jpg' ? 'jpg' : 'png'}`; document.body.appendChild(a); a.click(); a.remove();
-}
-
-document.getElementById('btnExport').addEventListener('click', ()=> exportAs('png'));
-document.getElementById('btnExportJ').addEventListener('click', ()=> exportAs('jpg'));
-
-/* ===================== Save / Share / Login (mock) ===================== */
-function isLoggedIn(){ return !!localStorage.getItem('vv_user'); }
-function showLoginModal(){ document.getElementById('loginModal').style.display = 'flex'; }
-document.getElementById('btnLogin').addEventListener('click', ()=> { if(isLoggedIn()){ localStorage.removeItem('vv_user'); alert('Logged out'); document.getElementById('btnLogin').innerText = 'Login'; } else showLoginModal(); } );
-document.getElementById('loginCancel').addEventListener('click', ()=> { document.getElementById('loginModal').style.display = 'none'; });
-document.getElementById('loginDo').addEventListener('click', ()=> {
-  const n = document.getElementById('loginName').value.trim();
-  if(!n){ alert('Enter name'); return; }
-  localStorage.setItem('vv_user', n);
-  document.getElementById('loginModal').style.display = 'none';
-  document.getElementById('btnLogin').innerText = 'Logout';
-  alert('Logged in as ' + n);
-});
-
-document.getElementById('btnSave').addEventListener('click', ()=>{
-  if(!isLoggedIn()){ if(confirm('You must be logged in to save. Log in now?')) showLoginModal(); return; }
-  const user = localStorage.getItem('vv_user');
-  // Save current board state + stickies HTML
-  const board = {
-    id: genId('board'),
-    user: user,
-    timestamp: Date.now(),
-    objects: objects,
-    stickies: Array.from(document.querySelectorAll('.sticky-note')).map(s => {
-      return { html: s.innerHTML, left: s.style.left, top: s.style.top, bg: s.style.background, width: s.style.width, height: s.style.height };
-    })
-  };
-  const saved = JSON.parse(localStorage.getItem('vv_saved') || '[]');
-  saved.push(board);
-  localStorage.setItem('vv_saved', JSON.stringify(saved));
-  alert('Board saved locally with id: ' + board.id);
-});
-
-document.getElementById('btnShare').addEventListener('click', async ()=>{
-  if(!isLoggedIn()){ if(confirm('You must be logged in to share. Log in now?')) showLoginModal(); return; }
-  // build export image and open in new tab as share
-  const dpr = window.devicePixelRatio || 1;
-  await exportAs('png'); // export triggers download, but create a data URL
-  // alternatively produce a data url and open - but exportAs already downloads
-  alert('Export initiated. You can upload the exported image to share.');
-});
-
-/* ===================== UI wiring: tool buttons, shapes, colors, font controls ===================== */
-function setActiveTool(t){
-  tool = t;
-  document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
-  if(t === 'pen') document.getElementById('btnPen').classList.add('active');
-  if(t === 'eraser') document.getElementById('btnEraser').classList.add('active');
-  if(t === 'text') document.getElementById('btnText').classList.add('active');
-  if(t === 'shape') document.getElementById('btnShapes').classList.add('active');
-}
-document.getElementById('btnPen').addEventListener('click', ()=> setActiveTool('pen'));
-document.getElementById('btnEraser').addEventListener('click', ()=> setActiveTool('eraser'));
-document.getElementById('btnText').addEventListener('click', ()=> setActiveTool('text'));
-document.getElementById('btnClear').addEventListener('click', ()=> { if(confirm('Clear entire board?')){ objects=[]; document.querySelectorAll('.sticky-note').forEach(s=>s.remove()); pushHistory(); redrawAll(); } });
-
-document.getElementById('btnShapes').addEventListener('click', ()=> { setActiveTool('shape'); }); // shapes chosen in right panel
-
-document.getElementById('colorPicker').addEventListener('input', (e)=> { strokeColor = e.target.value; });
-document.getElementById('fontSize').addEventListener('input', (e)=> { fontSize = parseInt(e.target.value)||20; });
-document.getElementById('fontPicker').addEventListener('change', (e)=> { fontFamily = e.target.value; });
-document.getElementById('boldToggle').addEventListener('change', (e)=> { bold = e.target.checked; });
-document.getElementById('italicToggle').addEventListener('change', (e)=> { italic = e.target.checked; });
-
-/* shapes grid */
-document.querySelectorAll('.shape-item').forEach(si => {
-  si.addEventListener('click', ()=> {
-    currentShape = si.dataset.shape;
-    setActiveTool('shape');
-  });
-});
-
-/* swatches & add sticky */
-document.querySelectorAll('.sw').forEach(sw => {
-  sw.addEventListener('click', ()=> {
-    const c = sw.dataset.color;
-    createSticky(c);
-  });
-});
-document.getElementById('addStickyBtn').addEventListener('click', ()=> createSticky('#fff18d'));
-
-/* pen width control via prompt (small) */
-strokeWidth = 3;
-const widthInput = document.createElement('input'); widthInput.type='number'; widthInput.value=3; widthInput.style.width='64px'; widthInput.style.marginLeft='8px';
-widthInput.addEventListener('input', ()=> strokeWidth = parseInt(widthInput.value) || 1);
-document.querySelector('.toolbar').appendChild(widthInput);
-
-/* ===================== Sticky notes creation logic ===================== */
-function createSticky(color='#fff18d'){
-  const s = document.createElement('div');
-  s.className = 'sticky-note';
-  s.style.left = '80px';
-  s.style.top = '80px';
-  s.style.background = color;
-  s.innerHTML = `<div class="sticky-header"><span>Note</span><button class="sticky-close" aria-label="close">✕</button></div><div contenteditable="true" style="min-height:60px;outline:none;">Note</div>`;
-  document.body.appendChild(s);
-  // make draggable (pointer)
-  let dragging = false, sx=0, sy=0, ox=0, oy=0;
-  const header = s.querySelector('.sticky-header');
-  header.style.cursor = 'move';
-  function down(e){
+  // Touch support
+  canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    dragging = true;
-    const p = (e.touches && e.touches[0]) || e;
-    sx = p.clientX; sy = p.clientY;
-    ox = s.offsetLeft; oy = s.offsetTop;
-    document.addEventListener('pointermove', move); document.addEventListener('pointerup', up);
-    document.addEventListener('touchmove', move, {passive:false}); document.addEventListener('touchend', up);
-  }
-  function move(e){
-    if(!dragging) return;
-    const p = (e.touches && e.touches[0]) || e;
-    const dx = p.clientX - sx; const dy = p.clientY - sy;
-    s.style.left = (ox + dx) + 'px'; s.style.top = (oy + dy) + 'px';
-  }
-  function up(){ dragging = false; document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up); document.removeEventListener('touchmove', move); document.removeEventListener('touchend', up); pushHistory(); }
-  header.addEventListener('pointerdown', down); header.addEventListener('touchstart', down, {passive:false});
+    drawing = true;
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    lastX = touch.clientX - rect.left;
+    lastY = touch.clientY - rect.top;
+  });
 
-  // close button
-  s.querySelector('.sticky-close').addEventListener('click', ()=> { s.remove(); pushHistory(); });
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (!drawing) return;
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    drawLine(touch.clientX - rect.left, touch.clientY - rect.top);
+  });
 
-  // support pinch-to-resize for sticky via touch (simple)
-  let pinchStart = null;
-  s.addEventListener('touchstart', (ev)=>{
-    if(ev.touches.length === 2){
-      pinchStart = { dist: distance(ev.touches[0], ev.touches[1]), w: s.offsetWidth, h: s.offsetHeight };
+  canvas.addEventListener('touchend', () => drawing = false);
+
+  // Draw line function
+  function draw(e) {
+    if (!drawing) return;
+    drawLine(e.offsetX, e.offsetY);
+  }
+
+  function drawLine(x, y) {
+    ctx.strokeStyle = '#ffffff'; // White pen
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+
+    [lastX, lastY] = [x, y];
+  }
+
+  // Clear canvas when clicking outside whiteboard
+  document.addEventListener('click', (e) => {
+    if (!document.getElementById('whiteboard').contains(e.target)) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-  }, {passive:false});
-  s.addEventListener('touchmove', (ev)=>{
-    if(pinchStart && ev.touches.length === 2){
-      ev.preventDefault();
-      const d = distance(ev.touches[0], ev.touches[1]);
-      const scale = d / pinchStart.dist;
-      s.style.width = Math.max(80, pinchStart.w * scale) + 'px';
-      s.style.height = Math.max(60, pinchStart.h * scale) + 'px';
-    }
-  }, {passive:false});
-  s.addEventListener('touchend', ()=> { pinchStart = null; pushHistory(); });
-  pushHistory();
-}
-
-/* distance helper */
-function distance(a,b){ return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); }
-
-/* ===================== Pinch-to-resize selected shape/text (touch) ===================== */
-let multiTouchState = null;
-document.addEventListener('touchstart', (ev)=>{
-  if(ev.touches.length === 2 && selected){
-    // start pinch to resize selected
-    const t0 = ev.touches[0], t1 = ev.touches[1];
-    multiTouchState = { dist: distance(t0,t1), object: JSON.parse(JSON.stringify(selected)) };
-  }
-}, {passive:false});
-document.addEventListener('touchmove', (ev)=>{
-  if(multiTouchState && ev.touches.length === 2){
-    ev.preventDefault();
-    const d = distance(ev.touches[0], ev.touches[1]);
-    const scale = d / multiTouchState.dist;
-    const o = selected;
-    const orig = multiTouchState.object;
-    if(!o) return;
-    if(o.type === 'text'){
-      o.size = Math.max(8, Math.round(orig.size * scale));
-    } else if(o.type === 'shape'){
-      // scale around center
-      const cx = (orig.x1 + orig.x2)/2, cy = (orig.y1 + orig.y2)/2;
-      const halfW = (orig.x2 - orig.x1)/2 * scale, halfH = (orig.y2 - orig.y1)/2 * scale;
-      o.x1 = cx - halfW; o.x2 = cx + halfW; o.y1 = cy - halfH; o.y2 = cy + halfH;
-    } else if(o.type === 'stroke'){
-      // scale stroke around centroid
-      // compute centroid
-      const xs = orig.path.map(p=>p.x), ys = orig.path.map(p=>p.y);
-      const cx = xs.reduce((a,b)=>a+b,0)/xs.length, cy = ys.reduce((a,b)=>a+b,0)/ys.length;
-      for(let i=0;i<o.path.length;i++){
-        o.path[i].x = cx + (orig.path[i].x - cx) * scale;
-        o.path[i].y = cy + (orig.path[i].y - cy) * scale;
-      }
-    }
-    redrawAll();
-  }
-}, {passive:false});
-document.addEventListener('touchend', (ev)=>{ if(multiTouchState){ pushHistory(); multiTouchState = null; } });
-
-/* ===================== Undo initial state & keyboard shortcuts ===================== */
-document.addEventListener('keydown', (e)=>{
-  if((e.ctrlKey || e.metaKey) && e.key === 'z'){ e.preventDefault(); undo(); }
-  if((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'Z'))){ e.preventDefault(); redo(); }
-});
-
-/* ===================== Helpers ===================== */
-function pushHistory(){
-  history.push(JSON.parse(JSON.stringify(objects)));
-  if(history.length > 80) history.shift();
-  future = [];
-  updateUndoRedoButtons();
-}
-function updateUndoRedoButtons(){ document.getElementById('btnUndo').disabled = history.length === 0; document.getElementById('btnRedo').disabled = future.length === 0; }
-
-document.getElementById('btnPen').addEventListener('click', ()=> setActiveTool('pen'));
-document.getElementById('btnEraser').addEventListener('click', ()=> setActiveTool('eraser'));
-document.getElementById('btnText').addEventListener('click', ()=> setActiveTool('text'));
-document.getElementById('btnShapes').addEventListener('click', ()=> setActiveTool('shape'));
-
-/* ===================== bbox helper reused here ===================== */
-function bboxForObject(o){
-  if(!o) return null;
-  if(o.type === 'text'){
-    ctx.save(); ctx.font = `${o.bold ? 'bold ' : ''}${o.italic ? 'italic ' : ''}${o.size}px ${o.font}`; let maxw=0; o.text.split('\n').forEach(l=>{maxw=Math.max(maxw, ctx.measureText(l).width)}); ctx.restore();
-    const h = o.text.split('\n').length * o.size * 1.2;
-    return { x: o.x, y: o.y - o.size, w: maxw, h: h };
-  } else if(o.type === 'shape'){
-    if(o.shape === 'circle' || o.shape === 'star' || o.shape === 'polygon'){
-      const r = Math.hypot(o.x2 - o.x1, o.y2 - o.y1);
-      return { x: o.x1 - r, y: o.y1 - r, w: 2*r, h: 2*r };
-    }
-    const x1 = Math.min(o.x1, o.x2), y1 = Math.min(o.y1, o.y2);
-    return { x: x1, y: y1, w: Math.abs(o.x2 - o.x1), h: Math.abs(o.y2 - o.y1) };
-  } else if(o.type === 'stroke'){
-    const xs = o.path.map(p=>p.x), ys = o.path.map(p=>p.y);
-    const minx = Math.min(...xs), maxx = Math.max(...xs), miny = Math.min(...ys), maxy = Math.max(...ys);
-    return { x: minx - o.width, y: miny - o.width, w: (maxx - minx) + o.width*2, h: (maxy - miny) + o.width*2 };
-  }
-  return null;
-}
-
-/* ===================== Initial UI state & helpers ===================== */
-setActiveTool('pen');
-resizeCanvas();
-redrawAll();
-
-/* expose some debug helpers on window for iterative testing if needed */
-window.__vv = { objects, pushHistory, redrawAll, exportAs };
-
+  });
 </script>
 </body>
 </html>
