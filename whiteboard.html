@@ -1,595 +1,143 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Whiteboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#0f1b24;
-    --panel:#0f1b24;
-    --muted:#cfd8dc;
-    --accent:#ffd166;
-    --card:#12171a;
-    --board:#dfe6e8;
-    --glass: rgba(255,255,255,0.05);
-    --rounded:18px;
-    --radius-sm:10px;
-    --shadow: 0 10px 30px rgba(2,8,12,0.6);
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
-  body{
-    background: linear-gradient(180deg,#07202a 0%, #122f36 45%, #0b1720 100%);
-    display:flex;align-items:center;justify-content:center;
-    padding:28px;
-    color:var(--muted);
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Valiant Vision Whiteboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #0d0129, #20124d);
+      color: white;
+      overflow: hidden;
+    }
 
-  /* Container mimics the app window in the image */
-  .app {
-    width:1100px;
-    max-width:96vw;
-    height:720px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-    border-radius:22px;
-    box-shadow: var(--shadow);
-    overflow:hidden;
-    display:flex;
-    border: 1px solid rgba(255,255,255,0.03);
-  }
+    header {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-  /* Left area: board */
-  .left {
-    flex:1 1 auto;
-    display:flex;
-    flex-direction:column;
-    background: linear-gradient(180deg,#e3eaec 0%, #cfd9dc 100%);
-    padding:18px;
-    position:relative;
-  }
+    header h1 {
+      font-size: 20px;
+      margin: 0;
+      font-weight: 600;
+    }
 
-  /* Top toolbar */
-  .toolbar {
-    display:flex;
-    gap:12px;
-    align-items:center;
-    padding:10px 8px;
-    background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.55));
-    color:#fff;
-    border-bottom:1px solid rgba(255,255,255,0.02);
-    border-top-left-radius:var(--rounded);
-    border-top-right-radius:0;
-  }
-  .title{
-    font-weight:700;
-    font-size:18px;
-    letter-spacing:1px;
-    margin-right:12px;
-  }
-  .btn {
-    background: rgba(255,255,255,0.03);
-    border-radius:12px;
-    padding:10px 14px;
-    cursor:pointer;
-    border:1px solid rgba(255,255,255,0.03);
-    color:var(--muted);
-    font-weight:600;
-  }
-  .btn.active{ background: rgba(255,255,255,0.06); color:#fff; }
-  .btn.small{ padding:8px 10px; font-size:14px;}
-  .spacer{flex:1}
+    header .tools {
+      display: flex;
+      gap: 10px;
+    }
 
-  /* board area */
-  .board-wrap{
-    margin-top:16px;
-    border-radius:12px;
-    background: linear-gradient(180deg,#e7eef0,#cfd9dc);
-    flex:1;
-    position:relative;
-    overflow:hidden;
-    display:flex;
-    align-items:flex-start;
-    justify-content:flex-start;
-  }
+    button {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
 
-  /* actual drawing canvas (left large area) */
-  #drawCanvas{
-    background: transparent;
-    position:absolute;
-    left:0; top:0;
-  }
+    button:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
 
-  /* content area on board where shapes/text/sticky notes sit */
-  .board-area{
-    width:74%;
-    height:100%;
-    min-width:420px;
-    background: linear-gradient(180deg,#f0f4f6,#dfe6e8);
-    border-radius:12px;
-    margin:24px;
-    padding:28px;
-    position:relative;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
-    overflow:hidden;
-  }
+    #board {
+      display: block;
+      width: 100vw;
+      height: calc(100vh - 60px);
+      background: #f9f9f9;
+      cursor: crosshair;
+      touch-action: none;
+    }
 
-  .big-title{
-    display:inline-block;
-    background:rgba(255,255,255,0.9);
-    padding:18px 28px;
-    border-radius:10px;
-    font-size:40px;
-    color:#0b0b0b;
-    font-weight:700;
-    margin-bottom:28px;
-  }
-
-  /* right sidebar (controls) */
-  .right {
-    width:280px;
-    background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.5));
-    padding:20px;
-    border-left:1px solid rgba(255,255,255,0.02);
-    display:flex;
-    flex-direction:column;
-    gap:16px;
-  }
-  .panel{
-    background: rgba(255,255,255,0.03);
-    border-radius:12px;
-    padding:12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.5) inset;
-  }
-  .panel h4{ margin:4px 0 8px 0; color:#e7eef0; font-size:16px; }
-  .shape-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:10px;
-  }
-  .shape-btn{
-    background:transparent;border:1px solid rgba(255,255,255,0.06);
-    padding:10px;border-radius:10px;cursor:pointer;text-align:center;
-  }
-  .shape-btn svg{ width:22px;height:22px; display:block; margin:0 auto; stroke:#e6eef0; fill:none; stroke-width:2; }
-
-  /* draggable elements on board: shape, text, sticky */
-  .element{
-    position:absolute;
-    touch-action:none;
-    user-select:none;
-    cursor:move;
-  }
-  .shape-rect{ width:230px;height:120px;background:#071016;border-radius:10px; }
-  .shape-circle{ width:80px;height:80px;background:#071016;border-radius:50%; }
-  .shape-line{
-    height:3px;background:#071016;width:220px;border-radius:3px;transform-origin:left center;
-  }
-
-  .text-box{
-    min-width:120px;
-    min-height:36px;
-    padding:8px 10px;
-    background:rgba(255,255,255,0.6);
-    color:#041018;
-    border-radius:8px;
-    font-weight:600;
-    outline:none;
-  }
-  .sticky{
-    width:150px;height:130px;background:#ffd966;color:#111;padding:10px;border-radius:8px;box-shadow:0 8px 18px rgba(0,0,0,0.25);
-  }
-
-  /* little controls area inside right panel */
-  .text-controls{ display:flex; gap:8px; align-items:center; margin-top:6px; }
-  .color-swatch{width:24px;height:20px;border-radius:6px;border:1px solid rgba(255,255,255,0.06); cursor:pointer}
-
-  /* utility helpers */
-  .small-muted{ font-size:13px; color:rgba(255,255,255,0.65); }
-  .footer{ font-size:12px; color:rgba(255,255,255,0.5); margin-top:auto; text-align:center; }
-
-  /* responsive for small screens */
-  @media (max-width:900px){
-    .app{ flex-direction:column; height:92vh; width:95vw; }
-    .right{ width:100%; order:2; display:flex; flex-direction:row; gap:10px; overflow:auto; padding:12px;}
-    .left{ order:1; }
-    .board-area{ width:100%; min-width:0; margin:12px; }
-  }
-</style>
+    input[type="color"], input[type="range"] {
+      vertical-align: middle;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <div class="app" role="application" aria-label="Interactive Whiteboard">
-    <div class="left">
-      <div class="toolbar" role="toolbar">
-        <div class="title">WHITEBOARD</div>
-        <button class="btn small" id="penBtn" title="Pen">Pen</button>
-        <button class="btn small" id="eraserBtn" title="Eraser">Eraser</button>
-
-        <div style="position:relative;">
-          <button class="btn small" id="shapesDropdown" title="Shapes">Shapes ▾</button>
-        </div>
-
-        <button class="btn small" id="textBtn" title="Text">Text</button>
-        <button class="btn small" id="stickyBtn" title="Sticky Notes">Sticky Notes</button>
-        <div class="spacer"></div>
-        <button class="btn small" id="clearBtn" title="Clear All">Clear All</button>
-      </div>
-
-      <div class="board-wrap" id="boardWrap">
-        <!-- the board area's DOM elements -->
-        <div class="board-area" id="boardArea" tabindex="0" aria-label="Drawing board">
-          <div class="big-title">Interactive Whiteboard</div>
-          <!-- dynamic elements (shapes, text, sticky notes) will be appended here -->
-        </div>
-
-        <!-- canvas sits absolutely over the board area to capture drawing -->
-        <canvas id="drawCanvas"></canvas>
-      </div>
+  <header>
+    <h1>🖊️ Valiant Vision Whiteboard</h1>
+    <div class="tools">
+      <button id="pen">Pen</button>
+      <button id="eraser">Eraser</button>
+      <input type="color" id="colorPicker" value="#000000" />
+      <input type="range" id="sizePicker" min="1" max="20" value="3" />
+      <button id="clear">Clear</button>
+      <button id="save">Save</button>
     </div>
+  </header>
+  <canvas id="board"></canvas>
 
-    <aside class="right" aria-label="Tool sidebar">
-      <div class="panel">
-        <h4>Shapes</h4>
-        <div class="shape-grid">
-          <button class="shape-btn" data-shape="rect" title="Rectangle">
-            <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"></rect></svg>
-          </button>
-          <button class="shape-btn" data-shape="circle" title="Circle">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"></circle></svg>
-          </button>
-          <button class="shape-btn" data-shape="line" title="Line">
-            <svg viewBox="0 0 24 24"><line x1="4" y1="20" x2="20" y2="4"></line></svg>
-          </button>
-          <button class="shape-btn" data-shape="arrow" title="Arrow">
-            <svg viewBox="0 0 24 24"><line x1="4" y1="20" x2="20" y2="4"></line><polyline points="15 4 20 4 20 9"></polyline></svg>
-          </button>
-        </div>
-      </div>
+  <script>
+    const canvas = document.getElementById("board");
+    const ctx = canvas.getContext("2d");
+    const colorPicker = document.getElementById("colorPicker");
+    const sizePicker = document.getElementById("sizePicker");
+    const clearBtn = document.getElementById("clear");
+    const saveBtn = document.getElementById("save");
+    const penBtn = document.getElementById("pen");
+    const eraserBtn = document.getElementById("eraser");
 
-      <div class="panel">
-        <h4>Text</h4>
-        <div class="small-muted">Click "Text" then click on board to place editable text box.</div>
-        <div class="text-controls">
-          <button class="btn small" id="boldBtn">B</button>
-          <button class="btn small" id="italicBtn">I</button>
-          <button class="btn small" id="underlineBtn">U</button>
-        </div>
-      </div>
+    let drawing = false;
+    let erasing = false;
 
-      <div class="panel">
-        <h4>Sticky Notes</h4>
-        <div class="small-muted">Click "Sticky Notes" to add a new note.</div>
-      </div>
+    function resizeCanvas() {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight - 60;
+      ctx.putImageData(imageData, 0, 0);
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
 
-      <div class="footer">Tip: draw with pointer / finger. Drag elements to move. Double-click text to edit.</div>
-    </aside>
-  </div>
-
-<script>
-/* Interactive Whiteboard JS
-   Features implemented:
-   - Freehand pen drawing and eraser (pointer events)
-   - Add rectangle/circle/line/arrow shapes as draggable elements
-   - Add editable text boxes (contentEditable)
-   - Add sticky notes (draggable)
-   - Clear All (remove shapes & text & clear canvas)
-   - Drag to move created elements
-   - Works with mouse + touch (pointer events)
-*/
-
-(() => {
-  const boardArea = document.getElementById('boardArea');
-  const drawCanvas = document.getElementById('drawCanvas');
-  const boardWrap = document.getElementById('boardWrap');
-
-  // tools
-  const penBtn = document.getElementById('penBtn');
-  const eraserBtn = document.getElementById('eraserBtn');
-  const textBtn = document.getElementById('textBtn');
-  const stickyBtn = document.getElementById('stickyBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  const shapeBtns = document.querySelectorAll('.shape-btn');
-
-  let tool = 'pen'; // pen | eraser | text | shape | sticky
-  let selectedShape = null; // 'rect','circle','line','arrow'
-
-  // set canvas size to overlay boardArea
-  function resizeCanvas() {
-    const rect = boardArea.getBoundingClientRect();
-    drawCanvas.style.left = rect.left + 'px';
-    drawCanvas.style.top = rect.top + 'px';
-    drawCanvas.width = Math.max(1, rect.width);
-    drawCanvas.height = Math.max(1, rect.height);
-    drawCanvas.style.width = rect.width + 'px';
-    drawCanvas.style.height = rect.height + 'px';
-    // position canvas absolutely relative to boardWrap
-    const wrapRect = boardWrap.getBoundingClientRect();
-    drawCanvas.style.left = (rect.left - wrapRect.left) + 'px';
-    drawCanvas.style.top = (rect.top - wrapRect.top) + 'px';
-    drawCanvasRect = boardArea.getBoundingClientRect();
-  }
-
-  window.addEventListener('resize', resizeCanvas);
-  // initial
-  let drawCanvasRect;
-  setTimeout(() => { resizeCanvas(); }, 50);
-
-  const ctx = drawCanvas.getContext('2d');
-  ctx.lineJoin = 'round';
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = '#071016';
-  ctx.lineWidth = 4;
-
-  // pointer drawing state
-  let drawing = false;
-  let last = {x:0,y:0};
-
-  // utility to set active tool button style
-  function updateActiveButtons() {
-    document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
-    if(tool === 'pen') penBtn.classList.add('active');
-    if(tool === 'eraser') eraserBtn.classList.add('active');
-    if(tool === 'text') textBtn.classList.add('active');
-    if(tool === 'sticky') stickyBtn.classList.add('active');
-  }
-
-  function setTool(newTool) {
-    tool = newTool;
-    updateActiveButtons();
-    // if pen, set globalCompositeOperation to source-over
-    if(tool === 'pen') ctx.globalCompositeOperation = 'source-over';
-    if(tool === 'eraser') ctx.globalCompositeOperation = 'destination-out';
-  }
-
-  // handle pointer events on canvas for drawing
-  drawCanvas.addEventListener('pointerdown', (e)=>{
-    // compute coords relative to canvas
-    const r = drawCanvas.getBoundingClientRect();
-    const x = e.clientX - r.left;
-    const y = e.clientY - r.top;
-
-    if(tool === 'pen' || tool === 'eraser'){
+    function startDraw(e) {
       drawing = true;
-      last = {x,y};
       ctx.beginPath();
-      ctx.moveTo(x,y);
-      // dynamic stroke width on stylus could be done if pressure available
-      if(e.pressure) ctx.lineWidth = Math.max(1, 4 * e.pressure);
-      drawCanvas.setPointerCapture(e.pointerId);
+      ctx.moveTo(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY - 60);
     }
-  });
-  drawCanvas.addEventListener('pointermove', (e)=>{
-    if(!drawing) return;
-    const r = drawCanvas.getBoundingClientRect();
-    const x = e.clientX - r.left;
-    const y = e.clientY - r.top;
-    ctx.lineTo(x,y);
-    ctx.stroke();
-    last = {x,y};
-  });
-  drawCanvas.addEventListener('pointerup', (e)=>{
-    if(drawing){
+
+    function draw(e) {
+      if (!drawing) return;
+      ctx.lineWidth = sizePicker.value;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = erasing ? "#f9f9f9" : colorPicker.value;
+      ctx.lineTo(e.clientX || e.touches[0].clientX, (e.clientY || e.touches[0].clientY) - 60);
+      ctx.stroke();
+    }
+
+    function stopDraw() {
       drawing = false;
-      ctx.closePath();
-      try{ drawCanvas.releasePointerCapture(e.pointerId); }catch(err){}
-    }
-  });
-  drawCanvas.addEventListener('pointercancel', ()=>{ drawing=false; });
-
-  // switch tools with buttons
-  penBtn.addEventListener('click', ()=> setTool('pen'));
-  eraserBtn.addEventListener('click', ()=> setTool('eraser'));
-  setTool('pen'); // default
-
-  // handle shape selection buttons
-  shapeBtns.forEach(b => {
-    b.addEventListener('click', ()=> {
-      shapeBtns.forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      selectedShape = b.dataset.shape;
-      setTool('shape');
-      // instruct user to click board to place shape
-      boardArea.style.cursor = 'crosshair';
-    });
-  });
-
-  // place shape on board when user clicks board
-  boardArea.addEventListener('pointerdown', (e) => {
-    // only if shape or text or sticky tool active (and not clicking on existing element)
-    const hitElem = e.target.closest('.element');
-    if(hitElem) return; // don't create when clicking existing object
-
-    if(tool === 'shape' && selectedShape){
-      const rect = boardArea.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      createShape(selectedShape, x, y);
-      // reset cursor if you want single-create or keep for multi-create:
-      // selectedShape = null; shapeBtns.forEach(x=>x.classList.remove('active')); setTool('pen'); boardArea.style.cursor='default';
-    } else if(tool === 'text'){
-      const rect = boardArea.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      createTextBox(x, y, 'Double-click to edit');
-      // switch back to pen optionally:
-      setTool('pen');
-      boardArea.style.cursor='default';
-    } else if(tool === 'sticky'){
-      const rect = boardArea.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      createSticky(x, y);
-      setTool('pen');
-      boardArea.style.cursor='default';
-    }
-  });
-
-  // create draggable shape element
-  function createShape(type, x, y){
-    const el = document.createElement('div');
-    el.classList.add('element','shape-'+type);
-    // default sizes for types
-    let w=220,h=120;
-    if(type === 'circle') { w=80; h=80;}
-    if(type === 'line') { w=220; h=6;}
-    if(type === 'arrow') { w=220; h=6;}
-    el.style.width = w + 'px';
-    el.style.height = h + 'px';
-    el.style.left = Math.max(8, x - w/2) + 'px';
-    el.style.top = Math.max(8, y - h/2) + 'px';
-
-    // create visual shape inside
-    if(type === 'rect'){
-      el.style.background = '#071016';
-      el.style.borderRadius = '10px';
-    } else if(type === 'circle'){
-      el.style.background = '#071016';
-      el.style.borderRadius = '50%';
-    } else if(type === 'line' || type === 'arrow'){
-      // use SVG for line & arrow so rotation possible
-      const svgNS = "http://www.w3.org/2000/svg";
-      const svg = document.createElementNS(svgNS, 'svg');
-      svg.setAttribute('width','100%');
-      svg.setAttribute('height','100%');
-      svg.setAttribute('viewBox','0 0 220 6');
-      svg.style.display = 'block';
-      const line = document.createElementNS(svgNS,'line');
-      line.setAttribute('x1','0'); line.setAttribute('y1','3'); line.setAttribute('x2','200'); line.setAttribute('y2','3');
-      line.setAttribute('stroke','#071016'); line.setAttribute('stroke-width','6'); line.setAttribute('stroke-linecap','round');
-      svg.appendChild(line);
-      if(type === 'arrow'){
-        const poly = document.createElementNS(svgNS,'polygon');
-        poly.setAttribute('points','200,0 220,3 200,6');
-        poly.setAttribute('fill','#071016');
-        svg.appendChild(poly);
-      }
-      el.style.background='transparent';
-      el.appendChild(svg);
+      ctx.beginPath();
     }
 
-    boardArea.appendChild(el);
-    makeDraggable(el);
-  }
+    canvas.addEventListener("mousedown", startDraw);
+    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("mouseup", stopDraw);
 
-  // create editable text box
-  function createTextBox(x,y, text='Click to edit'){
-    const el = document.createElement('div');
-    el.classList.add('element');
-    el.style.left = Math.max(8, x) + 'px';
-    el.style.top = Math.max(8, y) + 'px';
-    el.innerHTML = `<div class="text-box" contenteditable="true" spellcheck="false">${text}</div>`;
-    boardArea.appendChild(el);
-    const textBox = el.querySelector('.text-box');
-    textBox.addEventListener('dblclick', (ev)=> {
-      textBox.focus();
-    });
-    // simple styling/editing toggles
-    const boldBtn = document.getElementById('boldBtn');
-    const italicBtn = document.getElementById('italicBtn');
-    const underlineBtn = document.getElementById('underlineBtn');
-    // when focused apply formatting buttons to target
-    textBox.addEventListener('focus', ()=> {
-      boldBtn.onclick = ()=> document.execCommand('bold');
-      italicBtn.onclick = ()=> document.execCommand('italic');
-      underlineBtn.onclick = ()=> document.execCommand('underline');
-    });
-    makeDraggable(el);
-  }
+    canvas.addEventListener("touchstart", startDraw);
+    canvas.addEventListener("touchmove", draw);
+    canvas.addEventListener("touchend", stopDraw);
 
-  // create sticky note
-  function createSticky(x,y){
-    const el = document.createElement('div');
-    el.classList.add('element','sticky');
-    el.style.left = Math.max(8, x) + 'px';
-    el.style.top = Math.max(8, y) + 'px';
-    el.innerHTML = `<div contenteditable="true" style="width:100%;height:100%;outline:none;border:none;background:transparent; padding:4px; font-weight:600;">New note</div>`;
-    boardArea.appendChild(el);
-    makeDraggable(el);
-  }
+    clearBtn.onclick = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // draggability logic for elements
-  function makeDraggable(el){
-    let dragging = false;
-    let start = {x:0,y:0};
-    let origin = {x:0,y:0};
+    saveBtn.onclick = () => {
+      const link = document.createElement("a");
+      link.download = "whiteboard.png";
+      link.href = canvas.toDataURL();
+      link.click();
+    };
 
-    // pointer events
-    el.addEventListener('pointerdown', (e) => {
-      // only respond to primary button (touch & left click)
-      if(e.button && e.button !== 0) return;
-      e.stopPropagation();
-      dragging = true;
-      el.setPointerCapture(e.pointerId);
-      const rect = el.getBoundingClientRect();
-      const parentRect = boardArea.getBoundingClientRect();
-      origin = {x: rect.left - parentRect.left, y: rect.top - parentRect.top};
-      start = {x: e.clientX, y: e.clientY};
-      // bring to front
-      el.style.zIndex = (Date.now()%100000);
-    });
-
-    el.addEventListener('pointermove', (e) => {
-      if(!dragging) return;
-      const dx = e.clientX - start.x;
-      const dy = e.clientY - start.y;
-      let nx = origin.x + dx;
-      let ny = origin.y + dy;
-      // clamp inside board
-      nx = Math.max(4, Math.min(nx, boardArea.clientWidth - el.offsetWidth - 4));
-      ny = Math.max(4, Math.min(ny, boardArea.clientHeight - el.offsetHeight - 4));
-      el.style.left = nx + 'px';
-      el.style.top = ny + 'px';
-    });
-
-    el.addEventListener('pointerup', (e) => {
-      if(!dragging) return;
-      dragging = false;
-      try{ el.releasePointerCapture(e.pointerId); }catch(err){}
-    });
-    el.addEventListener('pointercancel', ()=>{ dragging=false; });
-    // double click: if text box double-click should focus contentEditable (handled in createTextBox)
-  }
-
-  // clear all handler
-  clearBtn.addEventListener('click', () => {
-    // clear canvas
-    ctx.clearRect(0,0,drawCanvas.width, drawCanvas.height);
-    // remove all appended elements inside boardArea
-    const elems = boardArea.querySelectorAll('.element');
-    elems.forEach(n => n.remove());
-  });
-
-  // toolbar text & sticky actions
-  textBtn.addEventListener('click', () => setTool('text'));
-  stickyBtn.addEventListener('click', () => setTool('sticky'));
-
-  // helper: download or export - not requested but handy (not used)
-  function exportBoardAsImage(){
-    // export combining canvas and board area would require rasterizing DOM; out of scope here
-  }
-
-  /* Make sure canvas overlays the board area properly when scrolling or resizing */
-  const ro = new ResizeObserver(resizeCanvas);
-  ro.observe(boardArea);
-
-  // Micro polish: allow eraser/pen width keyboard shortcuts
-  window.addEventListener('keydown', (e)=>{
-    if(e.key === 'e') setTool('eraser');
-    if(e.key === 'p') setTool('pen');
-    if(e.key === 't') setTool('text');
-    if(e.key === 'Delete'){ clearBtn.click(); }
-  });
-
-  // initialize a sample shape and sticky to mimic the image initial look
-  setTimeout(()=> {
-    createShape('rect', 140, 260);
-    createShape('circle', 520, 420);
-    createShape('line', 520, 320);
-    createTextBox(80,120,"Interactive Whiteboard");
-  }, 300);
-
-})();
-</script>
+    penBtn.onclick = () => { erasing = false; };
+    eraserBtn.onclick = () => { erasing = true; };
+  </script>
 </body>
 </html>
