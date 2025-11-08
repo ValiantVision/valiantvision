@@ -2,852 +2,1126 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Valiant Vision — Whiteboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- Optional: load a font (falls back to system if blocked) -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-  :root{
-    --vv-purple:#5b1bd6;
-    --vv-green:#7bbf0a;
-    --panel-bg: rgba(6,8,12,0.65);
-    --muted: #e7eef0;
-    --card: rgba(255,255,255,0.03);
-    --board-light: linear-gradient(180deg,#eef3f5,#dde6e8);
-    --radius:18px;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:Montserrat,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
-  body{
-    background: linear-gradient(135deg,#0b0230 0%, #20124d 50%, #07102b 100%);
-    display:flex;align-items:center;justify-content:center;
-    padding:18px;color:var(--muted);
-  }
+:root{
+  --vv-purple: #5b1bd6;
+  --vv-green: #7bbf0a;
+  --bg-1: #10002b;
+  --bg-2: #20124d;
+  --muted: #e7eef0;
+  --card: rgba(255,255,255,0.03);
+  --glass: rgba(255,255,255,0.04);
+  --surface: #eef3f5;
+  --radius-lg: 16px;
+}
+/* Basic reset */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:var(--muted)}
+body{
+  background: radial-gradient(circle at 10% 10%, var(--bg-1) 0%, var(--bg-2) 60%, #07011a 100%);
+  display:flex;align-items:center;justify-content:center;padding:12px;
+}
 
-  /* App shell */
-  .app {
-    width:1150px;
-    max-width:96vw;
-    height:760px;
-    border-radius:20px;
-    overflow:hidden;
-    display:flex;
-    box-shadow: 0 18px 60px rgba(3,7,12,0.7);
-    border:1px solid rgba(255,255,255,0.03);
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  }
+/* App shell */
+.app {
+  width:1200px; max-width:96vw;
+  height:820px; max-height:94vh;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow: 0 30px 70px rgba(2,6,10,0.65);
+  display:flex;flex-direction:column;
+  border:1px solid rgba(255,255,255,0.03);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+}
 
-  /* LEFT panel - board & toolbar */
-  .left {
-    flex:1 1 auto;
-    display:flex;
-    flex-direction:column;
-    min-width:680px;
-  }
+/* top toolbar */
+.toolbar {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.65));
+  border-bottom:1px solid rgba(255,255,255,0.02);
+}
+.brand {
+  display:flex;align-items:center;gap:12px;color:#fff;font-weight:700;
+}
+.logo {
+  width:42px;height:42px;border-radius:10px;
+  background:linear-gradient(135deg,var(--vv-green),var(--vv-purple));
+  box-shadow: 0 8px 24px rgba(91,27,214,0.18), inset 0 -6px 10px rgba(255,255,255,0.06);
+  flex:0 0 42px;
+}
+.toolbar-left { display:flex;align-items:center; gap:8px; margin-left:16px; }
+.toolbar-right { margin-left:auto; display:flex; gap:10px; align-items:center; }
 
-  .topbar {
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:12px 18px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.65));
-    color:white;
-  }
+/* controls */
+.btn {
+  background:var(--card); color:var(--muted); border:1px solid rgba(255,255,255,0.03);
+  padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn:hover{ background: rgba(255,255,255,0.05) }
+.btn.active{ background: linear-gradient(90deg,var(--vv-green),var(--vv-purple)); color:#fff; box-shadow: 0 6px 18px rgba(91,27,214,0.18);}
 
-  .brand {
-    font-weight:700;
-    letter-spacing:1px;
-    display:flex;align-items:center;gap:10px;
-  }
-  .brand .logo {
-    width:36px;height:36px;border-radius:8px;
-    background:linear-gradient(135deg,var(--vv-green),var(--vv-purple));
-    box-shadow: 0 6px 18px rgba(91,27,214,0.25), inset 0 -6px 14px rgba(255,255,255,0.06);
-  }
-  .title { font-size:16px; }
+/* inputs inline */
+.color-input {
+  width:36px; height:36px; padding:0; border-radius:8px; border:1px solid rgba(255,255,255,0.06);
+  background:#fff;
+}
+.range { width:120px; }
 
-  .toolbar {
-    margin-left:18px;
-    display:flex;
-    gap:10px;
-    align-items:center;
-  }
-  .tool-btn {
-    background: rgba(255,255,255,0.03);
-    border-radius:10px;
-    padding:8px 12px;
-    font-weight:600;
-    border:1px solid rgba(255,255,255,0.03);
-    cursor:pointer;color:var(--muted);
-  }
-  .tool-btn.active { background: rgba(255,255,255,0.06); color:#fff; }
+/* main area */
+.main {
+  display:flex; flex:1; gap:14px; padding:14px; align-items:stretch;
+}
 
-  .tool-row-right { margin-left:auto; display:flex; gap:10px; align-items:center;}
+/* workspace (left) */
+.workspace {
+  flex:1; position:relative; border-radius:12px; overflow:hidden;
+  background: linear-gradient(180deg,var(--surface), #dfe9eb);
+  padding:18px;
+  display:flex; align-items:center; justify-content:center;
+}
 
-  /* Board area */
-  .board-wrap{
-    flex:1;
-    padding:18px;
-    position:relative;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  }
+/* inner board surface */
+.board {
+  width:100%; height:100%;
+  border-radius:12px; background:var(--surface); position:relative;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+  overflow:hidden;
+}
 
-  .board {
-    width:100%;
-    height:100%;
-    background: var(--board-light);
-    border-radius:12px;
-    position:relative;
-    overflow:hidden;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-  }
+/* canvas overlay */
+#drawCanvas {
+  position:absolute; left:0; top:0; width:100%; height:100%; touch-action:none;
+}
 
-  /* drawing canvas overlays board */
-  #drawCanvas {
-    position:absolute;
-    left:0; top:0;
-    width:100%; height:100%;
-    touch-action: none;
-  }
+/* surface for DOM elements (shapes/text/stickies) */
+.surface {
+  position:absolute; left:0; top:0; width:100%; height:100%;
+  pointer-events:none; /* individual elements handle their pointer events */
+}
 
-  /* area where shapes/text/stickies are placed (acts like inner whiteboard surface) */
-  .surface {
-    position:absolute; left:0; top:0;
-    width:100%; height:100%;
-    padding:28px;
-    pointer-events:none; /* elements inside will have their own pointer handling */
-  }
+/* element base */
+.element {
+  position:absolute;
+  pointer-events:auto;
+  touch-action:none;
+  user-select:none;
+  transform-origin:center center;
+}
 
-  .surface .element{
-    position:absolute;
-    pointer-events:auto;
-    touch-action:none;
-    user-select:none;
-    cursor:grab;
-  }
+/* shape styles (when rendered as DOM nodes) */
+.shape-rect{ background:#071016; border-radius:10px; }
+.shape-circle{ background:#071016; border-radius:50%; }
+.shape-line{ background:transparent; }
+.shape-svg{ width:100%; height:100%; display:block; }
 
-  /* shape visuals (also used when exporting) */
-  .rect {
-    background:#071016;border-radius:10px;
-  }
-  .circle {
-    background:#071016;border-radius:50%;
-  }
-  .line-svg { pointer-events:none; }
+/* text box */
+.text-box {
+  background: rgba(255,255,255,0.95); color:#071016; padding:8px 10px; border-radius:8px;
+  min-width:80px; min-height:30px; font-weight:700; outline:none;
+}
 
-  .text-box {
-    background: rgba(255,255,255,0.9);
-    color:#071016;
-    padding:8px 10px;
-    border-radius:8px;
-    min-width:80px; min-height:30px;
-    font-weight:600;
-  }
+/* sticky */
+.sticky {
+  background:#ffd966; color:#111; padding:8px; border-radius:8px; min-width:120px; min-height:90px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+  overflow:auto; resize:none;
+}
 
-  .sticky {
-    background:#ffd966;color:#111;padding:8px;border-radius:8px;
-    width:150px;height:120px;box-shadow:0 12px 24px rgba(0,0,0,0.15);
-    font-weight:700;
-  }
+/* resize handles */
+.handle {
+  width:12px;height:12px;border-radius:3px;background:rgba(0,0,0,0.6);
+  position:absolute; right:-6px; bottom:-6px; cursor:se-resize;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.handle.rotate {
+  right:-6px; top:-18px; bottom:auto; cursor:grab; width:14px;height:14px;border-radius:50%;
+}
 
-  /* right sidebar */
-  .right {
-    width:300px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.55));
-    padding:18px;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    border-left:1px solid rgba(255,255,255,0.04);
-  }
-  .panel {
-    background: rgba(255,255,255,0.03);
-    border-radius:12px;
-    padding:12px;
-  }
-  .panel h4 { margin:0 0 8px 0; color:var(--muted); font-size:15px; }
-  .shape-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
-  .shape-btn {
-    background:transparent;border:1px solid rgba(255,255,255,0.06);
-    border-radius:10px;padding:10px;cursor:pointer;color:var(--muted);font-weight:600;
-  }
+/* selection ring + delete */
+.selected {
+  box-shadow: 0 0 0 4px rgba(91,27,214,0.12), 0 8px 24px rgba(0,0,0,0.25);
+  z-index:999;
+}
+.el-delete {
+  position:absolute; right:-12px; top:-12px; width:26px;height:26px;border-radius:50%;
+  background: #ff5252;color:#fff;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 16px rgba(0,0,0,0.3);
+}
 
-  .controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-  .small { padding:6px 8px; font-size:13px; border-radius:8px; }
+/* small controls pane (right) */
+.sidebar {
+  width:300px; flex:0 0 300px; display:flex; flex-direction:column; gap:12px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.5)); padding:12px; border-radius:10px;
+  border-left:1px solid rgba(255,255,255,0.02);
+  overflow:auto;
+}
+.panel { background: rgba(255,255,255,0.03); padding:12px; border-radius:10px; }
 
-  .footer { margin-top:auto; color:rgba(255,255,255,0.5); font-size:13px; text-align:center; }
+/* modal */
+.modal-backdrop { position:fixed; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; }
+.modal { background:#fff; color:#111; padding:18px; border-radius:12px; width:420px; max-width:92vw; }
 
-  /* helpers */
-  .icon { display:inline-block; width:18px; height:18px; vertical-align:middle; margin-right:6px; }
+/* tiny helpers */
+.small { font-size:13px; color:rgba(255,255,255,0.85); }
+.note { font-size:12px; color:rgba(255,255,255,0.6); }
 
-  /* responsive */
-  @media(max-width:1100px){
-    .app{ flex-direction:column; height:92vh; width:96vw; }
-    .right{ width:100%; order:2; display:flex; overflow:auto; }
-    .left{ order:1; }
-  }
+/* responsive */
+@media(max-width:1100px){
+  .app{ width:96vw; height:92vh; }
+  .sidebar{ display:none; }
+}
 </style>
 </head>
 <body>
-  <div class="app" role="application" aria-label="Valiant Vision Whiteboard">
-    <div class="left">
-      <div class="topbar">
-        <div class="brand">
-          <div class="logo" aria-hidden></div>
-          <div>
-            <div class="title">Valiant Vision</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.6)">Interactive Whiteboard</div>
-          </div>
-        </div>
 
-        <div class="toolbar" role="toolbar" aria-label="Main toolbar">
-          <button class="tool-btn" id="penBtn">Pen</button>
-          <button class="tool-btn" id="eraserBtn">Eraser</button>
-          <button class="tool-btn" id="shapesBtn">Shapes ▾</button>
-          <button class="tool-btn" id="textBtn">Text</button>
-          <button class="tool-btn" id="stickyBtn">Sticky Notes</button>
-        </div>
-
-        <div class="tool-row-right">
-          <div style="display:flex;gap:8px;align-items:center;">
-            <input id="colorPicker" type="color" title="Pen color" value="#071016" />
-            <input id="sizePicker" type="range" min="1" max="30" value="4" />
-          </div>
-          <button class="tool-btn" id="undoBtn" title="Undo">Undo</button>
-          <button class="tool-btn" id="redoBtn" title="Redo">Redo</button>
-          <button class="tool-btn" id="clearBtn" title="Clear All">Clear</button>
-          <button class="tool-btn" id="downloadBtn" title="Save as PNG">Download</button>
-        </div>
-      </div>
-
-      <div class="board-wrap">
-        <div class="board" id="board">
-          <canvas id="drawCanvas"></canvas>
-          <div class="surface" id="surface"></div>
-        </div>
+<div class="app" role="application" aria-label="Valiant Vision Whiteboard">
+  <!-- toolbar -->
+  <div class="toolbar" role="toolbar">
+    <div class="brand">
+      <div class="logo" aria-hidden></div>
+      <div>
+        <div style="font-size:16px">Valiant Vision</div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.7)">Interactive Whiteboard</div>
       </div>
     </div>
 
-    <aside class="right" aria-label="Tools sidebar">
-      <div class="panel">
-        <h4>Shapes</h4>
-        <div class="shape-grid" id="shapeGrid">
-          <button class="shape-btn" data-shape="rect">Rectangle</button>
-          <button class="shape-btn" data-shape="circle">Circle</button>
-          <button class="shape-btn" data-shape="triangle">Triangle</button>
-          <button class="shape-btn" data-shape="star">Star</button>
-          <button class="shape-btn" data-shape="line">Line</button>
-          <button class="shape-btn" data-shape="arrow">Arrow</button>
+    <div class="toolbar-left">
+      <button class="btn" id="penBtn" title="Pen (P)">🖊️ Pen</button>
+      <button class="btn" id="eraserBtn" title="Eraser (E)">🧽 Eraser</button>
+
+      <div style="position:relative;">
+        <button class="btn" id="shapeHamburger" title="Shapes">☰ Shapes</button>
+        <!-- shapes dropdown (hamburger) -->
+        <div id="shapesDropdown" style="position:absolute; top:44px; left:0; display:none; z-index:50; background:rgba(0,0,0,0.75); padding:10px; border-radius:10px; min-width:220px;">
+          <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:8px;">
+            <button class="btn shape-select" data-shape="rect">Rectangle</button>
+            <button class="btn shape-select" data-shape="circle">Circle</button>
+            <button class="btn shape-select" data-shape="triangle">Triangle</button>
+            <button class="btn shape-select" data-shape="star">Star</button>
+            <button class="btn shape-select" data-shape="line">Line</button>
+            <button class="btn shape-select" data-shape="arrow">Arrow</button>
+            <button class="btn shape-select" data-shape="diamond">Diamond</button>
+            <button class="btn shape-select" data-shape="pentagon">Pentagon</button>
+            <button class="btn shape-select" data-shape="heart">Heart</button>
+            <button class="btn shape-select" data-shape="cloud">Cloud</button>
+          </div>
+          <div style="margin-top:8px; text-align:right;"><button class="btn" id="shapesClose">Close</button></div>
         </div>
       </div>
 
-      <div class="panel">
-        <h4>Text</h4>
-        <div class="controls">
-          <button class="tool-btn small" id="boldBtn">B</button>
-          <button class="tool-btn small" id="italicBtn">I</button>
-          <button class="tool-btn small" id="underlineBtn">U</button>
-        </div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;">Click "Text" and then click on the board to add editable text.</div>
-      </div>
+      <button class="btn" id="textBtn" title="Text (T)">🅣 Text</button>
+      <button class="btn" id="stickyBtn" title="Sticky (S)">🗒️ Sticky</button>
 
-      <div class="panel">
-        <h4>Sticky Notes</h4>
-        <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:8px;">Click "Sticky Notes" then click board to add a note.</div>
-        <button class="tool-btn small" id="newStickyBtn">Add Sticky</button>
-      </div>
+      <input id="colorPicker" class="color-input" type="color" title="Choose pen color" value="#071016" />
+      <input id="sizeRange" class="range" type="range" min="1" max="40" value="4" title="Pen size" />
 
-      <div class="panel">
-        <h4>Help</h4>
-        <div style="font-size:13px;color:rgba(255,255,255,0.6)">Drag elements to move. Double-click text to edit. Use Undo/Redo or Download.</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <label class="small" style="color:rgba(255,255,255,0.75)">Opacity</label>
+        <input id="opacityRange" type="range" min="0.1" max="1" step="0.1" value="1" />
       </div>
+    </div>
 
-      <div class="footer">Valiant Vision — Whiteboard</div>
-    </aside>
+    <div class="toolbar-right">
+      <button class="btn" id="undoBtn" title="Undo (Ctrl/Cmd+Z)">↶ Undo</button>
+      <button class="btn" id="redoBtn" title="Redo (Ctrl/Cmd+Y)">↷ Redo</button>
+      <button class="btn" id="clearBtn" title="Clear all">🧹 Clear</button>
+      <button class="btn" id="downloadBtn" title="Download PNG (Ctrl/Cmd+S)">⬇️ Download</button>
+      <button class="btn" id="saveJsonBtn" title="Save board JSON">💾 Save</button>
+      <button class="btn" id="loadJsonBtn" title="Load board JSON">📂 Load</button>
+    </div>
   </div>
 
+  <!-- main area -->
+  <div class="main">
+    <div class="workspace">
+      <div class="board" id="board">
+        <!-- Canvas for freehand drawing -->
+        <canvas id="drawCanvas" width="1000" height="700"></canvas>
+
+        <!-- Surface for DOM elements (shapes, text, sticky) -->
+        <div class="surface" id="surface"></div>
+      </div>
+    </div>
+
+    <!-- collapsed sidebar (optional) -->
+    <aside class="sidebar" aria-hidden>
+      <div class="panel">
+        <div style="font-weight:700">Tools</div>
+        <div class="note">Use the toolbar at top. Shapes live in the Shapes menu (hamburger).</div>
+      </div>
+
+      <div class="panel">
+        <div style="font-weight:700">Shortcuts</div>
+        <div class="note">P = Pen, E = Eraser, T = Text, S = Sticky, Del = Delete selected</div>
+      </div>
+
+      <div class="panel">
+        <div style="font-weight:700">Tips</div>
+        <ul style="padding-left:18px; margin:8px 0;">
+          <li style="margin-bottom:6px">Double-click text boxes to edit and finish with Enter or click outside.</li>
+          <li style="margin-bottom:6px">Drag elements to move. Resize via the bottom-right handle.</li>
+          <li style="margin-bottom:6px">Click the delete (×) to remove element.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- confirmation modal template (hidden until used) -->
+<div id="modalRoot" style="display:none"></div>
+
 <script>
-/* Full working whiteboard implementation
-   - Canvas drawing (pen + eraser)
-   - Shapes (rect, circle, triangle, star, line, arrow)
-   - Text boxes (contenteditable)
-   - Sticky notes
-   - Dragging elements
-   - Undo/Redo (history snapshots)
-   - Export PNG (combine canvas + elements)
-   - Touch & mouse support
-*/
+/* ============================
+   Full-featured Whiteboard App
+   - Pen/Eraser (canvas)
+   - DOM shapes/text/sticky: draggable & resizable & deletable
+   - Unified undo/redo (snapshots)
+   - Export render (canvas + DOM elements)
+   - Save/load JSON (localStorage)
+   - Touch & mouse support (pointer events)
+   ============================ */
 
-(() => {
-  // Elements
-  const drawCanvas = document.getElementById('drawCanvas');
-  const board = document.getElementById('board');
-  const surface = document.getElementById('surface');
-  const penBtn = document.getElementById('penBtn');
-  const eraserBtn = document.getElementById('eraserBtn');
-  const shapesBtn = document.getElementById('shapesBtn');
-  const textBtn = document.getElementById('textBtn');
-  const stickyBtn = document.getElementById('stickyBtn');
-  const colorPicker = document.getElementById('colorPicker');
-  const sizePicker = document.getElementById('sizePicker');
-  const shapeGrid = document.getElementById('shapeGrid');
-  const newStickyBtn = document.getElementById('newStickyBtn');
-  const undoBtn = document.getElementById('undoBtn');
-  const redoBtn = document.getElementById('redoBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  const downloadBtn = document.getElementById('downloadBtn');
-  const boldBtn = document.getElementById('boldBtn');
-  const italicBtn = document.getElementById('italicBtn');
-  const underlineBtn = document.getElementById('underlineBtn');
+/* ---------- Utilities ---------- */
+function $(sel, root=document) { return root.querySelector(sel); }
+function $all(sel, root=document) { return Array.from(root.querySelectorAll(sel)); }
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+function uuid(){ return 'id_' + Math.random().toString(36).slice(2,9); }
 
-  // Canvas setup
-  const ctx = drawCanvas.getContext('2d');
-  let canvasRect = null;
-  function resizeCanvas(){
-    // save current drawing
-    const prev = document.createElement('canvas');
-    prev.width = drawCanvas.width;
-    prev.height = drawCanvas.height;
-    prev.getContext('2d').drawImage(drawCanvas,0,0);
+/* ---------- DOM refs ---------- */
+const canvas = $('#drawCanvas');
+const ctx = canvas.getContext('2d');
+const board = $('#board');
+const surface = $('#surface');
 
-    drawCanvas.width = board.clientWidth;
-    drawCanvas.height = board.clientHeight;
-    drawCanvas.style.width = board.clientWidth + 'px';
-    drawCanvas.style.height = board.clientHeight + 'px';
-    canvasRect = drawCanvas.getBoundingClientRect();
+const penBtn = $('#penBtn');
+const eraserBtn = $('#eraserBtn');
+const shapeHamburger = $('#shapeHamburger');
+const shapesDropdown = $('#shapesDropdown');
+const shapesClose = $('#shapesClose');
+const shapeButtons = $all('.shape-select');
 
-    // restore
-    ctx.drawImage(prev, 0, 0, prev.width, prev.height, 0, 0, drawCanvas.width, drawCanvas.height);
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-  }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
+const textBtn = $('#textBtn');
+const stickyBtn = $('#stickyBtn');
 
-  // State
-  let mode = 'pen'; // pen, eraser, shape, text, sticky
-  let selectedShape = null; // name
-  let drawing = false;
-  let lastPoint = null;
-  let elements = []; // list of element objects (type, x,y,w,h,props,id)
-  let elementIdCounter = 1;
+const colorPicker = $('#colorPicker');
+const sizeRange = $('#sizeRange');
+const opacityRange = $('#opacityRange');
 
-  // History for undo/redo
-  const history = [];
-  let historyIndex = -1;
-  function pushHistory(actionLabel){
-    // capture canvas data and shallow copy of elements
-    const dataURL = drawCanvas.toDataURL();
-    const elemsCopy = JSON.parse(JSON.stringify(elements)); // keep primitive data
-    // trim redo history
+const undoBtn = $('#undoBtn');
+const redoBtn = $('#redoBtn');
+const clearBtn = $('#clearBtn');
+const downloadBtn = $('#downloadBtn');
+const saveJsonBtn = $('#saveJsonBtn');
+const loadJsonBtn = $('#loadJsonBtn');
+
+/* ---------- State ---------- */
+let tool = 'pen'; // pen | eraser | shape | text | sticky
+let currentShape = null;
+let isDrawing = false;
+let lastPoint = null;
+let elements = []; // model: {id,type,shape,x,y,w,h,rotation,style,text}
+let selectedElement = null;
+
+// History (snapshots)
+const history = [];
+let historyIndex = -1;
+const MAX_HISTORY = 60;
+
+function pushHistory(label){
+  // snapshot: canvas dataURL + deep clone of elements
+  try {
+    const canvasData = canvas.toDataURL('image/png');
+    // deep clone elements
+    const elClone = JSON.parse(JSON.stringify(elements));
+    // trim future
     history.splice(historyIndex+1);
-    history.push({canvas:dataURL, elements: elemsCopy, label: actionLabel||''});
-    historyIndex = history.length-1;
-    updateUndoRedoButtons();
+    history.push({canvas: canvasData, elements: elClone, label: label || ''});
+    historyIndex = history.length - 1;
+    if(history.length > MAX_HISTORY) history.shift();
+    updateHistoryButtons();
+  } catch(e){
+    console.warn('History push failed:', e);
   }
-  function restoreFromSnapshot(snapshot){
+}
+function restoreHistory(idx){
+  if(idx < 0 || idx >= history.length) return;
+  const snap = history[idx];
+  const img = new Image();
+  img.onload = () => {
+    // clear canvas then draw
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    // restore elements
+    elements = JSON.parse(JSON.stringify(snap.elements));
+    rebuildElementsFromModel();
+  };
+  img.src = snap.canvas;
+  historyIndex = idx;
+  updateHistoryButtons();
+}
+function undo(){ if(historyIndex > 0) restoreHistory(historyIndex - 1); }
+function redo(){ if(historyIndex < history.length - 1) restoreHistory(historyIndex + 1); }
+function updateHistoryButtons(){
+  undoBtn.disabled = historyIndex <= 0;
+  redoBtn.disabled = historyIndex >= history.length - 1;
+}
+
+/* ---------- Canvas resizing & HiDPI ---------- */
+function resizeCanvasToBoard(){
+  const rect = board.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0); // scale drawing operations
+  // keep smooth lines
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+}
+window.addEventListener('resize', ()=> { resizeCanvasToBoard(); renderAll(); });
+resizeCanvasToBoard();
+
+/* ---------- Basic drawing (pen & eraser) ---------- */
+function getCanvasCoords(e){
+  const rect = canvas.getBoundingClientRect();
+  const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+  const clientY = (e.touches ? e.touches[0].clientY : e.clientY);
+  return { x: clientX - rect.left, y: clientY - rect.top };
+}
+function startStroke(e){
+  if(tool !== 'pen' && tool !== 'eraser') return;
+  isDrawing = true;
+  lastPoint = getCanvasCoords(e);
+  ctx.beginPath();
+  ctx.moveTo(lastPoint.x, lastPoint.y);
+  ctx.lineWidth = Number(sizeRange.value);
+  ctx.globalAlpha = Number(opacityRange.value);
+  if(tool === 'eraser'){
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.strokeStyle = 'rgba(0,0,0,1)';
+  } else {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = colorPicker.value;
+  }
+  // pressure if available
+  if(e.pressure && e.pressure > 0) {
+    ctx.lineWidth = Math.max(1, ctx.lineWidth * e.pressure);
+  }
+  canvas.setPointerCapture && e.pointerId && canvas.setPointerCapture(e.pointerId);
+}
+function moveStroke(e){
+  if(!isDrawing) return;
+  const p = getCanvasCoords(e);
+  ctx.lineTo(p.x, p.y);
+  ctx.stroke();
+  lastPoint = p;
+}
+function endStroke(e){
+  if(!isDrawing) return;
+  isDrawing = false;
+  ctx.closePath();
+  canvas.releasePointerCapture && e.pointerId && canvas.releasePointerCapture(e.pointerId);
+  // push snapshot
+  pushHistory('draw');
+}
+
+/* attach pointer events to canvas (works for touch & mouse) */
+canvas.addEventListener('pointerdown', (e)=> { startStroke(e); });
+canvas.addEventListener('pointermove', (e)=> { moveStroke(e); });
+canvas.addEventListener('pointerup', (e)=> { endStroke(e); });
+canvas.addEventListener('pointercancel', (e)=> { endStroke(e); });
+
+/* ---------- Tool button handlers ---------- */
+function setTool(t){
+  tool = t;
+  // toggle active class
+  $all('.btn').forEach(b => b.classList.remove('active'));
+  if(t === 'pen') penBtn.classList.add('active');
+  if(t === 'eraser') eraserBtn.classList.add('active');
+  if(t === 'text') textBtn.classList.add('active');
+  if(t === 'sticky') stickyBtn.classList.add('active');
+}
+penBtn.addEventListener('click', ()=> setTool('pen'));
+eraserBtn.addEventListener('click', ()=> setTool('eraser'));
+textBtn.addEventListener('click', ()=> setTool('text'));
+stickyBtn.addEventListener('click', ()=> setTool('sticky'));
+
+/* keyboard shortcuts */
+window.addEventListener('keydown', (e)=>{
+  if(e.key === 'p' || e.key === 'P') setTool('pen');
+  if(e.key === 'e' || e.key === 'E') setTool('eraser');
+  if(e.key === 't' || e.key === 'T') setTool('text');
+  if(e.key === 's' || e.key === 'S') setTool('sticky');
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z'){ e.preventDefault(); undo(); }
+  if((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase()==='z'))){ e.preventDefault(); redo(); }
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's'){ e.preventDefault(); exportBoardPNG(); }
+  if(e.key === 'Delete' && selectedElement){ deleteElement(selectedElement.id); }
+});
+
+/* ---------- Shapes menu (hamburger) ---------- */
+shapeHamburger.addEventListener('click', (ev) => {
+  shapesDropdown.style.display = shapesDropdown.style.display === 'block' ? 'none' : 'block';
+});
+shapesClose.addEventListener('click', ()=> shapesDropdown.style.display = 'none');
+shapeButtons.forEach(btn => {
+  btn.addEventListener('click', ()=> {
+    const s = btn.dataset.shape;
+    currentShape = s;
+    setTool('shape');
+    shapesDropdown.style.display = 'none';
+  });
+});
+
+/* ---------- Surface (click to add shapes/text/sticky) ---------- */
+surface.addEventListener('pointerdown', (ev) => {
+  // don't create if clicking existing element (their handlers should catch)
+  const targetEl = ev.target.closest('.element');
+  if(targetEl) return;
+  const rect = surface.getBoundingClientRect();
+  const x = ev.clientX - rect.left;
+  const y = ev.clientY - rect.top;
+
+  if(tool === 'shape' && currentShape){
+    const el = createElementFromShape(currentShape, x, y);
+    selectElement(el.id);
+    pushHistory('add-shape');
+    // After placing, revert to pen (optional) or keep shape - keep pen off: keep pen until user changes
+  } else if(tool === 'text'){
+    const el = createTextElement(x, y, "Double-click to edit");
+    selectElement(el.id);
+    pushHistory('add-text');
+  } else if(tool === 'sticky'){
+    const el = createSticky(x, y);
+    selectElement(el.id);
+    pushHistory('add-sticky');
+  }
+});
+
+/* ---------- Element Model & DOM management ---------- */
+function createElementFromShape(shape, x, y){
+  const id = uuid();
+  const defaultW = 200, defaultH = 120;
+  const data = {
+    id, type: 'shape', shape, x: x - defaultW/2, y: y - defaultH/2,
+    w: (shape === 'circle' ? 120 : (shape === 'line' ? 220 : defaultW)),
+    h: (shape === 'line' ? 6 : (shape === 'circle' ? 120 : defaultH)),
+    rotation: 0,
+    style: { fill: '#071016', stroke: '#071016', strokeWidth: 2 }
+  };
+  elements.push(data);
+  renderElement(data);
+  return data;
+}
+function createTextElement(x,y, text){
+  const id = uuid();
+  const data = { id, type:'text', x: x, y: y, w:220, h:60, rotation:0, text: text, style:{fontSize:20, color:'#071016', bold:false, italic:false, underline:false} };
+  elements.push(data);
+  renderElement(data);
+  return data;
+}
+function createSticky(x,y){
+  const id = uuid();
+  const data = { id, type:'sticky', x, y, w:160, h:120, rotation:0, text:'New note', style:{background:'#ffd966', color:'#111'} };
+  elements.push(data);
+  renderElement(data);
+  return data;
+}
+
+/* render single element into surface DOM */
+function renderElement(model){
+  // create container
+  const container = document.createElement('div');
+  container.className = 'element';
+  container.dataset.id = model.id;
+  container.style.left = (model.x) + 'px';
+  container.style.top = (model.y) + 'px';
+  container.style.width = (model.w) + 'px';
+  container.style.height = (model.h) + 'px';
+  container.style.transform = `rotate(${model.rotation}deg)`;
+  container.tabIndex = 0;
+
+  // delete button
+  const delBtn = document.createElement('button');
+  delBtn.className = 'el-delete';
+  delBtn.innerText = '×';
+  delBtn.title = 'Delete element';
+  delBtn.style.display = 'none';
+  container.appendChild(delBtn);
+
+  // content based on type
+  if(model.type === 'shape'){
+    if(['rect','circle'].includes(model.shape)){
+      const inner = document.createElement('div');
+      inner.style.width = '100%'; inner.style.height = '100%';
+      inner.style.background = model.style.fill;
+      if(model.shape === 'rect') inner.style.borderRadius = '10px';
+      if(model.shape === 'circle') inner.style.borderRadius = '50%';
+      inner.className = (model.shape === 'rect' ? 'shape-rect' : 'shape-circle');
+      container.appendChild(inner);
+    } else {
+      // create an SVG visual for the shape
+      const svgNS = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(svgNS, 'svg');
+      svg.setAttribute('class','shape-svg');
+      svg.setAttribute('viewBox','0 0 100 100');
+      svg.setAttribute('preserveAspectRatio','none');
+      // render different shapes
+      if(model.shape === 'line' || model.shape === 'arrow'){
+        svg.setAttribute('viewBox','0 0 220 12');
+        const ln = document.createElementNS(svgNS,'line');
+        ln.setAttribute('x1','2'); ln.setAttribute('y1','6'); ln.setAttribute('x2','200'); ln.setAttribute('y2','6');
+        ln.setAttribute('stroke', model.style.stroke); ln.setAttribute('stroke-width', model.style.strokeWidth);
+        ln.setAttribute('stroke-linecap','round');
+        svg.appendChild(ln);
+        if(model.shape === 'arrow'){
+          const poly = document.createElementNS(svgNS,'polygon');
+          poly.setAttribute('points','200,0 220,6 200,12');
+          poly.setAttribute('fill', model.style.stroke);
+          svg.appendChild(poly);
+        }
+      } else if(model.shape === 'triangle'){
+        const poly = document.createElementNS(svgNS,'polygon');
+        poly.setAttribute('points','50,6 94,94 6,94'); poly.setAttribute('fill', model.style.fill);
+        svg.appendChild(poly);
+      } else if(model.shape === 'star'){
+        const poly = document.createElementNS(svgNS,'polygon');
+        poly.setAttribute('points','50,6 61,39 98,39 67,59 79,91 50,72 21,91 33,59 2,39 39,39');
+        poly.setAttribute('fill', model.style.fill);
+        svg.appendChild(poly);
+      } else if(model.shape === 'diamond'){
+        const poly = document.createElementNS(svgNS,'polygon');
+        poly.setAttribute('points','50,6 94,50 50,94 6,50'); poly.setAttribute('fill', model.style.fill);
+        svg.appendChild(poly);
+      } else if(model.shape === 'pentagon'){
+        const poly = document.createElementNS(svgNS,'polygon');
+        poly.setAttribute('points','50,6 86,38 70,86 30,86 14,38'); poly.setAttribute('fill', model.style.fill);
+        svg.appendChild(poly);
+      } else if(model.shape === 'heart'){
+        const path = document.createElementNS(svgNS,'path');
+        path.setAttribute('d','M50 30 C50 20,35 12,25 20 C12 30,30 54,50 72 C70 54,88 30,75 20 C65 12,50 20,50 30 Z');
+        path.setAttribute('fill', model.style.fill);
+        svg.appendChild(path);
+      } else if(model.shape === 'cloud'){
+        const path = document.createElementNS(svgNS,'path');
+        path.setAttribute('d','M20 60 Q10 40 30 34 Q32 20 50 26 Q72 20 76 38 Q94 36 92 54 Q74 72 40 68 Q30 72 20 60 Z');
+        path.setAttribute('fill', model.style.fill);
+        svg.appendChild(path);
+      }
+      container.appendChild(svg);
+    }
+  } else if(model.type === 'text') {
+    const tb = document.createElement('div');
+    tb.className = 'text-box';
+    tb.contentEditable = true;
+    tb.spellcheck = false;
+    tb.innerText = model.text || '';
+    tb.style.fontSize = (model.style.fontSize || 20) + 'px';
+    tb.style.color = model.style.color || '#071016';
+    // on edit -> update model (debounced)
+    let timer;
+    tb.addEventListener('input', ()=> {
+      clearTimeout(timer);
+      timer = setTimeout(()=> {
+        const m = elements.find(x => x.id === model.id);
+        if(m){ m.text = tb.innerText; pushHistory('edit-text'); }
+      }, 600);
+    });
+    container.appendChild(tb);
+  } else if(model.type === 'sticky'){
+    const st = document.createElement('textarea');
+    st.className = 'sticky';
+    st.value = model.text || '';
+    st.style.background = model.style.background || '#ffd966';
+    st.style.color = model.style.color || '#111';
+    st.style.width = '100%';
+    st.style.height = '100%';
+    st.style.border = 'none';
+    st.style.resize = 'none';
+    st.style.padding = '8px';
+    // wrapper for sticky to maintain sizing
+    container.appendChild(st);
+    st.addEventListener('input', ()=> {
+      const m = elements.find(x => x.id === model.id);
+      if(m){ m.text = st.value; }
+    });
+  }
+
+  // resize handle
+  const handle = document.createElement('div');
+  handle.className = 'handle';
+  container.appendChild(handle);
+
+  // rotate handle (small circle above)
+  const rotateHandle = document.createElement('div');
+  rotateHandle.className = 'handle rotate';
+  rotateHandle.title = 'Rotate';
+  container.appendChild(rotateHandle);
+
+  // selection behavior, dragging, resizing
+  container.addEventListener('pointerdown', (ev) => {
+    ev.stopPropagation();
+    selectElement(model.id);
+    // if starting drag on handle => resizing
+    if(ev.target === handle){
+      startResize(container, model, ev);
+    } else if(ev.target === rotateHandle){
+      startRotate(container, model, ev);
+    } else if(ev.target.closest('.el-delete')){
+      // handled by delete button
+    } else {
+      startDrag(container, model, ev);
+    }
+  });
+
+  // show delete button on hover/selection
+  container.addEventListener('mouseenter', ()=> { delBtn.style.display = 'flex'; });
+  container.addEventListener('mouseleave', ()=> { if(!container.classList.contains('selected')) delBtn.style.display = 'none'; });
+
+  delBtn.addEventListener('click', (ev) => { ev.stopPropagation(); deleteElement(model.id); });
+
+  surface.appendChild(container);
+}
+
+/* rebuild entire DOM from elements[] (used when restoring history or loading) */
+function rebuildElementsFromModel(){
+  surface.innerHTML = '';
+  elements.forEach(renderElement);
+  selectedElement = null;
+}
+
+/* select element by id (visual) */
+function selectElement(id){
+  deselectCurrent();
+  const elNode = surface.querySelector(`.element[data-id="${id}"]`);
+  if(!elNode) return;
+  selectedElement = elements.find(x => x.id === id);
+  elNode.classList.add('selected');
+  // show delete button
+  const del = elNode.querySelector('.el-delete');
+  if(del) del.style.display = 'flex';
+  // bring to top
+  elNode.style.zIndex = 1000;
+}
+
+/* deselect */
+function deselectCurrent(){
+  if(!selectedElement) return;
+  const prevNode = surface.querySelector(`.element[data-id="${selectedElement.id}"]`);
+  if(prevNode){
+    prevNode.classList.remove('selected');
+    const del = prevNode.querySelector('.el-delete'); if(del) del.style.display = 'none';
+    prevNode.style.zIndex = '';
+  }
+  selectedElement = null;
+}
+
+/* delete element by id */
+function deleteElement(id){
+  const idx = elements.findIndex(x=>x.id === id);
+  if(idx === -1) return;
+  elements.splice(idx, 1);
+  const node = surface.querySelector(`.element[data-id="${id}"]`);
+  if(node) node.remove();
+  selectedElement = null;
+  pushHistory('delete');
+}
+
+/* ---------- Drag, Resize, Rotate implementations ---------- */
+function startDrag(node, model, ev){
+  ev.preventDefault();
+  let startX = ev.clientX, startY = ev.clientY;
+  const origX = model.x, origY = model.y;
+  node.setPointerCapture && ev.pointerId && node.setPointerCapture(ev.pointerId);
+
+  function onMove(e){
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const nx = clamp(origX + dx, 0, surface.clientWidth - model.w);
+    const ny = clamp(origY + dy, 0, surface.clientHeight - model.h);
+    node.style.left = nx + 'px';
+    node.style.top = ny + 'px';
+  }
+  function onUp(e){
+    node.releasePointerCapture && e.pointerId && node.releasePointerCapture(e.pointerId);
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    // update model
+    model.x = parseFloat(node.style.left);
+    model.y = parseFloat(node.style.top);
+    pushHistory('move');
+  }
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+}
+
+function startResize(node, model, ev){
+  ev.preventDefault();
+  ev.stopPropagation();
+  const startRec = node.getBoundingClientRect();
+  const startX = ev.clientX, startY = ev.clientY;
+  const origW = startRec.width, origH = startRec.height;
+  node.setPointerCapture && ev.pointerId && node.setPointerCapture(ev.pointerId);
+
+  function onMove(e){
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const newW = Math.max(24, origW + dx);
+    const newH = Math.max(24, origH + dy);
+    node.style.width = newW + 'px';
+    node.style.height = newH + 'px';
+  }
+  function onUp(e){
+    node.releasePointerCapture && e.pointerId && node.releasePointerCapture(e.pointerId);
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    // update model
+    model.w = parseFloat(node.style.width);
+    model.h = parseFloat(node.style.height);
+    pushHistory('resize');
+  }
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+}
+
+function startRotate(node, model, ev){
+  ev.preventDefault(); ev.stopPropagation();
+  const rect = node.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top + rect.height/2;
+  const startAngle = model.rotation || 0;
+  const startX = ev.clientX, startY = ev.clientY;
+  node.setPointerCapture && ev.pointerId && node.setPointerCapture(ev.pointerId);
+
+  function onMove(e){
+    const angle = Math.atan2(e.clientY - cy, e.clientX - cx) * (180/Math.PI);
+    const rot = angle + 90; // adjust so top points up
+    node.style.transform = `rotate(${rot}deg)`;
+  }
+  function onUp(e){
+    // compute final rotation and set model
+    const rect2 = node.getBoundingClientRect();
+    // parse transform rotation; fallback to startAngle
+    const style = node.style.transform;
+    let rot = startAngle;
+    if(style){
+      const match = style.match(/rotate\((-?\d+\.?\d*)deg\)/);
+      if(match) rot = parseFloat(match[1]);
+    }
+    model.rotation = rot;
+    pushHistory('rotate');
+    node.releasePointerCapture && e.pointerId && node.releasePointerCapture(e.pointerId);
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+  }
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+}
+
+/* ---------- Render utilities ---------- */
+function renderAll(){ // re-draw canvas elements? (canvas contains freehand strokes only)
+  // redraw elements DOM positions (already in DOM)
+  // ensure surface size matches canvas board size
+  const rect = board.getBoundingClientRect();
+  surface.style.width = rect.width + 'px';
+  surface.style.height = rect.height + 'px';
+}
+
+/* ---------- Export (render canvas + DOM elements to png) ---------- */
+async function exportBoardPNG(){
+  // create export canvas (pixel perfect)
+  const rect = board.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const exportCanvas = document.createElement('canvas');
+  exportCanvas.width = Math.round(rect.width * dpr);
+  exportCanvas.height = Math.round(rect.height * dpr);
+  const ex = exportCanvas.getContext('2d');
+  ex.scale(dpr, dpr);
+
+  // draw a background matching the board
+  ex.fillStyle = getComputedStyle(board).backgroundColor || '#eef3f5';
+  ex.fillRect(0,0, rect.width, rect.height);
+
+  // draw the canvas (freehand) onto export
+  // canvas might be high-dpi so drawImage handles scaling
+  ex.drawImage(canvas, 0, 0, rect.width, rect.height);
+
+  // draw each element from model onto export canvas
+  for(const el of elements){
+    await drawElementToExportCanvas(ex, el, rect.width, rect.height);
+  }
+
+  // download
+  const url = exportCanvas.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'valiant_whiteboard.png';
+  a.click();
+}
+
+/* helper that draws an element model to the export canvas context */
+async function drawElementToExportCanvas(ex, el, boardW, boardH){
+  const x = el.x, y = el.y, w = el.w, h = el.h, rot = el.rotation || 0;
+  ex.save();
+  // apply rotation around center
+  ex.translate(x + w/2, y + h/2);
+  ex.rotate((rot * Math.PI)/180);
+  ex.translate(-(x + w/2), -(y + h/2));
+
+  if(el.type === 'shape'){
+    ex.fillStyle = el.style.fill || '#071016';
+    ex.strokeStyle = el.style.stroke || '#071016';
+    ex.lineWidth = el.style.strokeWidth || 2;
+    if(el.shape === 'rect'){
+      roundRect(ex, x, y, w, h, 10, true, false);
+    } else if(el.shape === 'circle'){
+      ex.beginPath();
+      ex.ellipse(x + w/2, y + h/2, w/2, h/2, 0, 0, Math.PI*2);
+      ex.fill();
+    } else if(el.shape === 'line'){
+      ex.beginPath();
+      ex.moveTo(x + 2, y + h/2);
+      ex.lineTo(x + w - 18, y + h/2);
+      ex.stroke();
+    } else if(el.shape === 'arrow'){
+      ex.beginPath();
+      ex.moveTo(x + 2, y + h/2);
+      ex.lineTo(x + w - 30, y + h/2);
+      ex.stroke();
+      // arrow head
+      drawArrowHead(ex, x + w - 30, y + h/2, 12);
+    } else if(el.shape === 'triangle'){
+      ex.beginPath();
+      ex.moveTo(x + w/2, y + 6);
+      ex.lineTo(x + w - 6, y + h - 6);
+      ex.lineTo(x + 6, y + h - 6);
+      ex.closePath(); ex.fill();
+    } else if(el.shape === 'star'){
+      drawStar(ex, x + w/2, y + h/2, Math.min(w,h)/2 - 6, Math.min(w,h)/4 - 6, 5);
+    } else if(el.shape === 'diamond'){
+      ex.beginPath(); ex.moveTo(x + w/2, y + 6); ex.lineTo(x + w - 6, y + h/2); ex.lineTo(x + w/2, y + h - 6); ex.lineTo(x + 6, y + h/2); ex.closePath(); ex.fill();
+    } else if(el.shape === 'pentagon'){
+      drawPolygon(ex, x + w/2, y + h/2, Math.min(w,h)/2 - 6, 5);
+    } else if(el.shape === 'heart'){
+      ex.beginPath();
+      const cx = x + w/2, cy = y + h/3;
+      ex.moveTo(cx, cy + h/8);
+      ex.bezierCurveTo(cx, cy - h/8, x, cy - h/8, x, cy + h/8);
+      ex.bezierCurveTo(x, y + h*0.8, cx, y + h*0.9, cx, y + h);
+      ex.bezierCurveTo(cx, y + h*0.9, x + w, y + h*0.8, x + w, cy + h/8);
+      ex.bezierCurveTo(x + w, cy - h/8, cx, cy - h/8, cx, cy + h/8);
+      ex.fill();
+    } else if(el.shape === 'cloud'){
+      ex.beginPath();
+      const cx = x + w*0.5, cy = y + h*0.5;
+      ex.ellipse(x + w*0.3, y + h*0.5, w*0.18, h*0.14, 0, 0, Math.PI*2);
+      ex.ellipse(x + w*0.5, y + h*0.35, w*0.22, h*0.16, 0, 0, Math.PI*2);
+      ex.ellipse(x + w*0.7, y + h*0.5, w*0.18, h*0.14, 0, 0, Math.PI*2);
+      ex.fill();
+    }
+  } else if(el.type === 'text'){
+    ex.fillStyle = el.style.color || '#071016';
+    const fontSize = el.style.fontSize || 20;
+    ex.font = `${el.style.bold ? '800' : '600'} ${fontSize}px Montserrat, sans-serif`;
+    wrapText(ex, el.text || '', x + 6, y + 6 + fontSize, w - 12, fontSize + 6);
+  } else if(el.type === 'sticky'){
+    ex.fillStyle = el.style.background || '#ffd966';
+    ex.fillRect(x, y, w, h);
+    ex.fillStyle = el.style.color || '#111';
+    ex.font = '16px Montserrat, sans-serif';
+    wrapText(ex, el.text || '', x + 8, y + 20, w - 16, 20);
+  }
+
+  ex.restore();
+}
+
+function roundRect(ctx, x, y, w, h, r, fill, stroke){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  if(fill) ctx.fill();
+  if(stroke) ctx.stroke();
+}
+function drawArrowHead(ex, x, y, size){
+  ex.beginPath();
+  ex.moveTo(x, y);
+  ex.lineTo(x - size, y - size/1.6);
+  ex.lineTo(x - size, y + size/1.6);
+  ex.closePath(); ex.fill();
+}
+function drawStar(ex, cx, cy, outerR, innerR, spikes){
+  const step = Math.PI / spikes;
+  ex.beginPath();
+  for(let i=0;i<2*spikes;i++){
+    const r = (i%2 === 0) ? outerR : innerR;
+    const a = i * step - Math.PI/2;
+    const x = cx + Math.cos(a)*r, y = cy + Math.sin(a)*r;
+    if(i===0) ex.moveTo(x,y); else ex.lineTo(x,y);
+  }
+  ex.closePath(); ex.fill();
+}
+function drawPolygon(ex,cx,cy,r,sides){
+  ex.beginPath();
+  for(let i=0;i<sides;i++){
+    const a = (i/sides) * Math.PI*2 - Math.PI/2;
+    const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
+    if(i===0) ex.moveTo(x,y); else ex.lineTo(x,y);
+  }
+  ex.closePath(); ex.fill();
+}
+
+/* text wrap utility */
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  if(!text) return;
+  const words = (text + '').split(' ');
+  let line = '';
+  for(let n=0;n<words.length;n++){
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    const testWidth = metrics.width;
+    if(testWidth > maxWidth && n > 0){
+      ctx.fillText(line, x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, y);
+}
+
+/* ---------- Save/Load JSON (localStorage) ---------- */
+function saveToLocal(){
+  try {
+    const state = { canvas: canvas.toDataURL(), elements: elements };
+    localStorage.setItem('valiant_whiteboard', JSON.stringify(state));
+  } catch(e){ console.warn('Save failed', e); }
+}
+function loadFromLocal(){
+  const raw = localStorage.getItem('valiant_whiteboard');
+  if(!raw) return;
+  try {
+    const state = JSON.parse(raw);
     // restore canvas
     const img = new Image();
-    img.onload = () => {
-      ctx.clearRect(0,0,drawCanvas.width, drawCanvas.height);
-      ctx.drawImage(img, 0, 0, drawCanvas.width, drawCanvas.height);
-    };
-    img.src = snapshot.canvas;
-    // restore elements array and re-render DOM
-    elements = JSON.parse(JSON.stringify(snapshot.elements));
-    rebuildElementsDOM();
-  }
-  function undo(){ if(historyIndex>0){ historyIndex--; restoreFromSnapshot(history[historyIndex]); updateUndoRedoButtons(); } }
-  function redo(){ if(historyIndex < history.length-1){ historyIndex++; restoreFromSnapshot(history[historyIndex]); updateUndoRedoButtons(); } }
-  function updateUndoRedoButtons(){
-    undoBtn.disabled = historyIndex <= 0;
-    redoBtn.disabled = historyIndex >= history.length-1;
-  }
+    img.onload = ()=> { ctx.clearRect(0,0,canvas.width, canvas.height); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); };
+    img.src = state.canvas;
+    elements = state.elements || [];
+    rebuildElementsFromModel();
+    pushHistory('load-local');
+  } catch(e){ console.warn('Load failed', e); }
+}
+saveJsonBtn.addEventListener('click', ()=> {
+  saveToLocal();
+  alert('Saved to localStorage.');
+});
+loadJsonBtn.addEventListener('click', ()=> {
+  loadFromLocal();
+  alert('Loaded from localStorage (if present).');
+});
 
-  // Initial snapshot
-  pushHistory('initial');
-
-  // Tool buttons
-  function setMode(m){
-    mode = m;
-    // toggle active classes
-    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-    if(m === 'pen') penBtn.classList.add('active');
-    if(m === 'eraser') eraserBtn.classList.add('active');
-    if(m === 'text') textBtn.classList.add('active');
-    if(m === 'sticky') stickyBtn.classList.add('active');
-    // shapes dropdown handled separately
-    if(m === 'shape') shapesBtn.classList.add('active');
-  }
-  penBtn.addEventListener('click', ()=> setMode('pen'));
-  eraserBtn.addEventListener('click', ()=> setMode('eraser'));
-  textBtn.addEventListener('click', ()=> setMode('text'));
-  stickyBtn.addEventListener('click', ()=> setMode('sticky'));
-
-  // shape buttons
-  shapeGrid.addEventListener('click', (ev) => {
-    const btn = ev.target.closest('.shape-btn');
-    if(!btn) return;
-    selectedShape = btn.dataset.shape;
-    setMode('shape');
-    // visually indicate chosen shape briefly
-    btn.classList.add('active');
-    setTimeout(()=> btn.classList.remove('active'), 500);
-  });
-
-  // new sticky via button
-  newStickyBtn.addEventListener('click', ()=> {
-    setMode('sticky');
-    createStickyAt(60,60);
-    pushHistory('add-sticky');
-  });
-
-  // drawing handlers (pointer events)
-  function getLocalPos(ev){
-    const rect = drawCanvas.getBoundingClientRect();
-    const clientX = (ev.touches ? ev.touches[0].clientX : ev.clientX);
-    const clientY = (ev.touches ? ev.touches[0].clientY : ev.clientY);
-    return {x: clientX - rect.left, y: clientY - rect.top};
-  }
-
-  drawCanvas.addEventListener('pointerdown', (ev) => {
-    if(mode !== 'pen' && mode !== 'eraser') return;
-    drawing = true;
-    lastPoint = getLocalPos(ev);
-    ctx.beginPath();
-    ctx.moveTo(lastPoint.x, lastPoint.y);
-    ctx.lineWidth = parseInt(sizePicker.value,10) || 4;
-    ctx.strokeStyle = (mode === 'eraser') ? '#ffffff' : colorPicker.value;
-    ctx.globalCompositeOperation = (mode === 'eraser') ? 'destination-out' : 'source-over';
-    drawCanvas.setPointerCapture(ev.pointerId);
-  });
-  drawCanvas.addEventListener('pointermove', (ev) => {
-    if(!drawing) return;
-    const p = getLocalPos(ev);
-    ctx.lineTo(p.x, p.y);
-    ctx.stroke();
-    lastPoint = p;
-  });
-  drawCanvas.addEventListener('pointerup', (ev)=> {
-    if(!drawing) return;
-    drawing = false;
-    ctx.closePath();
-    try{ drawCanvas.releasePointerCapture(ev.pointerId); } catch(e){}
-    pushHistory('draw');
-  });
-
-  // Clicks on surface for adding shapes, text, sticky
-  surface.addEventListener('pointerdown', (ev) => {
-    // ignore if target is an element (we want to interact with existing elements)
-    if(ev.target.closest('.element')) return;
-    const rect = surface.getBoundingClientRect();
-    const x = ev.clientX - rect.left;
-    const y = ev.clientY - rect.top;
-    if(mode === 'shape' && selectedShape){
-      createShapeAt(selectedShape, x, y);
-      pushHistory('add-shape');
-    } else if(mode === 'text'){
-      createTextAt(x,y,"Double-click to edit");
-      pushHistory('add-text');
-    } else if(mode === 'sticky'){
-      createStickyAt(x,y);
-      pushHistory('add-sticky');
-    }
-  });
-
-  /* ---------- ELEMENT CREATION & DOM ---------- */
-
-  function makeId(){ return 'e' + (elementIdCounter++); }
-
-  function createShapeAt(kind, x,y){
-    const id = makeId();
-    const w = (kind === 'circle')? 90 : (kind==='line' || kind==='arrow')? 220 : 220;
-    const h = (kind === 'circle')? 90 : (kind==='line' || kind==='arrow')? 6 : 120;
-    const el = { id, type:'shape', shape:kind, x: x - w/2, y: y - h/2, w, h, style: { fill:'#071016', stroke:'#071016', strokeWidth:2 } };
-    elements.push(el);
-    renderElement(el);
-  }
-
-  function createTextAt(x,y,text){
-    const id = makeId();
-    const el = { id, type:'text', x, y, w:200, h:50, text:text, style:{font:'20px Montserrat', color:'#071016', bold:false, italic:false, underline:false} };
-    elements.push(el);
-    renderElement(el);
-  }
-
-  function createStickyAt(x,y){
-    const id = makeId();
-    const el = { id, type:'sticky', x, y, w:150, h:120, text:'New note', style:{background:'#ffd966', color:'#111'} };
-    elements.push(el);
-    renderElement(el);
-  }
-
-  function renderElement(el){
-    // create DOM node and set props based on type
-    const div = document.createElement('div');
-    div.classList.add('element');
-    div.dataset.id = el.id;
-    div.style.left = el.x + 'px';
-    div.style.top = el.y + 'px';
-    div.style.width = el.w + 'px';
-    div.style.height = el.h + 'px';
-    // content
-    if(el.type === 'shape'){
-      if(['rect','circle'].includes(el.shape)){
-        const inner = document.createElement('div');
-        inner.style.width = '100%';
-        inner.style.height = '100%';
-        inner.style.background = el.style.fill;
-        if(el.shape === 'rect'){ inner.style.borderRadius = '10px'; inner.className = 'rect'; }
-        if(el.shape === 'circle'){ inner.style.borderRadius = '50%'; inner.className = 'circle'; }
-        div.appendChild(inner);
-      } else {
-        // line/arrow/triangle/star rendered via SVG
-        const svgNS = "http://www.w3.org/2000/svg";
-        const svg = document.createElementNS(svgNS,'svg');
-        svg.setAttribute('width','100%');
-        svg.setAttribute('height','100%');
-        svg.classList.add('line-svg');
-        if(el.shape === 'line'){
-          svg.setAttribute('viewBox','0 0 220 6');
-          const ln = document.createElementNS(svgNS,'line');
-          ln.setAttribute('x1','0');ln.setAttribute('y1','3');ln.setAttribute('x2','200');ln.setAttribute('y2','3');
-          ln.setAttribute('stroke', el.style.stroke); ln.setAttribute('stroke-width', el.style.strokeWidth);
-          ln.setAttribute('stroke-linecap','round');
-          svg.appendChild(ln);
-        } else if(el.shape === 'arrow'){
-          svg.setAttribute('viewBox','0 0 220 12');
-          const ln = document.createElementNS(svgNS,'line');
-          ln.setAttribute('x1','0');ln.setAttribute('y1','6');ln.setAttribute('x2','180');ln.setAttribute('y2','6');
-          ln.setAttribute('stroke', el.style.stroke); ln.setAttribute('stroke-width', el.style.strokeWidth);
-          ln.setAttribute('stroke-linecap','round');
-          const poly = document.createElementNS(svgNS,'polygon');
-          poly.setAttribute('points','180,0 200,6 180,12'); poly.setAttribute('fill', el.style.stroke);
-          svg.appendChild(ln); svg.appendChild(poly);
-        } else if(el.shape === 'triangle'){
-          svg.setAttribute('viewBox','0 0 100 100');
-          const poly = document.createElementNS(svgNS,'polygon');
-          poly.setAttribute('points','50,6 94,94 6,94'); poly.setAttribute('fill', el.style.fill);
-          svg.appendChild(poly);
-        } else if(el.shape === 'star'){
-          svg.setAttribute('viewBox','0 0 100 100');
-          const star = document.createElementNS(svgNS,'polygon');
-          star.setAttribute('points','50,6 61,39 98,39 67,59 79,91 50,72 21,91 33,59 2,39 39,39');
-          star.setAttribute('fill', el.style.fill);
-          svg.appendChild(star);
-        }
-        div.appendChild(svg);
-      }
-    } else if(el.type === 'text'){
-      const t = document.createElement('div');
-      t.className = 'text-box';
-      t.contentEditable = true;
-      t.spellcheck = false;
-      t.innerText = el.text || '';
-      t.style.font = el.style.font;
-      t.style.color = el.style.color;
-      if(el.style.bold) t.style.fontWeight = '800';
-      if(el.style.italic) t.style.fontStyle = 'italic';
-      if(el.style.underline) t.style.textDecoration = 'underline';
-      // sync content on blur
-      t.addEventListener('input', ()=> {
-        const snap = elements.find(o=>o.id===el.id); if(snap) snap.text = t.innerText;
-      });
-      t.addEventListener('dblclick', (e)=> { t.focus(); });
-      div.appendChild(t);
-    } else if(el.type === 'sticky'){
-      const t = document.createElement('div');
-      t.className = 'sticky';
-      t.contentEditable = true;
-      t.spellcheck = false;
-      t.innerText = el.text || 'New note';
-      t.style.background = el.style.background;
-      t.style.color = el.style.color;
-      t.addEventListener('input', ()=> {
-        const snap = elements.find(o=>o.id===el.id); if(snap) snap.text = t.innerText;
-      });
-      div.appendChild(t);
-    }
-
-    // append and add drag support
-    surface.appendChild(div);
-    makeDraggable(div, el.id);
-  }
-
-  function rebuildElementsDOM(){
-    // clear surface and recreate
-    surface.innerHTML = '';
-    elements.forEach(e => renderElement(e));
-  }
-
-  /* ---------- Drag & Update ---------- */
-  function makeDraggable(node, id){
-    let dragging=false;
-    let start={x:0,y:0}, origin={x:0,y:0};
-
-    node.addEventListener('pointerdown', (ev) => {
-      ev.stopPropagation();
-      node.setPointerCapture(ev.pointerId);
-      dragging = true;
-      const rect = surface.getBoundingClientRect();
-      start = {x: ev.clientX, y: ev.clientY};
-      origin = { x: parseFloat(node.style.left), y: parseFloat(node.style.top) };
-      node.style.cursor = 'grabbing';
-      node.style.zIndex = 9999;
-    });
-
-    node.addEventListener('pointermove', (ev) => {
-      if(!dragging) return;
-      const dx = ev.clientX - start.x;
-      const dy = ev.clientY - start.y;
-      let nx = origin.x + dx;
-      let ny = origin.y + dy;
-      // clamp
-      nx = Math.max(0, Math.min(nx, surface.clientWidth - node.offsetWidth));
-      ny = Math.max(0, Math.min(ny, surface.clientHeight - node.offsetHeight));
-      node.style.left = nx + 'px';
-      node.style.top = ny + 'px';
-    });
-
-    node.addEventListener('pointerup', (ev) => {
-      if(!dragging) return;
-      dragging = false;
-      node.style.cursor = 'grab';
-      try{ node.releasePointerCapture(ev.pointerId); }catch(e){}
-      node.style.zIndex = '';
-      // update model
-      const idRef = id;
-      const el = elements.find(o=>o.id===idRef);
-      if(el){
-        el.x = parseFloat(node.style.left);
-        el.y = parseFloat(node.style.top);
-        // also update size if changed (not implemented resizing here)
-        pushHistory('move-element');
-      }
-    });
-    node.addEventListener('pointercancel', ()=> { dragging=false; try{ node.releasePointerCapture(); }catch(e){}});
-  }
-
-  /* ---------- Export / Download ---------- */
-  async function exportBoardPNG(){
-    // create an offscreen canvas with board size
-    const exportCanvas = document.createElement('canvas');
-    exportCanvas.width = drawCanvas.width;
-    exportCanvas.height = drawCanvas.height;
-    const ec = exportCanvas.getContext('2d');
-
-    // draw board background (light)
-    ec.fillStyle = '#eef3f5';
-    ec.fillRect(0,0, exportCanvas.width, exportCanvas.height);
-
-    // draw the drawing canvas on it
-    ec.drawImage(drawCanvas, 0, 0);
-
-    // iterate elements and draw them using their data (so the PNG contains shapes and text)
-    elements.forEach(el => {
-      const scaleX = exportCanvas.width / drawCanvas.clientWidth;
-      const scaleY = exportCanvas.height / drawCanvas.clientHeight;
-      const x = el.x * scaleX;
-      const y = el.y * scaleY;
-      const w = el.w * (scaleX || 1);
-      const h = el.h * (scaleY || 1);
-      if(el.type === 'shape'){
-        ec.fillStyle = el.style.fill || '#071016';
-        ec.strokeStyle = el.style.stroke || '#071016';
-        ec.lineWidth = el.style.strokeWidth || 2;
-        if(el.shape === 'rect'){
-          const r = Math.min(14, Math.min(w,h)/8);
-          roundRect(ec, x, y, w, h, r, true, false);
-        } else if(el.shape === 'circle'){
-          ec.beginPath();
-          ec.ellipse(x + w/2, y + h/2, w/2, h/2, 0, 0, Math.PI*2);
-          ec.fill();
-        } else if(el.shape === 'line'){
-          ec.beginPath();
-          ec.moveTo(x+2, y + h/2);
-          ec.lineTo(x + w - 20, y + h/2);
-          ec.stroke();
-        } else if(el.shape === 'arrow'){
-          ec.beginPath();
-          ec.moveTo(x+2, y + h/2);
-          ec.lineTo(x + w - 40, y + h/2);
-          ec.stroke();
-          // arrow head
-          ec.beginPath();
-          ec.moveTo(x + w - 40, y + h/2 - 8);
-          ec.lineTo(x + w - 16, y + h/2);
-          ec.lineTo(x + w - 40, y + h/2 + 8);
-          ec.fill();
-        } else if(el.shape === 'triangle'){
-          ec.beginPath();
-          ec.moveTo(x + w/2, y + 6);
-          ec.lineTo(x + w - 6, y + h - 6);
-          ec.lineTo(x + 6, y + h - 6);
-          ec.closePath();
-          ec.fill();
-        } else if(el.shape === 'star'){
-          // simple 5-point star
-          drawStar(ec, x + w/2, y + h/2, Math.min(w,h)/2 - 6, Math.min(w,h)/4 - 6, 5);
-        }
-      } else if(el.type === 'text'){
-        ec.fillStyle = el.style.color || '#071016';
-        const fontSize = parseInt((el.style.font||'20px').match(/\d+/)) || 20;
-        ec.font = `${el.style.bold? '800' : '600'} ${fontSize}px Montserrat`;
-        wrapText(ec, el.text || '', x+6, y + fontSize + 4, w-12, fontSize + 6);
-      } else if(el.type === 'sticky'){
-        ec.fillStyle = el.style.background || '#ffd966';
-        ec.fillRect(x, y, w, h);
-        ec.fillStyle = el.style.color || '#111';
-        ec.font = '16px Montserrat';
-        wrapText(ec, el.text || '', x+8, y + 22, w - 14, 20);
-      }
-    });
-
-    // download
-    const link = document.createElement('a');
-    link.download = 'valiant-whiteboard.png';
-    link.href = exportCanvas.toDataURL('image/png');
-    link.click();
-  }
-
-  function roundRect(ctx, x, y, w, h, r, fill, stroke) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
-    if(fill) ctx.fill();
-    if(stroke) ctx.stroke();
-  }
-  function drawStar(ctx, cx, cy, outerR, innerR, points){
-    const step = Math.PI / points;
-    ctx.beginPath();
-    for(let i=0;i<2*points;i++){
-      const r = (i % 2 === 0) ? outerR : innerR;
-      const a = i * step - Math.PI/2;
-      const x = cx + Math.cos(a)*r;
-      const y = cy + Math.sin(a)*r;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    }
-    ctx.closePath();
-    ctx.fill();
-  }
-  function wrapText(ctx, text, x, y, maxWidth, lineHeight){
-    const words = text.split(' ');
-    let line = '';
-    for(let n=0;n<words.length;n++){
-      const testLine = line + words[n] + ' ';
-      const metrics = ctx.measureText(testLine);
-      const testWidth = metrics.width;
-      if(testWidth > maxWidth && n>0){
-        ctx.fillText(line, x, y);
-        line = words[n] + ' ';
-        y += lineHeight;
-      } else {
-        line = testLine;
-      }
-    }
-    ctx.fillText(line, x, y);
-  }
-
-  /* ---------- Utilities ---------- */
-  function createInitialSample(){
-    // create a sample title and shapes like the reference
-    createTextAt(30,20,'Interactive Whiteboard');
-    createShapeAt('rect', 60, 140);
-    createShapeAt('circle', 520, 360);
-    createShapeAt('line', 380, 300);
-    pushHistory('sample');
-  }
-  // ensure surface size matches board
-  function syncSurfaceSize(){ surface.style.width = board.clientWidth + 'px'; surface.style.height = board.clientHeight + 'px'; }
-  window.addEventListener('resize', ()=>{ resizeCanvas(); syncSurfaceSize(); });
-  syncSurfaceSize();
-
-  // On first load create some sample elements
-  createInitialSample();
-
-  /* ---------- Buttons: undo/redo/clear/download ---------- */
-  undoBtn.addEventListener('click', undo);
-  redoBtn.addEventListener('click', redo);
-  clearBtn.addEventListener('click', ()=> {
-    // clear canvas and remove elements
-    ctx.clearRect(0,0,drawCanvas.width, drawCanvas.height);
+/* ---------- Clear & Download ---------- */
+clearBtn.addEventListener('click', ()=> {
+  // confirmation modal
+  showModal('Clear all?', 'This will clear the canvas and remove all elements. Proceed?', ()=>{
+    ctx.clearRect(0,0,canvas.width, canvas.height);
     elements = [];
-    rebuildElementsDOM();
+    rebuildElementsFromModel();
     pushHistory('clear');
   });
-  downloadBtn.addEventListener('click', exportBoardPNG);
+});
 
-  /* ---------- Text formatting buttons ---------- */
-  boldBtn.addEventListener('click', ()=> document.execCommand('bold'));
-  italicBtn.addEventListener('click', ()=> document.execCommand('italic'));
-  underlineBtn.addEventListener('click', ()=> document.execCommand('underline'));
+downloadBtn.addEventListener('click', ()=> exportBoardPNG());
 
-  /* ---------- Helper: create element by API positions ---------- */
-  // (Used by toolbar new sticky)
-  // create functions above already available: createShapeAt, createTextAt, createStickyAt
+/* ---------- Undo/Redo ---------- */
+undoBtn.addEventListener('click', undo);
+redoBtn.addEventListener('click', redo);
 
-  /* ---------- Keep elements model & DOM in sync when content changes ---------- */
-  // Save function before pushHistory to ensure we snapshot current DOM text values
-  function syncFromDOM(){
-    // iterate DOM elements and update elements[] entries where content may have changed
-    document.querySelectorAll('.element').forEach(node=>{
-      const id = node.dataset.id;
-      const el = elements.find(o=>o.id===id);
-      if(!el) return;
-      el.x = parseFloat(node.style.left);
-      el.y = parseFloat(node.style.top);
-      el.w = parseFloat(node.style.width);
-      el.h = parseFloat(node.style.height);
-      if(el.type === 'text'){
-        const tb = node.querySelector('.text-box');
-        if(tb) el.text = tb.innerText;
-      }
-      if(el.type === 'sticky'){
-        const tb = node.querySelector('.sticky');
-        if(tb) el.text = tb.innerText;
-      }
-    });
-  }
+/* ---------- initial sample & autosave ---------- */
+function createSample(){
+  // a title text and a rectangle and a sticky
+  const t = createTextElement(36, 24, 'Interactive Whiteboard — Valiant Vision');
+  t.style = t.style || {}; t.style.fontSize = 28;
+  const s = createElementFromShape('rect', 160, 220);
+  s.style.fill = '#ffffff';
+  s.style.stroke = '#d0d8db';
+  const st = createSticky(420, 360);
+  st.text = 'Welcome!\nDouble-click this text to edit.';
+  pushHistory('initial');
+}
+createSample();
 
-  /* ---------- Keep history updated after major actions (debounced where needed) ---------- */
-  // Already pushHistory on draw end, create, move end, clear.
+/* autosave periodically */
+setInterval(()=> saveToLocal(), 15000);
 
-  /* ---------- Keyboard shortcuts ---------- */
-  window.addEventListener('keydown', (e)=>{
-    if(e.ctrlKey || e.metaKey){
-      if(e.key === 'z'){ undo(); e.preventDefault(); }
-      if(e.key === 'y'){ redo(); e.preventDefault(); }
-      if(e.key === 's'){ e.preventDefault(); exportBoardPNG(); }
-    } else {
-      if(e.key === 'e') setMode('eraser');
-      if(e.key === 'p') setMode('pen');
-      if(e.key === 't') setMode('text');
-      if(e.key === 'Delete'){ clearBtn.click(); }
-    }
-  });
+/* on load: load local if present */
+loadFromLocal();
 
-  /* ---------- Make sure to push snapshot when leaving the page or after edits ---------- */
-  // When user edits text or sticky, push a snapshot after a short delay
-  let saveTimer = null;
-  document.addEventListener('input', (ev)=>{
-    if(ev.target.closest('.element')){
-      if(saveTimer) clearTimeout(saveTimer);
-      saveTimer = setTimeout(()=>{
-        syncFromDOM();
-        pushHistory('edit-content');
-      }, 800);
-    }
-  });
+/* ---------- modal utility ---------- */
+function showModal(title, text, onConfirm){
+  const root = $('#modalRoot');
+  root.innerHTML = '';
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  const h = document.createElement('div'); h.style.fontWeight = 800; h.style.marginBottom = '8px'; h.innerText = title;
+  const p = document.createElement('div'); p.innerText = text; p.style.marginBottom = '12px';
+  const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='flex-end'; row.style.gap='8px';
+  const cancel = document.createElement('button'); cancel.className='btn'; cancel.innerText='Cancel';
+  const ok = document.createElement('button'); ok.className='btn'; ok.innerText='Proceed';
+  cancel.addEventListener('click', ()=> { root.style.display='none'; root.innerHTML=''; });
+  ok.addEventListener('click', ()=> { root.style.display='none'; root.innerHTML=''; onConfirm && onConfirm(); });
+  row.appendChild(cancel); row.appendChild(ok);
+  modal.appendChild(h); modal.appendChild(p); modal.appendChild(row);
+  backdrop.appendChild(modal);
+  root.appendChild(backdrop);
+  root.style.display = 'block';
+}
 
-  // Basic touch improvements for mobile: prevent accidental scrolling on surface
-  surface.addEventListener('touchstart', (e)=> e.preventDefault(), {passive:false});
+/* ---------- helpers for rendering initial content after resize ---------- */
+function renderAllOnResize(){
+  // scale canvas image appropriately (maintains drawn image)
+  // handled by history restore if needed; simply ensure DOM overlay size
+  const rect = board.getBoundingClientRect();
+  surface.style.width = rect.width + 'px';
+  surface.style.height = rect.height + 'px';
+}
+window.addEventListener('resize', renderAllOnResize);
 
-  // Update undo/redo UI initially
-  updateUndoRedoButtons();
-})();
+/* ---------- helper to delete element by id (exposed) ---------- */
+window.deleteElementById = deleteElement;
+
+/* ---------- initial history snapshot already created in createSample() ---------- */
+updateHistoryButtons();
+
+/* ---------- small UX: clicking outside deselects ---------- */
+board.addEventListener('pointerdown', (e) => {
+  // clicking clear area deselects element
+  if(!e.target.closest('.element')) deselectCurrent();
+});
+
+/* ---------- export on Ctrl/Cmd+S handled earlier, also prevent default browser save on canvas area ---------- */
+window.addEventListener('keydown', function(e){
+  if((e.ctrlKey || e.metaKey) && e.key === 's'){ e.preventDefault(); exportBoardPNG(); }
+});
+
+/* End of app */
 </script>
+
 </body>
 </html>
